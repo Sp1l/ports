@@ -244,7 +244,6 @@ OVERLAY_ENABLE=		yes
 
 CONFIGURE_ARGS+=	--localstatedir=${LOCALSTATEDIR} \
 			--enable-crypt \
-			--enable-lmpasswd \
 			--enable-ldap=${BACKEND_ENABLE} \
 			--enable-meta=${BACKEND_ENABLE} \
 			--enable-rewrite \
@@ -252,6 +251,10 @@ CONFIGURE_ARGS+=	--localstatedir=${LOCALSTATEDIR} \
 			--enable-monitor=${BACKEND_ENABLE}
 
 PLIST_SUB+=		BACKEND=${BACKEND_PLIST}
+
+.if ${OPENSSL_PORT} != security/libressl
+CONFIGURE_ARGS+=	--enable-lmpasswd
+.endif
 
 .if ${PORT_OPTIONS:MACCESSLOG}
 CONFIGURE_ARGS+=	--enable-accesslog=${OVERLAY_ENABLE}
