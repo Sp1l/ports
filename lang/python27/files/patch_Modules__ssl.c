@@ -1,28 +1,29 @@
---- ./Modules/_ssl.c.orig       2014-06-30 04:05:42.000000000 +0200
-+++ ./Modules/_ssl.c            2014-08-07 11:58:48.000000000 +0200
-@@ -1604,20 +1604,11 @@
+--- Modules/_ssl.c.orig	2014-06-30 04:05:42.000000000 +0200
++++ Modules/_ssl.c	2014-11-21 11:36:17.902267822 +0100
+@@ -1601,6 +1601,7 @@
+ It is necessary to seed the PRNG with RAND_add() on some platforms before\n\
+ using the ssl() function.");
+ 
++#ifndef LIBRESSL_VERSION_NUMBER
  static PyObject *
  PySSL_RAND_egd(PyObject *self, PyObject *arg)
  {
--    int bytes;
--
--    if (!PyString_Check(arg))
--        return PyErr_Format(PyExc_TypeError,
--                            "RAND_egd() expected string, found %s",
--                            Py_TYPE(arg)->tp_name);
--    bytes = RAND_egd(PyString_AS_STRING(arg));
--    if (bytes == -1) {
--        PyErr_SetString(PySSLErrorObject,
--                        "EGD connection failed or EGD did not return "
--                        "enough data to seed the PRNG");
--        return NULL;
--    }
--    return PyInt_FromLong(bytes);
-+
-+  PyErr_SetString(PySSLErrorObject,
-+                 "EGD connection failed or EGD did not return "
-+                 "enough data to seed the PRNG");
-+  return NULL;
- }
-
- PyDoc_STRVAR(PySSL_RAND_egd_doc,
+@@ -1626,6 +1627,7 @@
+ Queries the entropy gather daemon (EGD) on the socket named by 'path'.\n\
+ Returns number of bytes read.  Raises SSLError if connection to EGD\n\
+ fails or if it does not provide enough data to seed PRNG.");
++#endif /* LIBRESSL_VERSION_NUMBER */
+ 
+ #endif /* HAVE_OPENSSL_RAND */
+ 
+@@ -1640,8 +1642,10 @@
+ #ifdef HAVE_OPENSSL_RAND
+     {"RAND_add",            PySSL_RAND_add, METH_VARARGS,
+      PySSL_RAND_add_doc},
++#ifndef LIBRESSL_VERSION_NUMBER
+     {"RAND_egd",            PySSL_RAND_egd, METH_O,
+      PySSL_RAND_egd_doc},
++#endif /* LIBRESSL_VERSION_NUMBER */
+     {"RAND_status",         (PyCFunction)PySSL_RAND_status, METH_NOARGS,
+      PySSL_RAND_status_doc},
+ #endif
