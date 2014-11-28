@@ -4,7 +4,7 @@
  It is necessary to seed the PRNG with RAND_add() on some platforms before\n\
  using the ssl() function.");
  
-+#ifndef LIBRESSL_VERSION_NUMBER
++#ifdef HAVE_RAND_EGD
  static PyObject *
  PySSL_RAND_egd(PyObject *self, PyObject *arg)
  {
@@ -12,7 +12,7 @@
  Queries the entropy gather daemon (EGD) on the socket named by 'path'.\n\
  Returns number of bytes read.  Raises SSLError if connection to EGD\n\
  fails or if it does not provide enough data to seed PRNG.");
-+#endif /* LIBRESSL_VERSION_NUMBER */
++#endif /* HAVE_RAND_EGD */
  
  #endif /* HAVE_OPENSSL_RAND */
  
@@ -20,10 +20,10 @@
  #ifdef HAVE_OPENSSL_RAND
      {"RAND_add",            PySSL_RAND_add, METH_VARARGS,
       PySSL_RAND_add_doc},
-+#ifndef LIBRESSL_VERSION_NUMBER
++#ifdef HAVE_RAND_EGD 
      {"RAND_egd",            PySSL_RAND_egd, METH_O,
       PySSL_RAND_egd_doc},
-+#endif /* LIBRESSL_VERSION_NUMBER */
++#endif /* HAVE_RAND_EGD */
      {"RAND_status",         (PyCFunction)PySSL_RAND_status, METH_NOARGS,
       PySSL_RAND_status_doc},
  #endif
