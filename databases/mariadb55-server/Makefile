@@ -29,6 +29,7 @@ OPTIONS_DEFINE+=	FASTMTX
 OPTIONS_RADIO=		SSL
 OPTIONS_RADIO_SSL=	BUNDLED_SSL OPENSSL WITHOUT_SSL
 OPTIONS_DEFAULT+=	OPENSSL
+OPTIONS_SUB=		yes
 
 BUNDLED_SSL_DESC=	SSL/TLS support via (bundled) CyaSSL
 FASTMTX_DESC=	Replace mutexes with spinlocks
@@ -55,8 +56,8 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 		-DEXECINFO_ROOT=${LOCALBASE} \
 		-DCOMPILATION_COMMENT="FreeBSD Ports"
 
-.ifdef USE_MYSQL
-.error You have `USE_MYSQL' variable defined either in environment or in make(1) arguments. Please undefine and try again.
+.if defined(USE_MYSQL)
+.error You have 'USE_MYSQL' variable defined either in environment or in make(1) arguments. Please undefine and try again.
 .endif
 
 DATADIR=	${PREFIX}/share/mysql
@@ -84,9 +85,7 @@ OPENSSL_USE=		USE_OPENSSL=yes
 BUNDLED_SSL_CMAKE_ON=	-DWITH_SSL=bundled
 WITHOUT_SSL_CMAKE=	-DWITH_SSL=no
 
-.if ${PORT_OPTIONS:MFASTMTX}
-CMAKE_ARGS+=	-DWITH_FAST_MUTEXES=1
-.endif
+FASTMTX_CMAKE_ON=	-DWITH_FAST_MUTEXES=1
 
 # MySQL-Server part
 .if !defined(CLIENT_ONLY)
@@ -106,12 +105,6 @@ GROUPS=		mysql
 CMAKE_ARGS+=	-DWITH_EMBEDDED_SERVER="ON" \
 		-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1
 
-post-install:
-.if !defined(PACKAGE_BUILDING)
-	@${CAT} ${PKGMESSAGE}
-.endif
-
-OPTIONS_SUB=yes
 OQGRAPH_CMAKE_OFF=	-DWITHOUT_OQGRAPH_STORAGE_ENGINE=1
 OQGRAPH_USE=	GCC=yes
 OQGRAPH_CMAKE_ON=	-DWITH_OQGRAPH_STORAGE_ENGINE=1
@@ -119,10 +112,10 @@ OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs
 
 MAXKEY_EXTRA_PATCHES=	${FILESDIR}/extra-patch-include_my_compare.h
 
+# Server segfaults when built with clang >= 3.4
 .if ${ARCH} == 'i386' && ${OSVERSION} >= 1001000
 USE_GCC=	yes
 .endif
-
 
 .else
 # MySQL-Client part
@@ -136,8 +129,6 @@ post-patch:
 
 .include <bsd.port.pre.mk>
 
-.if ${ARCH} == "arm"
-BROKEN=		Does not compile on arm
-.endif
+BROKEN_armv6=		Does not compile on arm
 
 .include <bsd.port.post.mk>
