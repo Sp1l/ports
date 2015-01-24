@@ -4,7 +4,7 @@ ports
 FreeBSD ports
 
 LibreSSL fixes for FreeBSD ports usually committed as PR and upstream where possible
-* lang/python: all versions in ports
+* lang/python: all versions in ports. These patches will appear in the coming fix versions of upstream
 * www/apache24
 * ftp/wget
 * security/tor
