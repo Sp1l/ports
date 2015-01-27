@@ -1,5 +1,5 @@
 # Created by: Kubilay Kocak <koobs@FreeBSD.org>
-# $FreeBSD: head/security/py-cryptography/Makefile 366044 2014-08-25 08:40:33Z koobs $
+# $FreeBSD: head/security/py-cryptography/Makefile 377287 2015-01-18 09:38:15Z koobs $
 
 PORTNAME=	cryptography
 PORTVERSION=	0.7.2
@@ -31,10 +31,10 @@ LDFLAGS+=	-L${OPENSSLLIB}
 .include <bsd.port.pre.mk>
 
 .if ${PYTHON_REL} < 340
-RUN_DEPENDS+=	${PYTHON_PKGNAMEPREFIX}enum34>0:${PORTSDIR}/devel/py-enum34
+BUILD_DEPENDS+=	${PYTHON_PKGNAMEPREFIX}enum34>0:${PORTSDIR}/devel/py-enum34
 .endif
 
 regression-test: build
-	@cd ${WRKSRC} && ${PYTHON_CMD} ${PYSETUP} test
+	@cd ${WRKSRC} && ${PYTHON_CMD} ${PYDISTUTILS_SETUP} test
 
 .include <bsd.port.post.mk>
