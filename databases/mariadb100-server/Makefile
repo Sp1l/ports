@@ -1,4 +1,4 @@
-# $FreeBSD: head/databases/mariadb100-server/Makefile 374835 2014-12-17 07:10:58Z delphij $
+# $FreeBSD: head/databases/mariadb100-server/Makefile 377185 2015-01-16 15:55:34Z xmj $
 
 PORTNAME?=	mariadb
 PORTVERSION=	10.0.15
