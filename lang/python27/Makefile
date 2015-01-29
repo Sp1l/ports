@@ -1,8 +1,7 @@
-# $FreeBSD: head/lang/python27/Makefile 372138 2014-11-04 09:14:21Z demon $
+# $FreeBSD: head/lang/python27/Makefile 377581 2015-01-21 09:40:18Z koobs $
 
 PORTNAME=	python27
-PORTVERSION=	2.7.8
-PORTREVISION=	6
+PORTVERSION=	2.7.9
 CATEGORIES=	lang python ipv6
 MASTER_SITES=	PYTHON
 MASTER_SITE_SUBDIR=	ftp/python/${PORTVERSION}
@@ -34,21 +33,22 @@ PLIST_SUB=		ABI=${ABIFLAGS} \
 			PORTVERSION=${PORTVERSION} \
 			OSMAJOR=${OSVERSION:C/([0-9]*)[0-9]{5}/\1/}		# For plat-freebsd* in pkg-plist. http://bugs.python.org/issue19554
 
-OPTIONS_DEFINE=		DEBUG IPV6 NLS PYMALLOC SEM THREADS LIBFFI
-OPTIONS_DEFAULT=	IPV6 NLS PYMALLOC SEM THREADS UCS4 LIBFFI
+OPTIONS_DEFINE=		DEBUG IPV6 LIBFFI NLS PYMALLOC SEM THREADS
+OPTIONS_DEFAULT=	IPV6 LIBFFI NLS PYMALLOC SEM THREADS UCS4
 OPTIONS_SINGLE=		UNICODE
 OPTIONS_SINGLE_UNICODE=	UCS2 UCS4
-
 OPTIONS_SUB=		yes
 
+LIBFFI_DESC=	Use libffi from ports instead of bundled version
 NLS_DESC=	Enable gettext support for the locale module
 UCS2_DESC=	Enable UCS2 Unicode Strings
 UCS4_DESC=	Enable UCS4 Unicode Strings
 PYMALLOC_DESC=	Enable specialized mallocs
-LIBFFI_DESC=	Use libffi from ports instead of bundled version
 
 DEBUG_CONFIGURE_WITH=	pydebug
 IPV6_CONFIGURE_ENABLE=	ipv6
+LIBFFI_CONFIGURE_ON=	--with-system-ffi
+LIBFFI_LIB_DEPENDS=	libffi.so:${PORTSDIR}/devel/libffi
 
 # Use CPPFLAGS over CFLAGS due to -I ordering, causing elementtree and pyexpat
 # to break in Python 2.7, or preprocessor complaints in Python >= 3.3
@@ -72,37 +72,37 @@ UCS4_CONFIGURE_ON=	--enable-unicode=ucs4
 
 .include <bsd.port.options.mk>
 
+# http://bugs.python.org/issue22521
+# http://bugs.python.org/issue23042
+.if !${PORT_OPTIONS:MLIBFFI} && ${ARCH} == i386
+BROKEN=	You must use libffi from ports on i386. Enable the LIBFFI option
+.endif
+
 .if ${ARCH} == i386
 PLIST_SUB+=	X86_ONLY=""
 .else
 PLIST_SUB+=	X86_ONLY="@comment "
 .endif
-.if ${ARCH} == amd64 || ${ARCH} == ia64 || ${ARCH} == sparc64 || ${ARCH} == powerpc64
+
+.if ${ARCH} == amd64 || ${ARCH} == ia64 || ${ARCH} == sparc64 || ${ARCH} == powerpc64 || ${ARCH} == mips64
 PLIST_SUB+=	32BIT_ONLY="@comment "
 .else
 PLIST_SUB+=	32BIT_ONLY=""
 .endif
+
 .if ${ARCH} == powerpc64
 MAKE_ENV+=	UNAME_m="powerpc64"
 .endif
+
 .if ${ARCH} == sparc64
 CFLAGS+=	-DPYTHON_DEFAULT_RECURSION_LIMIT=900
 .endif
 
-.if ${PORT_OPTIONS:MLIBFFI}
-CONFIGURE_ARGS+=	--with-system-ffi
-LIB_DEPENDS+=		libffi.so:${PORTSDIR}/devel/libffi
-.endif
-
-# See http://bugs.freebsd.org/115940
-.if !exists(/usr/bin/ypcat) || defined(WITHOUT_NIS) # the world with NO_NIS
+# See http://bugs.freebsd.org/115940 and http://bugs.freebsd.org/193650
+.if !exists(/usr/bin/ypcat) || defined(WITHOUT_NIS)
 PLIST_SUB+=	NO_NIS="@comment "
 .else
 PLIST_SUB+=	NO_NIS=""
-.endif
-
-.if ${WITH_OPENSSL_PORT}
-CONFIGURE_ARGS+=	CPPFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib
 .endif
 
 post-patch:
