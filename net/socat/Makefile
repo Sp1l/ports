@@ -12,7 +12,7 @@ COMMENT=	Multipurpose relay and more
 
 LICENSE=	GPLv2
 
-USES=		compiler tar:bzip2
+USES=		compiler tar:bzip2 cpe
 GNU_CONFIGURE=	yes
 USE_RC_SUBR=	socat
 USE_OPENSSL=	yes
