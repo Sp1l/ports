@@ -123,14 +123,24 @@ _MARIADB!=	${LOCALBASE}/bin/mysql --version | ${GREP} MariaDB | wc -l
 
 .if ${_PERCONA} == 1
 _MYSQL_VER=	${_MYSQL}p
+_MYSQL_DIST=	percona
 .elif ${_MARIADB} == 1
 _MYSQL_VER=	${_MYSQL}m
+_MYSQL_DIST=	mariadb
 .else
 _MYSQL_VER=	${_MYSQL}
+_MYSQL_DIST=	mysql
 .endif
 .endif
 
 .if defined(WANT_MYSQL_VER)
+.if   (${WANT_MYSQL_VER:C/[0-9]//g} == "m")
+MYSQL_DIST=	mariadb
+.elif (${WANT_MYSQL_VER:C/[0-9]//g} == "p")
+MYSQL_DIST=	percona
+.else
+MYSQL_DIST=	mysql
+.endif
 .if defined(WITH_MYSQL_VER) && ${WITH_MYSQL_VER} != ${WANT_MYSQL_VER}
 IGNORE=		cannot install: the port wants mysql${WANT_MYSQL_VER}-client and you try to install mysql${WITH_MYSQL_VER}-client
 .endif
@@ -147,7 +157,7 @@ MYSQL_VER=	${DEFAULT_MYSQL_VER}
 
 .if defined(_MYSQL_VER)
 .if ${_MYSQL_VER} != ${MYSQL_VER}
-IGNORE=		cannot install: MySQL versions mismatch: mysql${_MYSQL_VER}-client is installed and wanted version is mysql${MYSQL_VER}-client
+IGNORE=		cannot install: MySQL versions mismatch: ${_MYSQL_DIST}${_MYSQL_VER:C/[a-z]//}-client is installed and wanted version is ${MYSQL_DIST}${MYSQL_VER:C/[a-z]//}-client
 .endif
 .endif
 
