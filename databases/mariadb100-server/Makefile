@@ -16,6 +16,8 @@ PKGNAMESUFFIX?=	100-server
 MAINTAINER=	spil.oss@gmail.com
 COMMENT?=	Multithreaded SQL database (server)
 
+LICENSE=	GPLv2
+
 SUB_FILES=	pkg-message
 PKGMESSAGE=	${WRKDIR}/pkg-message
 
@@ -77,7 +79,7 @@ OQGRAPH_DESC=		Open Query Graph Computation engine (gcc)
 .endif
 
 BUNDLED_SSL_CMAKE_ON=   -DWITH_SSL=bundled
-FASTMX_CMAKE_ON=	-DWITH_FAST_MUTEXES=1
+FASTMTX_CMAKE_ON=	-DWITH_FAST_MUTEXES=1
 OPENSSL_CMAKE_ON=	-DWITH_SSL=yes
 OPENSSL_USE=	OPENSSL=yes
 WITHOUT_SSL_CMAKE_ON=	-DWITH_SSL=no
