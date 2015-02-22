@@ -54,6 +54,10 @@ CONFIGURE_ARGS+=	--enable-gcc-hardening
 CONFIGURE_ARGS+=	--disable-gcc-hardening
 .endif
 
+.if ( "${OPENSSL_PORT:tl}" == "security/libressl" )
+CONFIGURE_ENV+=	ac_cv_member_struct_ssl_method_st_get_cipher_by_char=no
+.endif
+
 .if ${PORT_OPTIONS:MBUFFEREVENTS}
 CONFIGURE_ARGS+=	--enable-bufferevents
 .else
