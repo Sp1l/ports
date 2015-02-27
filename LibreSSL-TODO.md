@@ -28,11 +28,11 @@ If the port has configure you can add a check
 
 `AC_LIBRARY_CHECK libcrypto RAND_egd HAVE_RAND_EGD`
 
-{{{
+```
 #ifdef HAVE_RAND_EGD
    RAND_egd("/some/file");
 #endif
-}}}
+```
 
 ## Deprecated des_ methods
 OpenSSL has deprecated a large number of des_ methods and types in (find reference)
