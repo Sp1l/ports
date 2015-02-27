@@ -1,37 +1,25 @@
 ## Types of failures
 
-EGD -> uses RAND_egd methods that no longer exist in LibreSSL 
-
-SSLv2 -> Uses SSLv2 methods that no longer exist in LibreSSL 
-
-PSK -> Uses PSK methods
-
-DES -> Uses deprecated des_ methods (replaced by DES_ methods)
-
-CMS -> S/MIME?
-
-COMP -> Wants SSL compression
-
-arc4random -> conflict in FreeBSD/LibreSSL libs
+* EGD -> uses RAND_egd methods that no longer exist in LibreSSL 
+* SSLv2 -> Uses SSLv2 methods that no longer exist in LibreSSL 
+* PSK -> Uses PSK methods
+* DES -> Uses deprecated des_ methods (replaced by DES_ methods)
+* CMS -> S/MIME?
+* COMP -> Wants SSL compression
+* arc4random -> conflict in FreeBSD/LibreSSL libs
 
 Most have been discovered  by the EDGE build of PC-BSD
 
 ## TODO
 
 ### Uses remopved SSLv2 methods
-mail/courier (SSLv2)
-
-security/nessus-libnasl (SSLv2)
-
-sslscan/work
+1. mail/courier
+2. security/nessus-libnasl
+3. security/sslscan
 
 ### Uses removed EGD methods
 
-lang/pypy-devel
-
-devel/ace
-
-net-mgmt/xymon-server
+WIP net-mgmt/xymon-server
 
 ? net-p2p/twister (RAND_add...?)
 
@@ -40,7 +28,7 @@ net-mgmt/xymon-server
 comms/kermit? error: no member named 'expand' in 'struct ssl_st'
 
 ### Uses deprecated des_ methods
-security/chntpw (DES_)
+security/chntpw
 
 net-mgmt/ettercap 
 
@@ -97,4 +85,9 @@ irc/znc
 
 www/links
 
+lang/pypy-devel (patch test only, no build-test!)
+
+devel/ace
+
+net-mgmt/xymon-server
 
