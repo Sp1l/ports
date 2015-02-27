@@ -1,0 +1,17 @@
+# $FreeBSD: head/security/heimdal/files/kpasswdd-Makefile 373047 2014-11-22 10:51:58Z hrs $
+
+all: kpasswdd-cracklib.so
+
+kpasswdd-cracklib.so: kpasswdd-cracklib.c
+	${CC} ${CFLAGS} -fPIC -shared \
+	    -DLOCALBASE=\"${LOCALBASE}\" \
+	    -I${LOCALBASE}/include -I./include \
+	    -o ${.TARGET} ${.ALLSRC} \
+	    -lcrack -L${LOCALBASE}/lib
+
+install-strip: install
+
+install: ${DESTDIR}${PREFIX}/lib/heimdal/kpasswdd-cracklib.so
+
+${DESTDIR}${PREFIX}/lib/heimdal/kpasswdd-cracklib.so: kpasswdd-cracklib.so
+	${BSD_INSTALL_LIB} ${.ALLSRC} ${.TARGET}
