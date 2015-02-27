@@ -26,7 +26,6 @@ security/nessus-libnasl (SSLv2)
 sslscan/work
 
 ### Uses removed EGD methods
-irc/ircd-ratbox (EGD)
 
 www/links
 
@@ -35,8 +34,6 @@ lang/pypy-devel
 devel/ace
 
 net-mgmt/xymon-server
-
-irc/ircd-ratbox-devel
 
 ? net-p2p/twister (RAND_add...?)
 
@@ -95,4 +92,8 @@ devel/dcmtk (EGD)
 security/opencryptoki (deprecated des_* methods to DES_)
 
 databases/virtuoso (deprecated des_ methods to DES_*) NOT BUILD-TESTED!!!
+
+irc/ircd-ratbox (EGD)
+
+irc/ircd-ratbox-devel (EGD)
 
