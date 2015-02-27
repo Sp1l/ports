@@ -1,3 +1,7 @@
+Moved to https://wiki.freebsd.org/LibreSSL
+You can fork this and change, your help is appreciated! 
+Do let me know of any ports you've patched.
+
 ## Types of failures
 
 * EGD -> uses RAND_egd methods that no longer exist in LibreSSL 
