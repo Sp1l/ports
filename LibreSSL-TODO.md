@@ -2,6 +2,62 @@ Moved to https://wiki.freebsd.org/LibreSSL
 You can fork this and change, your help is appreciated! 
 Do let me know of any ports you've patched.
 
+# Types of failures 
+
+ * EGD -> uses RAND_egd methods that no longer exist in LibreSSL 
+ * SSLv2 -> Uses SSLv2 methods that no longer exist in LibreSSL 
+ * PSK -> Uses PSK methods
+ * DES -> Uses deprecated des_ methods (replaced by DES_ methods)
+ * CMS -> S/MIME?
+ * COMP -> Wants SSL compression
+ * arc4random -> conflict in FreeBSD/LibreSSL libs
+
+## EGD
+FreeBSD has not needed the Perl Entropy Gathering Daemon since FreeBSD 4.2 and no still supported Operating System needs it any longer.
+
+### Observed as
+Usually noticed as 
+
+`undefined reference to 'RAND_egd'`
+
+in the compile output
+
+### Resolution
+Remove the offending part
+If the port has configure you can add a check 
+
+`AC_LIBRARY_CHECK libcrypto RAND_egd HAVE_RAND_EGD`
+
+{{{
+#ifdef HAVE_RAND_EGD
+   RAND_egd("/some/file");
+#endif
+}}}
+
+## Deprecated des_ methods
+OpenSSL has deprecated a large number of des_ methods and types in (find reference)
+
+### Observed as
+
+`use of undeclared identifier 'des_cblock'; did you mean 'DES_cblock'?`
+
+### Resolution ###
+
+1. Rename the des_ method or type to DES_
+2. Adapt the variables passed to the method (DES_ structs need to be passed as pointers, prefix the variable with `&`)
+
+## Uses removed Compression
+LibreSSL removed compression completely because of the number of attacks that use compression (BEAST, POODLE)
+
+### Observed as
+
+`COMP_METHOD` or `SSL_get_current_compression`
+
+### Resolution
+
+Remove offending code
+
+
 ## Types of failures
 
 * EGD -> uses RAND_egd methods that no longer exist in LibreSSL 
@@ -16,7 +72,7 @@ Most have been discovered  by the EDGE build of PC-BSD
 
 ## TODO
 
-### Uses remopved SSLv2 methods
+### Uses removed SSLv2 methods
 1. mail/courier
 2. security/nessus-libnasl
 3. security/sslscan
