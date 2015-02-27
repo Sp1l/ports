@@ -28,66 +28,40 @@ WIP net-mgmt/xymon-server
 comms/kermit? error: no member named 'expand' in 'struct ssl_st'
 
 ### Uses deprecated des_ methods
-security/chntpw
-
-net-mgmt/ettercap 
-
-ftp/pavuk
-
-security/hydra
-
-security/sectok
+1. security/chntpw
+1. net-mgmt/ettercap 
+1. ftp/pavuk
+1. security/hydra
+1. security/sectok
 
 ### Conflicts with FreeBSD arc4random function
-sysutils/bacula5-client-static (arc4)
-
-sysutils/bacula-client-static
-
-devel/subversion-static (arc4)
-
-sysutils/webjob
+1. sysutils/bacula5-client-static
+1. sysutils/bacula-client-static
+1. devel/subversion-static
+1. sysutils/webjob
 
 ### Other
-net/mosquitto (PSK)
+1. net/mosquitto (PSK)
+1. security/krb5-111 (CMS)
+1. security/krb5-112 (CMS)
+1. security/p5-Business-PayPal-EWP (Checks agains OpenSSL version STRING!)
+1. security/pond (curve25519, poly1305)
+1. dns/knot (GOST overlap)
+1. www/mod_spdy (SSL_CTX_use_certificate_chain overlap -> apache22)
+1. security/tor-devel
 
-security/krb5-111 (CMS)
-
-security/krb5-112 (CMS)
-
-security/p5-Business-PayPal-EWP (Checks agains OpenSSL version STRING!)
-
-security/pond (curve25519, poly1305)
-
-dns/knot (GOST overlap)
-
-www/mod_spdy (SSL_CTX_use_certificate_chain overlap -> apache22)
-
-security/tor-devel
-
-## Fixed
-irc/unreal (EGD)
-
-devel/ice (EGD)
-
-devel/dcmtk (EGD)
-
-security/opencryptoki (deprecated des_* methods to DES_)
-
-databases/virtuoso (deprecated des_ methods to DES_*) NOT BUILD-TESTED!!!
-
-irc/ircd-ratbox (EGD)
-
-irc/ircd-ratbox-devel (EGD)
-
-irc/ircd-hybrid (COMP+EGD)
-
-irc/znc
-
-www/links
-
-lang/pypy-devel (patch test only, no build-test!)
-
-devel/ace
-
-net-mgmt/xymon-server
+## Fixed, needs cleanup for PR and/or upstreaming
+1. devel/ice (EGD)
+1. devel/dcmtk (EGD)
+1. security/opencryptoki (DES)
+1. databases/virtuoso (*) NOT BUILD-TESTED!!!
+1. irc/unreal (EGD)
+1. irc/ircd-ratbox (EGD)
+1. irc/ircd-ratbox-devel (EGD)
+1. irc/ircd-hybrid (COMP+EGD)
+1. irc/znc
+1. www/links
+1. lang/pypy-devel (patch test only, no build-test!)
+1. devel/ace
+1. net-mgmt/xymon-server (patched, NOT BUILD-TESTED!!!)
 
