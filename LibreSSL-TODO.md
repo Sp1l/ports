@@ -26,8 +26,6 @@ security/nessus-libnasl (SSLv2)
 sslscan/work
 
 ### Uses removed EGD methods
-devel/dcmtk (EGD)
-
 irc/ircd-ratbox (EGD)
 
 www/links
@@ -92,6 +90,9 @@ irc/unreal (EGD)
 
 devel/ice (EGD)
 
+devel/dcmtk (EGD)
+
 security/opencryptoki (deprecated des_* methods to DES_)
 
 databases/virtuoso (deprecated des_ methods to DES_*) NOT BUILD-TESTED!!!
+
