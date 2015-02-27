@@ -27,8 +27,6 @@ sslscan/work
 
 ### Uses removed EGD methods
 
-www/links
-
 lang/pypy-devel
 
 devel/ace
@@ -39,11 +37,7 @@ net-mgmt/xymon-server
 
 ### Uses removed SSL compression
 
-irc/ircd-hybrid (COMP)
-
 comms/kermit? error: no member named 'expand' in 'struct ssl_st'
-
-irc/znc
 
 ### Uses deprecated des_ methods
 security/chntpw (DES_)
@@ -96,4 +90,11 @@ databases/virtuoso (deprecated des_ methods to DES_*) NOT BUILD-TESTED!!!
 irc/ircd-ratbox (EGD)
 
 irc/ircd-ratbox-devel (EGD)
+
+irc/ircd-hybrid (COMP+EGD)
+
+irc/znc
+
+www/links
+
 
