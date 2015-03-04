@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/bsd.sanity.mk 376473 2015-01-07 17:22:07Z mva $
+# $FreeBSD: head/Mk/bsd.sanity.mk 379358 2015-02-19 18:19:28Z makc $
 #
 # MAINTAINER: portmgr@FreeBSD.org
 #
@@ -70,10 +70,6 @@ DEV_WARNING+=	"USE_GNOME=gnomehack is deprecated, please use USES=pathfix"
 
 .if defined(USE_GNOME) && ${USE_GNOME:Mdesktopfileutils}
 DEV_WARNING+=	"USE_GNOME=desktopfileutils is deprecated, please use USES=desktop-file-utils"
-.endif
-
-.if defined(USE_KDE4) && ${USE_KDE4:Mkdehier}
-DEV_WARNING+=	"USE_KDE4=kdehier is deprecated, please use USE_KDE4=kdeprefix"
 .endif
 
 .if defined(LIB_DEPENDS) && ${LIB_DEPENDS:Nlib*}

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/iconv.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/iconv.mk 378858 2015-02-11 22:02:16Z antoine $
 #
 # handle dependency on the iconv port
 #
@@ -26,7 +26,7 @@ BUILD_DEPENDS+=	${ICONV_CMD}:${PORTSDIR}/converters/libiconv
 .elif ${iconv_ARGS:Mpatch}
 PATCH_DEPENDS+=	${ICONV_CMD}:${PORTSDIR}/converters/libiconv
 .else
-LIB_DEPENDS+=	libiconv.so.3:${PORTSDIR}/converters/libiconv
+LIB_DEPENDS+=	libiconv.so:${PORTSDIR}/converters/libiconv
 .endif
 
 .else

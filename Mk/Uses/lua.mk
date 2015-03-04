@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/lua.mk 377213 2015-01-17 02:19:59Z bapt $
+# $FreeBSD: head/Mk/Uses/lua.mk 378872 2015-02-12 12:55:24Z koobs $
 #
 # Provide support for lua
 # 
@@ -98,7 +98,7 @@ MAKE_ENV+=	LUA_MODLIBDIR=${LUA_MODLIBDIR} \
 
 .if ${lua_ARGS:Mbuild}
 BUILD_DEPENDS+=	${LUA_CMD}:${PORTSDIR}/lang/lua${LUA_VER_STR}
-.elfif ${lua_ARGS:Mrun}
+.elif ${lua_ARGS:Mrun}
 RUN_DEPENDS+=	${LUA_CMD}:${PORTSDIR}/lang/lua${LUA_VER_STR}
 .else
 LIB_DEPENDS+=	liblua-${LUA_VER}.so:${PORTSDIR}/lang/lua${LUA_VER_STR}

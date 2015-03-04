@@ -3,7 +3,7 @@
 #
 # Created by: Akinori MUSHA <knu@FreeBSD.org>
 #
-# $FreeBSD: head/Mk/bsd.ruby.mk 378283 2015-02-01 23:19:51Z bapt $
+# $FreeBSD: head/Mk/bsd.ruby.mk 379837 2015-02-24 20:10:42Z rene $
 #
 
 .if !defined(Ruby_Include)
@@ -15,7 +15,7 @@ Ruby_Include_MAINTAINER=	ruby@FreeBSD.org
 # [variables that a user may define]
 #
 # RUBY_VER		- (See below)
-# RUBY_DEFAULT_VER	- Set to (e.g.) "1.9" if you want to refer to "ruby19"
+# RUBY_DEFAULT_VER	- Set to (e.g.) "2.0" if you want to refer to "ruby20"
 #			  just as "ruby".
 # RUBY_ARCH		- (See below)
 # RUBY_RD_HTML		- Define if you want HTML files generated from RD files.
@@ -172,23 +172,7 @@ _RUBY_VENDORDIR!=	${_RUBY_CONFIG} 'puts C["vendordir"]'
 RUBY?=			${LOCALBASE}/bin/${RUBY_NAME}
 
 .if defined(RUBY_VER)
-. if ${RUBY_VER} == 1.9
-#
-# Ruby 1.9
-#
-RUBY_RELVERSION=	1.9.3
-RUBY_PORTREVISION=	2
-RUBY_PORTEPOCH=		1
-RUBY_PATCHLEVEL=	551
-
-#
-# PLIST_SUB helpers
-#
-RUBY19=			""
-RUBY20=			"@comment "
-RUBY21=			"@comment "
-
-. elif ${RUBY_VER} == 2.0
+. if ${RUBY_VER} == 2.0
 #
 # Ruby 2.0
 #
@@ -196,13 +180,7 @@ RUBY_RELVERSION=	2.0.0
 RUBY_PORTREVISION=	2
 RUBY_PORTEPOCH=		1
 RUBY_PATCHLEVEL=	598
-
-#
-# PLIST_SUB helpers
-#
-RUBY19=			"@comment "
-RUBY20=			""
-RUBY21=			"@comment "
+RUBY20=			""	# PLIST_SUB helpers
 
 . elif ${RUBY_VER} == 2.1
 #
@@ -212,21 +190,29 @@ RUBY_RELVERSION=	2.1.5
 RUBY_PORTREVISION=	2
 RUBY_PORTEPOCH=		1
 RUBY_PATCHLEVEL=	0
+RUBY21=			""	# PLIST_SUB helpers
 
+. elif ${RUBY_VER} == 2.2
 #
-# PLIST_SUB helpers
+# Ruby 2.2
 #
-RUBY19=			"@comment "
-RUBY20=			"@comment "
-RUBY21=			""
+RUBY_RELVERSION=	2.2.0
+RUBY_PORTREVISION=	0
+RUBY_PORTEPOCH=		1
+RUBY_PATCHLEVEL=	0
+RUBY22=			""	# PLIST_SUB helpers
 
 . else
 #
 # Other versions
 #
-IGNORE=	Only ruby 1.9, 2.0 and 2.1 are supported
+IGNORE=	Only ruby 2.0, 2.1 and 2.2 are supported
 . endif
 .endif # defined(RUBY_VER)
+
+RUBY20?=		"@comment "
+RUBY21?=		"@comment "
+RUBY22?=		"@comment "
 
 .if ${RUBY_PATCHLEVEL} == 0
 RUBY_VERSION?=		${RUBY_RELVERSION}
@@ -355,9 +341,9 @@ PLIST_SUB+=		${PLIST_RUBY_DIRS:C,DIR="(${LOCALBASE}|${PREFIX})/,DIR=",} \
 			RUBY_SUFFIX="${RUBY_SUFFIX}" \
 			RUBY_NAME="${RUBY_NAME}" \
 			RUBY_DEFAULT_SUFFIX="${RUBY_DEFAULT_SUFFIX}" \
-			RUBY19=${RUBY19} \
 			RUBY20=${RUBY20} \
-			RUBY21=${RUBY21}
+			RUBY21=${RUBY21} \
+			RUBY22=${RUBY22}
 
 .if defined(USE_RUBY_RDOC)
 MAKE_ENV+=	RUBY_RDOC=${RUBY_RDOC}
@@ -581,19 +567,6 @@ BUILD_DEPENDS+=		${DEPEND_RUBY}
 .if !defined(RUBY_NO_RUN_DEPENDS)
 RUN_DEPENDS+=		${DEPEND_RUBY}
 .endif
-.endif
-
-.if defined(USE_RUBY_FEATURES)
-
-_use=	${USE_RUBY_FEATURES:Miconv}
-.if !empty(_use)
-.if (${RUBY_VER} == 1.9)
-BUILD_DEPENDS+=		${DEPEND_RUBY_ICONV}
-RUN_DEPENDS+=		${DEPEND_RUBY_ICONV}
-.endif
-.endif
-
-.undef _use
 .endif
 
 .if defined(USE_RAKE)

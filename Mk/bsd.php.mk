@@ -7,7 +7,7 @@
 # Please send all suggested changes to the maintainer instead of committing
 # them to SVN yourself.
 #
-# $FreeBSD: head/Mk/bsd.php.mk 373200 2014-11-24 10:30:56Z ale $
+# $FreeBSD: head/Mk/bsd.php.mk 379803 2015-02-24 15:05:17Z ale $
 #
 # Adding 'USE_PHP=yes' to a port includes this Makefile after bsd.ports.pre.mk.
 # If the port requires a predefined set of PHP extensions, they can be
@@ -195,7 +195,7 @@ PHP_HEADER_DIRS?=	""
 
 do-install:
 	@${MKDIR} ${STAGEDIR}${PREFIX}/lib/php/${PHP_EXT_DIR}
-	@${INSTALL_DATA} ${WRKSRC}/modules/${PHP_MODNAME}.so \
+	@${INSTALL_LIB} ${WRKSRC}/modules/${PHP_MODNAME}.so \
 		${STAGEDIR}${PREFIX}/lib/php/${PHP_EXT_DIR}
 .	for header in . ${PHP_HEADER_DIRS}
 		@${MKDIR} ${STAGEDIR}${PREFIX}/include/php/ext/${PHP_MODNAME}/${header}

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/bsd.kde4.mk 374791 2014-12-16 10:26:19Z alonso $
+# $FreeBSD: head/Mk/bsd.kde4.mk 379563 2015-02-21 22:53:53Z rakuco $
 
 .if !defined(_POSTMKINCLUDED) && !defined(Kde_Pre_Include)
 
@@ -83,7 +83,7 @@ KTP_VERSION?=		0.8.0
 KTP_BRANCH?=		stable
 CALLIGRA_VERSION?=	2.7.5
 CALLIGRA_BRANCH?=	stable
-KDEVELOP_VERSION?=	4.7.0
+KDEVELOP_VERSION?=	4.7.1
 KDEVELOP_BRANCH?=	stable
 
 KDE4_PREFIX?=	${LOCALBASE}
@@ -144,8 +144,6 @@ _USE_KDE4_ALL+=		akonadi attica automoc4 ontologies qimageblitz soprano \
 			strigi
 # Meta components
 _USE_KDE4_ALL+=		kdeprefix
-# Deprecated
-_USE_KDE4_ALL+=		kdehier
 
 baloo_PORT=		sysutils/baloo
 baloo_PATH=		${KDE4_PREFIX}/lib/libbaloocore.so

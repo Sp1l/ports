@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/perl5.mk 375898 2014-12-31 16:04:29Z rene $
+# $FreeBSD: head/Mk/Uses/perl5.mk 379168 2015-02-17 15:58:12Z mat $
 #
 # Provide support to use perl5
 #
@@ -54,7 +54,7 @@ PERL_VERSION=	5.16.3
 .elif ${PERL5_DEFAULT} == 5.18
 PERL_VERSION=	5.18.4
 .elif ${PERL5_DEFAULT} == 5.20
-PERL_VERSION=	5.20.1
+PERL_VERSION=	5.20.2
 .else
 IGNORE=	Invalid perl5 version ${PERL5_DEFAULT}
 .endif

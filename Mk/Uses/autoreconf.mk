@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/autoreconf.mk 377757 2015-01-23 18:54:01Z tijl $
+# $FreeBSD: head/Mk/Uses/autoreconf.mk 379150 2015-02-17 10:30:55Z tijl $
 #
 # Run autoreconf in CONFIGURE_WRKSRC to update configure, Makefile.in and
 # other build scripts.
@@ -75,6 +75,13 @@ do-autoreconf:
 # Don't modify time stamps if the files already exist
 	@test -e ${CONFIGURE_WRKSRC}/${f} || ${TOUCH} ${CONFIGURE_WRKSRC}/${f}
 .endfor
+.if defined(_USE_GNOME) && ${_USE_GNOME:Mintltool}
+	@(cd ${CONFIGURE_WRKSRC} && \
+		if test -f configure.ac; then configure=configure.ac; \
+		else configure=configure.in; fi && \
+		if ${EGREP} -q '^(AC|IT)_PROG_INTLTOOL' $${configure}; \
+		then ${LOCALBASE}/bin/intltoolize -f -c; fi)
+.endif
 	@(cd ${CONFIGURE_WRKSRC} && ${LOCALBASE}/bin/autoreconf -f -i)
 .endif
 

@@ -1,7 +1,7 @@
 #-*- tab-width: 4; -*-
 # ex:ts=4
 #
-# $FreeBSD: head/Mk/bsd.qt.mk 378033 2015-01-28 01:15:22Z rakuco $
+# $FreeBSD: head/Mk/bsd.qt.mk 379843 2015-02-24 21:39:19Z makc $
 #
 # Port variables:
 # USE_QT*			- List of Qt modules to depend on, with optional '_build'
@@ -88,7 +88,7 @@ MASTER_SITE_SUBDIR=	official_releases/qt/${_QT_VERSION:R}/${_QT_VERSION}/submodu
 DISTNAME=		${QT_DIST:S,^,qt,:S,$,-opensource-src-${_QT_VERSION},}
 DISTFILES=		${DISTNAME:S,$,${EXTRACT_SUFX},}
 DIST_SUBDIR=		KDE/Qt/${_QT_VERSION}
-USE_XZ=			yes
+USES+=			tar:xz
 
 .  if ${.TARGETS:Mmakesum} || ${.TARGETS:Mfetch} && \
 	defined(DISABLE_SIZE) && defined(NO_CHECKSUM)
@@ -285,7 +285,7 @@ PLIST_SUB+=		QT_${dir}DIR="${QT_${dir}DIR_REL}"
 Qt_Post_Include=	bsd.qt.mk
 
 _USE_QT_ALL=	assistant clucene dbus declarative designer gui help \
-				imageformats linguist multimedia network opengl pixeltool \
+				imageformats linguist linguisttools multimedia network opengl pixeltool \
 				qdbusviewer qmake script scripttools sql sql-ibase sql-mysql \
 				sql-odbc sql-pgsql sql-sqlite2 sql-sqlite3 svg testlib webkit \
 				xml xmlpatterns
@@ -296,7 +296,7 @@ _USE_QT4_ONLY=	accessible assistant-adp assistantclient codecs-cn codecs-jp \
 				phonon-gst porting qdoc3 qmlviewer qt3support qtconfig \
 				qtestlib qvfb rcc uic uic3 xmlpatterns-tool
 
-_USE_QT5_ONLY=	buildtools concurrent core graphicaleffects linguisttools \
+_USE_QT5_ONLY=	buildtools concurrent core graphicaleffects \
 				paths printsupport qdbus qdoc qev qml quick \
 				quickcontrols serialport uitools widgets x11extras
 
