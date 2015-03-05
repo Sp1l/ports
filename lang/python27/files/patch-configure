@@ -1,4 +1,12 @@
---- configure.orig	2015-03-04 11:28:43 UTC
+# Description: do not define __BSD_VISIBLE/_XOPEN_SOURCE/_POSIX_C_SOURCE
+# in include/python2.7/pyconfig.h
+# Submitted by: antoine
+
+# Fix build with LibreSSL (does not have RAND_egd)
+# PR192511, http://bugs.python.org/issue21356
+# submitted by: spil.oss@gmail.com
+
+--- configure.orig	2014-12-10 16:00:00 UTC
 +++ configure
 @@ -2924,13 +2924,6 @@ $as_echo "#define _NETBSD_SOURCE 1" >>co
  

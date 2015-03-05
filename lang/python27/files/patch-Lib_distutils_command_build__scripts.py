@@ -1,3 +1,8 @@
+# Description: A non-invasive partial backport of the Python3 distutils behaviour.
+# This allows Python's scripts to be properly suffixed (similar to Python 3.x) on
+# installation.
+# Submitted by: mva
+
 --- Lib/distutils/command/build_scripts.py.orig	2014-12-10 15:59:34 UTC
 +++ Lib/distutils/command/build_scripts.py
 @@ -126,6 +126,9 @@ class build_scripts (Command):

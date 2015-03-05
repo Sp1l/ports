@@ -1,4 +1,12 @@
---- configure.ac.orig	2015-03-04 11:28:43 UTC
+# Description: do not define __BSD_VISIBLE/_XOPEN_SOURCE/_POSIX_C_SOURCE
+# in include/python2.7/pyconfig.h
+# Submitted by: antoine
+
+# Fix build with LibreSSL (does not have RAND_egd)
+# PR192511, http://bugs.python.org/issue21356
+# submitted by: spil.oss@gmail.com
+
+--- configure.ac.orig	2014-12-10 16:00:00 UTC
 +++ configure.ac
 @@ -88,11 +88,6 @@ AC_DEFINE(_GNU_SOURCE, 1, [Define on Lin
  AC_DEFINE(_NETBSD_SOURCE, 1, [Define on NetBSD to activate all library features])
