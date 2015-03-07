@@ -2,7 +2,7 @@
 # $FreeBSD: head/irc/znc/Makefile 371288 2014-10-20 17:52:16Z mva $
 
 PORTNAME=	znc
-PORTVERSION=	1.4
+PORTVERSION=	1.6.0
 CATEGORIES=	irc ipv6
 MASTER_SITES=	http://znc.in/releases/
 
