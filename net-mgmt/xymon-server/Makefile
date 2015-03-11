@@ -1,8 +1,8 @@
-# $FreeBSD: head/net-mgmt/xymon-server/Makefile 379186 2015-02-17 19:31:10Z feld $
+# $FreeBSD: head/net-mgmt/xymon-server/Makefile 380844 2015-03-09 13:24:11Z feld $
 
 PORTNAME=	xymon
 PORTVERSION=	4.3.18
-PORTREVISION=	5
+PORTREVISION=	6
 CATEGORIES=	net-mgmt www
 MASTER_SITES=	SF/xymon/Xymon/${PORTVERSION}
 PKGNAMESUFFIX=	-server${PKGNAMESUFFIX2}
