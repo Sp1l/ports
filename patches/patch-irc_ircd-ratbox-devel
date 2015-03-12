@@ -1,0 +1,13 @@
+Index: irc/ircd-ratbox-devel/Makefile
+===================================================================
+--- irc/ircd-ratbox-devel/Makefile	(revision 380073)
++++ irc/ircd-ratbox-devel/Makefile	(working copy)
+@@ -12,6 +12,8 @@
+ MAINTAINER=	moggie@elasticmind.net
+ COMMENT=	Advanced, stable IRC daemon, used widely on EFnet ('testing' release)
+ 
++IGNORE=		The non-devel version of irc/ircd-ratbox is newer
++
+ LICENSE=	GPLv2
+ 
+ CONFLICTS=	ircd-ratbox-[0-9]* charybdis-[0-9]*

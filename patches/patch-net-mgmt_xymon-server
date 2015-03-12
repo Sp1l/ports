@@ -1,0 +1,36 @@
+Index: net-mgmt/xymon-server/files/patch-xymonnet_conftest.c
+===================================================================
+--- net-mgmt/xymon-server/files/patch-xymonnet_conftest.c	(revision 0)
++++ net-mgmt/xymon-server/files/patch-xymonnet_conftest.c	(working copy)
+@@ -0,0 +1,16 @@
++--- xymonnet/contest.c.orig	2014-01-10 10:29:38.000000000 +0100
+++++ xymonnet/contest.c	2015-03-11 15:49:20.218730976 +0100
++@@ -460,11 +460,13 @@
++ 			/* load entropy from files */
++ 			RAND_load_file(RAND_file_name(path, sizeof (path)), -1);
++ 
+++#ifndef BSD 
++ 			/* load entropy from egd sockets */
++ 			RAND_egd("/var/run/egd-pool");
++ 			RAND_egd("/dev/egd-pool");
++ 			RAND_egd("/etc/egd-pool");
++ 			RAND_egd("/var/spool/prngd/pool");
+++#endif
++ 
++ 			/* shuffle $RANDFILE (or ~/.rnd if unset) */
++ 			RAND_write_file(RAND_file_name(path, sizeof (path)));
+
+Property changes on: net-mgmt/xymon-server/files/patch-xymonnet_conftest.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property

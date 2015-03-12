@@ -1,0 +1,66 @@
+Index: irc/ircd-hybrid/files/patch-src_rsa.c
+===================================================================
+--- irc/ircd-hybrid/files/patch-src_rsa.c	(revision 0)
++++ irc/ircd-hybrid/files/patch-src_rsa.c	(working copy)
+@@ -0,0 +1,16 @@
++--- src/rsa.c.orig	2013-06-23 19:49:22.000000000 +0200
+++++ src/rsa.c	2015-03-10 20:19:06.002564940 +0100
++@@ -68,11 +68,13 @@
++ int
++ get_randomness(unsigned char *buf, int length)
++ {
+++#ifdef HAVE_RAND_EGD
++   /* Seed OpenSSL PRNG with EGD enthropy pool -kre */
++   if (ConfigFileEntry.use_egd &&
++       ConfigFileEntry.egdpool_path)
++     if (RAND_egd(ConfigFileEntry.egdpool_path) == -1)
++       return -1;
+++#endif
++ 
++   if (RAND_status())
++     return RAND_bytes(buf, length);
+
+Property changes on: irc/ircd-hybrid/files/patch-src_rsa.c
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: irc/ircd-hybrid/files/patch-src_s__serv.c
+===================================================================
+--- irc/ircd-hybrid/files/patch-src_s__serv.c	(revision 0)
++++ irc/ircd-hybrid/files/patch-src_s__serv.c	(working copy)
+@@ -0,0 +1,10 @@
++--- src/s_serv.c.orig	2013-06-23 19:49:22.000000000 +0200
+++++ src/s_serv.c	2015-03-10 20:12:43.301585509 +0100
++@@ -25,6 +25,7 @@
++ #include "stdinc.h"
++ #ifdef HAVE_LIBCRYPTO
++ #include <openssl/rsa.h>
+++#include <openssl/comp.h>
++ #include "rsa.h"
++ #endif
++ #include "list.h"
+
+Property changes on: irc/ircd-hybrid/files/patch-src_s__serv.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property

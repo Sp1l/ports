@@ -1,0 +1,109 @@
+Index: security/heimdal/files/patch-include_crypto-headers.h
+===================================================================
+--- security/heimdal/files/patch-include_crypto-headers.h	(revision 0)
++++ security/heimdal/files/patch-include_crypto-headers.h	(working copy)
+@@ -0,0 +1,14 @@
++--- include/crypto-headers.h.orig	2012-12-09 23:06:44.000000000 +0100
+++++ include/crypto-headers.h	2015-03-11 19:50:53.148719459 +0100
++@@ -28,6 +28,11 @@
++ #ifndef BN_is_negative
++ #define BN_set_negative(bn, flag) ((bn)->neg=(flag)?1:0)
++ #define BN_is_negative(bn) ((bn)->neg != 0)
+++
+++#ifndef LIBRESSL_VERSION_NUMBER
+++#define HAVE_RAND_EGD
+++#endif
+++
++ #endif
++ 
++ #else /* !HAVE_OPENSSL */
+
+Property changes on: security/heimdal/files/patch-include_crypto-headers.h
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: security/heimdal/files/patch-lib_hcrypto_rand-egd.c
+===================================================================
+--- security/heimdal/files/patch-lib_hcrypto_rand-egd.c	(revision 0)
++++ security/heimdal/files/patch-lib_hcrypto_rand-egd.c	(working copy)
+@@ -0,0 +1,17 @@
++--- lib/hcrypto/rand-egd.c.orig	2012-12-09 23:06:44.000000000 +0100
+++++ lib/hcrypto/rand-egd.c	2015-03-11 18:59:17.067934065 +0100
++@@ -33,6 +33,8 @@
++ 
++ #include <config.h>
++ 
+++#ifdef HAVE_RAND_EGD
+++
++ #include <sys/types.h>
++ #ifdef HAVE_SYS_UN_H
++ #include <sys/un.h>
++@@ -258,3 +260,5 @@
++ 
++     return 1;
++ }
+++
+++#endif
+
+Property changes on: security/heimdal/files/patch-lib_hcrypto_rand-egd.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: security/heimdal/files/patch-lib_krb5_crypto-rand.c
+===================================================================
+--- security/heimdal/files/patch-lib_krb5_crypto-rand.c	(revision 0)
++++ security/heimdal/files/patch-lib_krb5_crypto-rand.c	(working copy)
+@@ -0,0 +1,18 @@
++--- lib/krb5/crypto-rand.c.orig	2012-12-09 23:06:44.000000000 +0100
+++++ lib/krb5/crypto-rand.c	2015-03-11 19:01:30.449923193 +0100
++@@ -66,6 +66,7 @@
++ 	krb5_context context;
++ 	const char *p;
++ 
+++#ifdef HAVE_RAND_EGD
++ 	/* Try using egd */
++ 	if (!krb5_init_context(&context)) {
++ 	    p = krb5_config_get_string(context, NULL, "libdefaults",
++@@ -74,6 +75,7 @@
++ 		RAND_egd_bytes(p, ENTROPY_NEEDED);
++ 	    krb5_free_context(context);
++ 	}
+++#endif
++ #else
++ 	/* TODO: Once a Windows CryptoAPI RAND method is defined, we
++ 	   can use that and failover to another method. */
+
+Property changes on: security/heimdal/files/patch-lib_krb5_crypto-rand.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
