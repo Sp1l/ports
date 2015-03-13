@@ -1,3 +1,7 @@
+# Fix build with LibreSSL (does not have RAND_egd)
+# PR192511, http://bugs.python.org/issue21356
+# Submitted by: spil.oss@gmail.org
+
 --- pyconfig.h.in.orig	2014-12-10 16:00:01 UTC
 +++ pyconfig.h.in
 @@ -544,6 +544,9 @@

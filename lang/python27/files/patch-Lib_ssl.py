@@ -1,3 +1,7 @@
+# Fix build with LibreSSL (does not have RAND_egd)
+# PR192511, http://bugs.python.org/issue21356
+# Submitted by: spil.oss@gmail.org
+
 --- Lib/ssl.py.orig	2014-12-10 15:59:40 UTC
 +++ Lib/ssl.py
 @@ -106,7 +106,11 @@ from _ssl import CERT_NONE, CERT_OPTIONA

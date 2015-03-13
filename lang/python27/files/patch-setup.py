@@ -1,3 +1,10 @@
+# Description: Partial script installation backport from Python3
+# Submitted by: mva
+
+# Description: Some modules are installed via other ports
+
+# Description: ossaudiodev detection fix backport
+
 --- setup.py.orig	2014-12-10 16:00:01 UTC
 +++ setup.py
 @@ -15,6 +15,7 @@ from distutils.core import Extension, se
