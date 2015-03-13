@@ -1,3 +1,8 @@
+# Description: Fix _ctypes abort on import for FreeBSD/ARM. This is an issue
+# for anything !apple that is using the libcompiler_rt provided by clang on arm
+# PR: ports/149167 ports/184517
+# Patch by: cognet@ (to be upstreamed @ LLVM)
+
 --- Modules/_ctypes/libffi/src/arm/ffi.c.orig	2014-12-10 15:59:52 UTC
 +++ Modules/_ctypes/libffi/src/arm/ffi.c
 @@ -33,6 +33,11 @@

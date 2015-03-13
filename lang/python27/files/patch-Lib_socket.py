@@ -1,3 +1,7 @@
+# Fix build with LibreSSL (does not have RAND_egd)
+# PR192511, http://bugs.python.org/issue21356
+# Submitted by: spil.oss@gmail.org
+
 --- Lib/socket.py.orig	2014-12-10 15:59:40 UTC
 +++ Lib/socket.py
 @@ -67,7 +67,6 @@ else:

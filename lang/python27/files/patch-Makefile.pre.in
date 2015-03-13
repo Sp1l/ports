@@ -1,3 +1,6 @@
+# Description: Link scripts in the same way Python3 does
+# Submitted by: mva
+
 --- Makefile.pre.in.orig	2014-12-10 15:59:50 UTC
 +++ Makefile.pre.in
 @@ -900,6 +900,12 @@ bininstall:	altbininstall

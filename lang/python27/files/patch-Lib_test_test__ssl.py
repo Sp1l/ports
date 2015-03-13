@@ -1,3 +1,7 @@
+# Fix build with LibreSSL (does not have RAND_egd)
+# PR192511, http://bugs.python.org/issue21356
+# Submitted by: spil.oss@gmail.org
+
 --- Lib/test/test_ssl.py.orig	2014-12-10 15:59:47 UTC
 +++ Lib/test/test_ssl.py
 @@ -169,8 +169,9 @@ class BasicSocketTests(unittest.TestCase
