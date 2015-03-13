@@ -1,7 +1,3 @@
-# Fix build with LibreSSL (does not have RAND_egd)
-# PR192511, http://bugs.python.org/issue21356
-# submitted by: spil.oss@gmail.com
-
 --- Modules/_ssl.c.orig	2014-12-10 15:59:53 UTC
 +++ Modules/_ssl.c
 @@ -3301,6 +3301,7 @@ Returns 1 if the OpenSSL PRNG has been s
