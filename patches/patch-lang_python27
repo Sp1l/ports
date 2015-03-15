@@ -1,6 +1,6 @@
 Index: lang/python27/Makefile
 ===================================================================
---- lang/python27/Makefile	(revision 380439)
+--- lang/python27/Makefile	(revision 381315)
 +++ lang/python27/Makefile	(working copy)
 @@ -105,6 +105,10 @@
  PLIST_SUB+=	NO_NIS=""
@@ -15,7 +15,7 @@ Index: lang/python27/Makefile
  		's,/usr/doc/python-docs-,${PREFIX}/share/doc/python,g' \
 Index: lang/python27/files/patch-Doc__library__fcntl.rst
 ===================================================================
---- lang/python27/files/patch-Doc__library__fcntl.rst	(revision 380439)
+--- lang/python27/files/patch-Doc__library__fcntl.rst	(revision 381315)
 +++ lang/python27/files/patch-Doc__library__fcntl.rst	(working copy)
 @@ -1,10 +0,0 @@
 ---- ./Doc/library/fcntl.rst.orig	2014-07-03 21:53:41.473098625 +1000
@@ -60,7 +60,7 @@ Added: svn:eol-style
 \ No newline at end of property
 Index: lang/python27/files/patch-Lib__distutils__unixccompiler.py
 ===================================================================
---- lang/python27/files/patch-Lib__distutils__unixccompiler.py	(revision 380439)
+--- lang/python27/files/patch-Lib__distutils__unixccompiler.py	(revision 381315)
 +++ lang/python27/files/patch-Lib__distutils__unixccompiler.py	(working copy)
 @@ -1,15 +0,0 @@
 -# Description: Some python extensions can't be compiled with clang 3.4
@@ -82,7 +82,12 @@ Index: lang/python27/files/patch-Lib_distutils_command_build__scripts.py
 ===================================================================
 --- lang/python27/files/patch-Lib_distutils_command_build__scripts.py	(revision 0)
 +++ lang/python27/files/patch-Lib_distutils_command_build__scripts.py	(working copy)
-@@ -0,0 +1,12 @@
+@@ -0,0 +1,17 @@
++# Description: A non-invasive partial backport of the Python3 distutils behaviour.
++# This allows Python's scripts to be properly suffixed (similar to Python 3.x) on
++# installation.
++# Submitted by: mva
++
 +--- Lib/distutils/command/build_scripts.py.orig	2014-12-10 15:59:34 UTC
 ++++ Lib/distutils/command/build_scripts.py
 +@@ -126,6 +126,9 @@ class build_scripts (Command):
@@ -98,10 +103,6 @@ Index: lang/python27/files/patch-Lib_distutils_command_build__scripts.py
 
 Property changes on: lang/python27/files/patch-Lib_distutils_command_build__scripts.py
 ___________________________________________________________________
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
-\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -110,9 +111,13 @@ Added: svn:eol-style
 ## -0,0 +1 ##
 +native
 \ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
 Index: lang/python27/files/patch-Lib_distutils_command_build_scripts.py
 ===================================================================
---- lang/python27/files/patch-Lib_distutils_command_build_scripts.py	(revision 380439)
+--- lang/python27/files/patch-Lib_distutils_command_build_scripts.py	(revision 381315)
 +++ lang/python27/files/patch-Lib_distutils_command_build_scripts.py	(working copy)
 @@ -1,17 +0,0 @@
 -# Description: A non-invasive partial backport of the Python3 distutils behaviour.
@@ -136,7 +141,11 @@ Index: lang/python27/files/patch-Lib_distutils_unixccompiler.py
 ===================================================================
 --- lang/python27/files/patch-Lib_distutils_unixccompiler.py	(revision 0)
 +++ lang/python27/files/patch-Lib_distutils_unixccompiler.py	(working copy)
-@@ -0,0 +1,11 @@
+@@ -0,0 +1,15 @@
++# Description: Some python extensions can't be compiled with clang 3.4
++# Issue ID: http://bugs.python.org/issue20767
++# Submitted by: antoine
++
 +--- Lib/distutils/unixccompiler.py.orig	2014-12-10 15:59:34 UTC
 ++++ Lib/distutils/unixccompiler.py
 +@@ -228,6 +228,8 @@ class UnixCCompiler(CCompiler):
@@ -167,7 +176,11 @@ Index: lang/python27/files/patch-Lib_socket.py
 ===================================================================
 --- lang/python27/files/patch-Lib_socket.py	(revision 0)
 +++ lang/python27/files/patch-Lib_socket.py	(working copy)
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,26 @@
++# Fix build with LibreSSL (does not have RAND_egd)
++# PR192511, http://bugs.python.org/issue21356
++# Submitted by: spil.oss@gmail.org
++
 +--- Lib/socket.py.orig	2014-12-10 15:59:40 UTC
 ++++ Lib/socket.py
 +@@ -67,7 +67,6 @@ else:
@@ -193,6 +206,10 @@ Index: lang/python27/files/patch-Lib_socket.py
 
 Property changes on: lang/python27/files/patch-Lib_socket.py
 ___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -201,15 +218,15 @@ Added: svn:eol-style
 ## -0,0 +1 ##
 +native
 \ No newline at end of property
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
-\ No newline at end of property
 Index: lang/python27/files/patch-Lib_ssl.py
 ===================================================================
 --- lang/python27/files/patch-Lib_ssl.py	(revision 0)
 +++ lang/python27/files/patch-Lib_ssl.py	(working copy)
-@@ -0,0 +1,15 @@
+@@ -0,0 +1,19 @@
++# Fix build with LibreSSL (does not have RAND_egd)
++# PR192511, http://bugs.python.org/issue21356
++# Submitted by: spil.oss@gmail.org
++
 +--- Lib/ssl.py.orig	2014-12-10 15:59:40 UTC
 ++++ Lib/ssl.py
 +@@ -106,7 +106,11 @@ from _ssl import CERT_NONE, CERT_OPTIONA
@@ -244,7 +261,11 @@ Index: lang/python27/files/patch-Lib_test_test__ssl.py
 ===================================================================
 --- lang/python27/files/patch-Lib_test_test__ssl.py	(revision 0)
 +++ lang/python27/files/patch-Lib_test_test__ssl.py	(working copy)
-@@ -0,0 +1,14 @@
+@@ -0,0 +1,18 @@
++# Fix build with LibreSSL (does not have RAND_egd)
++# PR192511, http://bugs.python.org/issue21356
++# Submitted by: spil.oss@gmail.org
++
 +--- Lib/test/test_ssl.py.orig	2014-12-10 15:59:47 UTC
 ++++ Lib/test/test_ssl.py
 +@@ -169,8 +169,9 @@ class BasicSocketTests(unittest.TestCase
@@ -276,12 +297,12 @@ Added: svn:mime-type
 \ No newline at end of property
 Index: lang/python27/files/patch-Makefile.pre.in
 ===================================================================
---- lang/python27/files/patch-Makefile.pre.in	(revision 380439)
+--- lang/python27/files/patch-Makefile.pre.in	(revision 381315)
 +++ lang/python27/files/patch-Makefile.pre.in	(working copy)
-@@ -1,12 +1,9 @@
--# Description: Link scripts in the same way Python3 does
--# Submitted by: mva
--
+@@ -1,12 +1,12 @@
+ # Description: Link scripts in the same way Python3 does
+ # Submitted by: mva
+ 
 ---- Makefile.pre.in.orig	2014-06-30 04:05:39.000000000 +0200
 -+++ Makefile.pre.in	2014-07-26 11:09:46.000000000 +0200
 -@@ -868,6 +868,12 @@
@@ -299,7 +320,7 @@ Index: lang/python27/files/patch-Makefile.pre.in
  +	-rm -f $(DESTDIR)$(BINDIR)/pydoc
 Index: lang/python27/files/patch-Modules-_ctypes-libffi-configure
 ===================================================================
---- lang/python27/files/patch-Modules-_ctypes-libffi-configure	(revision 380439)
+--- lang/python27/files/patch-Modules-_ctypes-libffi-configure	(revision 381315)
 +++ lang/python27/files/patch-Modules-_ctypes-libffi-configure	(working copy)
 @@ -1,11 +0,0 @@
 ---- Modules/_ctypes/libffi/configure.orig	2014-12-16 08:10:12.000000000 +0100
@@ -315,7 +336,7 @@ Index: lang/python27/files/patch-Modules-_ctypes-libffi-configure
 -   # options accordingly.  Note that the listed cases only cover the
 Index: lang/python27/files/patch-Modules___ctypes__libffi__src__arm__ffi.c
 ===================================================================
---- lang/python27/files/patch-Modules___ctypes__libffi__src__arm__ffi.c	(revision 380439)
+--- lang/python27/files/patch-Modules___ctypes__libffi__src__arm__ffi.c	(revision 381315)
 +++ lang/python27/files/patch-Modules___ctypes__libffi__src__arm__ffi.c	(working copy)
 @@ -1,36 +0,0 @@
 -# Description: Fix _ctypes abort on import for FreeBSD/ARM. This is an issue
@@ -389,7 +410,12 @@ Index: lang/python27/files/patch-Modules___ctypes_libffi_src_arm_ffi.c
 ===================================================================
 --- lang/python27/files/patch-Modules___ctypes_libffi_src_arm_ffi.c	(revision 0)
 +++ lang/python27/files/patch-Modules___ctypes_libffi_src_arm_ffi.c	(working copy)
-@@ -0,0 +1,31 @@
+@@ -0,0 +1,36 @@
++# Description: Fix _ctypes abort on import for FreeBSD/ARM. This is an issue
++# for anything !apple that is using the libcompiler_rt provided by clang on arm
++# PR: ports/149167 ports/184517
++# Patch by: cognet@ (to be upstreamed @ LLVM)
++
 +--- Modules/_ctypes/libffi/src/arm/ffi.c.orig	2014-12-10 15:59:52 UTC
 ++++ Modules/_ctypes/libffi/src/arm/ffi.c
 +@@ -33,6 +33,11 @@
@@ -440,7 +466,11 @@ Index: lang/python27/files/patch-Modules___ssl.c
 ===================================================================
 --- lang/python27/files/patch-Modules___ssl.c	(revision 0)
 +++ lang/python27/files/patch-Modules___ssl.c	(working copy)
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,33 @@
++# Fix build with LibreSSL (does not have RAND_egd)
++# PR192511, http://bugs.python.org/issue21356
++# Submitted by: spil.oss@gmail.org
++
 +--- Modules/_ssl.c.orig	2014-12-10 15:59:53 UTC
 ++++ Modules/_ssl.c
 +@@ -3301,6 +3301,7 @@ Returns 1 if the OpenSSL PRNG has been s
@@ -487,7 +517,7 @@ Added: svn:eol-style
 \ No newline at end of property
 Index: lang/python27/files/patch-Modules__fcntlmodule.c
 ===================================================================
---- lang/python27/files/patch-Modules__fcntlmodule.c	(revision 380439)
+--- lang/python27/files/patch-Modules__fcntlmodule.c	(revision 381315)
 +++ lang/python27/files/patch-Modules__fcntlmodule.c	(working copy)
 @@ -1,53 +0,0 @@
 ---- ./Modules/fcntlmodule.c.orig	2014-07-03 21:57:10.429953240 +1000
@@ -604,10 +634,6 @@ Index: lang/python27/files/patch-Modules_fcntlmodule.c
 
 Property changes on: lang/python27/files/patch-Modules_fcntlmodule.c
 ___________________________________________________________________
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
-\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -616,13 +642,51 @@ Added: svn:eol-style
 ## -0,0 +1 ##
 +native
 \ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
 Index: lang/python27/files/patch-configure
 ===================================================================
 --- lang/python27/files/patch-configure	(revision 0)
 +++ lang/python27/files/patch-configure	(working copy)
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,85 @@
++# Description: do not define __BSD_VISIBLE/_XOPEN_SOURCE/_POSIX_C_SOURCE
++# in include/python2.7/pyconfig.h
++# Submitted by: antoine
++
++# Fix build with LibreSSL (does not have RAND_egd)
++# PR192511, http://bugs.python.org/issue21356
++# Submitted by: spil.oss@gmail.org
++
 +--- configure.orig	2015-03-13 12:32:09 UTC
 ++++ configure
++@@ -2919,13 +2919,6 @@
++
++
++ # The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
++-# certain features on FreeBSD, so we need __BSD_VISIBLE to re-enable
++-# them.
++-
++-$as_echo "#define __BSD_VISIBLE 1" >>confdefs.h
++-
++-
++-# The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
++ # u_int on Irix 5.3. Defining _BSD_TYPES brings it back.
++
++ $as_echo "#define _BSD_TYPES 1" >>confdefs.h
++@@ -3293,9 +3286,8 @@
++   # but used in struct sockaddr.sa_family. Reported by Tim Rice.
++   SCO_SV/3.2)
++     define_xopen_source=no;;
++-  # On FreeBSD 4, the math functions C89 does not cover are never defined
++-  # with _XOPEN_SOURCE and __BSD_VISIBLE does not re-enable them.
++-  FreeBSD/4.*)
+++  # On FreeBSD,  defining _XOPEN_SOURCE to 600 requests a strict environment.
+++  FreeBSD/*)
++     define_xopen_source=no;;
++   # On MacOS X 10.2, a bug in ncurses.h means that it craps out if
++   # _XOPEN_EXTENDED_SOURCE is defined. Apparently, this is fixed in 10.3, which
 +@@ -8534,6 +8534,48 @@ _ACEOF
 + fi
 + 	# Dynamic linking for HP-UX
@@ -675,6 +739,10 @@ Index: lang/python27/files/patch-configure
 
 Property changes on: lang/python27/files/patch-configure
 ___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -683,17 +751,46 @@ Added: svn:eol-style
 ## -0,0 +1 ##
 +native
 \ No newline at end of property
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
-\ No newline at end of property
 Index: lang/python27/files/patch-configure.ac
 ===================================================================
 --- lang/python27/files/patch-configure.ac	(revision 0)
 +++ lang/python27/files/patch-configure.ac	(working copy)
-@@ -0,0 +1,13 @@
+@@ -0,0 +1,46 @@
++# Description: do not define __BSD_VISIBLE/_XOPEN_SOURCE/_POSIX_C_SOURCE
++# in include/python2.7/pyconfig.h
++# Submitted by: antoine
++
++# Fix build with LibreSSL (does not have RAND_egd)
++# PR192511, http://bugs.python.org/issue21356
++# Submitted by: spil.oss@gmail.org
++
 +--- configure.ac.orig	2015-03-13 12:32:09 UTC
 ++++ configure.ac
++@@ -88,11 +88,6 @@
++ AC_DEFINE(_NETBSD_SOURCE, 1, [Define on NetBSD to activate all library features])
++
++ # The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
++-# certain features on FreeBSD, so we need __BSD_VISIBLE to re-enable
++-# them.
++-AC_DEFINE(__BSD_VISIBLE, 1, [Define on FreeBSD to activate all library features])
++-
++-# The later defininition of _XOPEN_SOURCE and _POSIX_C_SOURCE disables
++ # u_int on Irix 5.3. Defining _BSD_TYPES brings it back.
++ AC_DEFINE(_BSD_TYPES, 1, [Define on Irix to enable u_int])
++
++@@ -426,9 +421,8 @@
++   # but used in struct sockaddr.sa_family. Reported by Tim Rice.
++   SCO_SV/3.2)
++     define_xopen_source=no;;
++-  # On FreeBSD 4, the math functions C89 does not cover are never defined
++-  # with _XOPEN_SOURCE and __BSD_VISIBLE does not re-enable them.
++-  FreeBSD/4.*)
+++  # On FreeBSD,  defining _XOPEN_SOURCE to 600 requests a strict environment.
+++  FreeBSD/*)
++     define_xopen_source=no;;
++   # On MacOS X 10.2, a bug in ncurses.h means that it craps out if
++   # _XOPEN_EXTENDED_SOURCE is defined. Apparently, this is fixed in 10.3, which
++
 +@@ -2216,6 +2216,10 @@ AC_MSG_RESULT($SHLIBS)
 + AC_CHECK_LIB(dl, dlopen)	# Dynamic linking for SunOS/Solaris and SYSV
 + AC_CHECK_LIB(dld, shl_load)	# Dynamic linking for HP-UX
@@ -722,7 +819,7 @@ Added: svn:eol-style
 \ No newline at end of property
 Index: lang/python27/files/patch-pr192365
 ===================================================================
---- lang/python27/files/patch-pr192365	(revision 380439)
+--- lang/python27/files/patch-pr192365	(revision 381315)
 +++ lang/python27/files/patch-pr192365	(working copy)
 @@ -1,58 +0,0 @@
 -# Description: do not define __BSD_VISIBLE/_XOPEN_SOURCE/_POSIX_C_SOURCE
@@ -783,18 +880,50 @@ Index: lang/python27/files/patch-pr192365
 -     define_xopen_source=no;;
 -   # On MacOS X 10.2, a bug in ncurses.h means that it craps out if 
 -   # _XOPEN_EXTENDED_SOURCE is defined. Apparently, this is fixed in 10.3, which
+Index: lang/python27/files/patch-pyconfig.h.in
+===================================================================
+--- lang/python27/files/patch-pyconfig.h.in	(revision 0)
++++ lang/python27/files/patch-pyconfig.h.in	(working copy)
+@@ -0,0 +1,16 @@
++# Fix build with LibreSSL (does not have RAND_egd)
++# PR192511, http://bugs.python.org/issue21356
++# Submitted by: spil.oss@gmail.org
++
++--- pyconfig.h.in.orig	2014-12-10 16:00:01 UTC
+++++ pyconfig.h.in
++@@ -544,6 +544,9 @@
++ /* Define to 1 if you have the `putenv' function. */
++ #undef HAVE_PUTENV
++ 
+++/* Define if the libcrypto has RAND_egd */
+++#undef HAVE_RAND_EGD
+++
++ /* Define to 1 if you have the `readlink' function. */
++ #undef HAVE_READLINK
++ 
+
+Property changes on: lang/python27/files/patch-pyconfig.h.in
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
 Index: lang/python27/files/patch-setup.py
 ===================================================================
---- lang/python27/files/patch-setup.py	(revision 380439)
+--- lang/python27/files/patch-setup.py	(revision 381315)
 +++ lang/python27/files/patch-setup.py	(working copy)
-@@ -1,13 +1,6 @@
--# Description: Partial script installation backport from Python3
--# Submitted by: mva
--
--# Description: Some modules are installed via other ports
--
--# Description: ossaudiodev detection fix backport
--
+@@ -5,9 +5,9 @@
+ 
+ # Description: ossaudiodev detection fix backport
+ 
 ---- setup.py.orig	2014-06-30 04:05:48.000000000 +0200
 -+++ setup.py	2014-07-26 14:51:29.000000000 +0200
 -@@ -15,6 +15,7 @@
@@ -804,7 +933,7 @@ Index: lang/python27/files/patch-setup.py
   from distutils.command.build_ext import build_ext
   from distutils.command.install import install
   from distutils.command.install_lib import install_lib
-@@ -15,7 +8,7 @@
+@@ -15,7 +15,7 @@
   from distutils.spawn import find_executable
   
   cross_compiling = "_PYTHON_HOST_PLATFORM" in os.environ
@@ -813,7 +942,7 @@ Index: lang/python27/files/patch-setup.py
   COMPILED_WITH_PYDEBUG = ('--with-pydebug' in sysconfig.get_config_var("CONFIG_ARGS"))
   
   # This global variable is used to hold the list of modules to be disabled.
-@@ -24,7 +17,7 @@
+@@ -24,7 +24,7 @@
   
   def add_dir_to_list(dirlist, dir):
       """Add the directory 'dir' to the list 'dirlist' (at the front) if
@@ -822,7 +951,7 @@ Index: lang/python27/files/patch-setup.py
                   sysroot = macosx_sdk_root()
                   f = os.path.join(sysroot, f[1:])
   
-@@ -33,7 +26,7 @@
+@@ -33,7 +33,7 @@
               data = open(f).read()
               m = re.search(r"#s*define\s+HASHVERSION\s+2\s*", data)
               if m is not None:
@@ -831,7 +960,7 @@ Index: lang/python27/files/patch-setup.py
               macros = dict()
               libraries = []
   
-@@ -42,7 +35,7 @@
+@@ -42,7 +42,7 @@
               # FreeBSD's P1003.1b semaphore support is very experimental
               # and has many known problems. (as of June 2008)
               macros = dict()
@@ -840,7 +969,7 @@ Index: lang/python27/files/patch-setup.py
           else:
               missing.append('linuxaudiodev')
   
-@@ -56,7 +49,7 @@
+@@ -56,7 +56,7 @@
               exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
           else:
               missing.append('ossaudiodev')
@@ -849,7 +978,7 @@ Index: lang/python27/files/patch-setup.py
       def is_chmod_supported(self):
           return hasattr(os, 'chmod')
   
-@@ -79,7 +72,7 @@
+@@ -79,7 +79,7 @@
   SUMMARY = """
   Python is an interpreted, interactive, object-oriented programming
   language. It is often compared to Tcl, Perl, Scheme or Java.
@@ -858,7 +987,7 @@ Index: lang/python27/files/patch-setup.py
             platforms = ["Many"],
   
             # Build info
-@@ -90,7 +83,7 @@
+@@ -90,7 +90,7 @@
                         'install_lib':PyBuildInstallLib},
             # The struct module is defined here, because build_ext won't be
             # called unless there's at least one extension module defined.
