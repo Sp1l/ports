@@ -32,7 +32,6 @@
      define_xopen_source=no;;
    # On MacOS X 10.2, a bug in ncurses.h means that it craps out if
    # _XOPEN_EXTENDED_SOURCE is defined. Apparently, this is fixed in 10.3, which
-
 @@ -2216,6 +2216,10 @@ AC_MSG_RESULT($SHLIBS)
  AC_CHECK_LIB(dl, dlopen)	# Dynamic linking for SunOS/Solaris and SYSV
  AC_CHECK_LIB(dld, shl_load)	# Dynamic linking for HP-UX
