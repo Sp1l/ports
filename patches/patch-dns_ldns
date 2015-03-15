@@ -1,0 +1,169 @@
+Index: Makefile
+===================================================================
+--- Makefile	(revision 377788)
++++ Makefile	(working copy)
+@@ -3,7 +3,7 @@
+ 
+ PORTNAME=	ldns
+ PORTVERSION=	1.6.17
+-PORTREVISION=	3
++PORTREVISION=	4
+ CATEGORIES=	dns
+ MASTER_SITES=	http://www.nlnetlabs.nl/downloads/ldns/ \
+ 		LOCAL/ehaupt
+@@ -80,6 +80,7 @@
+ .if ${PORT_OPTIONS:MGOST}
+ . if ${OSVERSION} < 1000015
+ BUILD_DEPENDS+=	openssl>=1.0:${PORTSDIR}/security/openssl
++CONFLICTS+=    libressl-*
+ . endif
+ .else
+ NO_GOST=	--disable-gost
+Index: files/patch-drill_Makefile.in
+===================================================================
+--- files/patch-drill_Makefile.in	(revision 0)
++++ files/patch-drill_Makefile.in	(working copy)
+@@ -0,0 +1,11 @@
++--- drill/Makefile.in.orig	2014-01-10 21:04:41 UTC
+++++ drill/Makefile.in
++@@ -98,7 +98,7 @@ doc:	
++ 
++ install: all
++ 	$(INSTALL) -d $(DESTDIR)$(bindir)
++-	$(INSTALL) drill $(DESTDIR)$(bindir)/drill
+++	$(INSTALL) -s drill $(DESTDIR)$(bindir)/drill
++ 	$(INSTALL) -m 644 drill.1 $(DESTDIR)$(mandir)/man1/drill.1
++ 
++ uninstall:
+
+Property changes on: files/patch-drill_Makefile.in
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: files/patch-examples_Makefile.in
+===================================================================
+--- files/patch-examples_Makefile.in	(revision 0)
++++ files/patch-examples_Makefile.in	(working copy)
+@@ -0,0 +1,28 @@
++--- examples/Makefile.in.orig	2014-01-10 21:04:41 UTC
+++++ examples/Makefile.in
++@@ -169,7 +169,7 @@ install:	$(PROGRAMS) $(SSL_PROGRAMS)
++ 		$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)
++ 		$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)/man1
++ 		for i in $(PROGRAMS) $(SSL_PROGRAMS); do \
++-			$(libtool) --tag=CC --mode=install ${INSTALL} -c $$i $(DESTDIR)$(bindir) ; \
+++			$(libtool) --tag=CC --mode=install ${INSTALL} -s -c $$i $(DESTDIR)$(bindir) ; \
++ 			if test -f $$i.1 ; \
++ 			then $(INSTALL) -c -m 644 $$i.1 $(DESTDIR)$(mandir)/man1/$$i.1 ; \
++ 			else $(INSTALL) -c -m 644 $(srcdir)/$$i.1 $(DESTDIR)$(mandir)/man1/$$i.1 ; \
++@@ -182,14 +182,14 @@ install-static:	all-static
++ 		$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)
++ 		$(INSTALL) -d -m 755 $(DESTDIR)$(mandir)/man1
++ 		for i in $(PROGRAMS); do \
++-			$(libtool) --tag=CC --mode=install ${INSTALL} -c $$i.stc $(DESTDIR)$(bindir) ; \
+++			$(libtool) --tag=CC --mode=install ${INSTALL} -s -c $$i.stc $(DESTDIR)$(bindir) ; \
++ 			if test -f $$i.1 ; \
++ 			then $(INSTALL) -c -m 644 $$i.1 $(DESTDIR)$(mandir)/man1/$$i.1 ; \
++ 			else $(INSTALL) -c -m 644 $(srcdir)/$$i.1 $(DESTDIR)$(mandir)/man1/$$i.1 ; \
++ 			fi ; \
++ 			done
++ 		for i in $(SSL_PROGRAMS); do \
++-			$(libtool) --tag=CC --mode=install ${INSTALL} -c $$i.stc-ssl $(DESTDIR)$(bindir) ; \
+++			$(libtool) --tag=CC --mode=install ${INSTALL} -s -c $$i.stc-ssl $(DESTDIR)$(bindir) ; \
++ 			if test -f $$i.1 ; \
++ 			then $(INSTALL) -c -m 644 $$i.1 $(DESTDIR)$(mandir)/man1/$$i.1 ; \
++ 			else $(INSTALL) -c -m 644 $(srcdir)/$$i.1 $(DESTDIR)$(mandir)/man1/$$i.1 ; \
+
+Property changes on: files/patch-examples_Makefile.in
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: files/patch-examples_configure.ac
+===================================================================
+--- files/patch-examples_configure.ac	(revision 0)
++++ files/patch-examples_configure.ac	(working copy)
+@@ -0,0 +1,11 @@
++--- examples/configure.ac.orig	2014-01-10 21:04:41 UTC
+++++ examples/configure.ac
++@@ -207,6 +207,8 @@ case "$enable_dane" in
++       ;;
++ esac
++ 
+++AC_CHECK_FUNCS(ENGINE_load_cryptodev)
+++
++ LDFLAGS="$tmp_LDFLAGS"
++ LIBS="$tmp_LIBS"
++ 
+
+Property changes on: files/patch-examples_configure.ac
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: files/patch-examples_ldns-signzone.c
+===================================================================
+--- files/patch-examples_ldns-signzone.c	(revision 0)
++++ files/patch-examples_ldns-signzone.c	(working copy)
+@@ -0,0 +1,18 @@
++--- examples/ldns-signzone.c.orig	2014-01-10 21:04:41 UTC
+++++ examples/ldns-signzone.c
++@@ -470,6 +470,7 @@ main(int argc, char *argv[])
++ 		case 'A':
++ 			signflags |= LDNS_SIGN_DNSKEY_WITH_ZSK;
++ 			break;
+++#ifdef HAVE_ENGINE_LOAD_CRYPTODEV
++ 		case 'E':
++ 			ENGINE_load_builtin_engines();
++ 			ENGINE_load_dynamic();
++@@ -494,6 +495,7 @@ main(int argc, char *argv[])
++ 				ENGINE_set_default(engine, 0);
++ 			}
++ 			break;
+++#endif
++ 		case 'k':
++ 			eng_key_l = strchr(optarg, ',');
++ 			if (eng_key_l && strlen(eng_key_l) > 1) {
+
+Property changes on: files/patch-examples_ldns-signzone.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
