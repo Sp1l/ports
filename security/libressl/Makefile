@@ -16,7 +16,7 @@ CPE_VENDOR=	openbsd
 CONFLICTS?=	openssl-*
 
 GNU_CONFIGURE=	yes
-USES=	libtool pkgconfig pathfix cpe
+USES=		cpe libtool pathfix pkgconfig
 USE_LDCONFIG=	yes
 
 INSTALL_TARGET=	install-strip
