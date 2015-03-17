@@ -1,8 +1,8 @@
 # Created by: Vsevolod Stakhov <vsevolod@FreeBSD.org>
-# $FreeBSD: head/security/libressl/Makefile 377668 2015-01-22 16:48:37Z vsevolod $
+# $FreeBSD: head/security/libressl/Makefile 380424 2015-03-04 09:34:25Z vsevolod $
 
 PORTNAME=	libressl
-PORTVERSION=	2.1.4
+PORTVERSION=	2.1.5
 CATEGORIES=	security devel
 MASTER_SITES=	${MASTER_SITE_OPENBSD}
 MASTER_SITE_SUBDIR=	LibreSSL
@@ -16,7 +16,7 @@ CPE_VENDOR=	openbsd
 CONFLICTS?=	openssl-*
 
 GNU_CONFIGURE=	yes
-USES=		cpe libtool pathfix pkgconfig
+USES=	libtool pkgconfig pathfix cpe
 USE_LDCONFIG=	yes
 
 INSTALL_TARGET=	install-strip
