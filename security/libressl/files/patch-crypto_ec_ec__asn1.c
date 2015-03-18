@@ -21,7 +21,16 @@
  		return NULL;
  	}
  	if (a == NULL || *a == NULL) {
-@@ -1109,10 +1104,12 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
+@@ -1058,8 +1053,6 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
+ 			    ERR_R_MALLOC_FAILURE);
+ 			goto err;
+ 		}
+-		if (a)
+-			*a = ret;
+ 	} else
+ 		ret = *a;
+ 
+@@ -1109,10 +1102,12 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
  			goto err;
  		}
  	}
@@ -31,7 +40,7 @@
  err:
  	if (!ok) {
 -		if (ret)
-+		if (ret) && (a == NULL || *a != ret))
++		if (ret && (a == NULL || *a != ret))
  			EC_KEY_free(ret);
  		ret = NULL;
  	}

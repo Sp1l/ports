@@ -14,7 +14,7 @@ Index: security/libressl/files/patch-crypto_ec_ec__asn1.c
 ===================================================================
 --- security/libressl/files/patch-crypto_ec_ec__asn1.c	(revision 0)
 +++ security/libressl/files/patch-crypto_ec_ec__asn1.c	(working copy)
-@@ -0,0 +1,37 @@
+@@ -0,0 +1,46 @@
 +# Backport of CVE-2015-0209 vuln mitigation
 +# Fix a failure to NULL a pointer freed on error.
 +#
@@ -38,7 +38,16 @@ Index: security/libressl/files/patch-crypto_ec_ec__asn1.c
 + 		return NULL;
 + 	}
 + 	if (a == NULL || *a == NULL) {
-+@@ -1109,10 +1104,12 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
++@@ -1058,8 +1053,6 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
++ 			    ERR_R_MALLOC_FAILURE);
++ 			goto err;
++ 		}
++-		if (a)
++-			*a = ret;
++ 	} else
++ 		ret = *a;
++ 
++@@ -1109,10 +1102,12 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
 + 			goto err;
 + 		}
 + 	}
@@ -48,13 +57,17 @@ Index: security/libressl/files/patch-crypto_ec_ec__asn1.c
 + err:
 + 	if (!ok) {
 +-		if (ret)
-++		if (ret) && (a == NULL || *a != ret))
+++		if (ret && (a == NULL || *a != ret))
 + 			EC_KEY_free(ret);
 + 		ret = NULL;
 + 	}
 
 Property changes on: security/libressl/files/patch-crypto_ec_ec__asn1.c
 ___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
 Added: svn:eol-style
 ## -0,0 +1 ##
 +native
@@ -62,10 +75,6 @@ Added: svn:eol-style
 Added: svn:mime-type
 ## -0,0 +1 ##
 +text/plain
-\ No newline at end of property
-Added: fbsd:nokeywords
-## -0,0 +1 ##
-+yes
 \ No newline at end of property
 Index: security/libressl/files/patch-crypto_x509_x509__req.c
 ===================================================================
