@@ -1,0 +1,106 @@
+Index: security/libressl/Makefile
+===================================================================
+--- security/libressl/Makefile	(revision 381535)
++++ security/libressl/Makefile	(working copy)
+@@ -3,6 +3,7 @@
+ 
+ PORTNAME=	libressl
+ PORTVERSION=	2.1.5
++PORTREVISION=	1
+ CATEGORIES=	security devel
+ MASTER_SITES=	${MASTER_SITE_OPENBSD}
+ MASTER_SITE_SUBDIR=	LibreSSL
+Index: security/libressl/files/patch-crypto_ec_ec__asn1.c
+===================================================================
+--- security/libressl/files/patch-crypto_ec_ec__asn1.c	(revision 0)
++++ security/libressl/files/patch-crypto_ec_ec__asn1.c	(working copy)
+@@ -0,0 +1,37 @@
++# Backport of CVE-2015-0209 vuln mitigation
++# Fix a failure to NULL a pointer freed on error.
++#
++# Inspired by BoringSSL commit 517073cd4b by Eric Roman <eroman@chromium.org>
++# CVE-2015-0209
++
++--- crypto/ec/ec_asn1.c.orig	2015-02-10 14:54:46 UTC
+++++ crypto/ec/ec_asn1.c
++@@ -1043,13 +1043,8 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
++ 	EC_KEY *ret = NULL;
++ 	EC_PRIVATEKEY *priv_key = NULL;
++ 
++-	if ((priv_key = EC_PRIVATEKEY_new()) == NULL) {
++-		ECerr(EC_F_D2I_ECPRIVATEKEY, ERR_R_MALLOC_FAILURE);
++-		return NULL;
++-	}
++-	if ((priv_key = d2i_EC_PRIVATEKEY(&priv_key, in, len)) == NULL) {
+++	if ((priv_key = d2i_EC_PRIVATEKEY(NULL, in, len)) == NULL) {
++ 		ECerr(EC_F_D2I_ECPRIVATEKEY, ERR_R_EC_LIB);
++-		EC_PRIVATEKEY_free(priv_key);
++ 		return NULL;
++ 	}
++ 	if (a == NULL || *a == NULL) {
++@@ -1109,10 +1104,12 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
++ 			goto err;
++ 		}
++ 	}
+++	if (a)
+++		*a = ret;
++ 	ok = 1;
++ err:
++ 	if (!ok) {
++-		if (ret)
+++		if (ret) && (a == NULL || *a != ret))
++ 			EC_KEY_free(ret);
++ 		ret = NULL;
++ 	}
+
+Property changes on: security/libressl/files/patch-crypto_ec_ec__asn1.c
+___________________________________________________________________
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Index: security/libressl/files/patch-crypto_x509_x509__req.c
+===================================================================
+--- security/libressl/files/patch-crypto_x509_x509__req.c	(revision 0)
++++ security/libressl/files/patch-crypto_x509_x509__req.c	(working copy)
+@@ -0,0 +1,17 @@
++# Backport of CVE-2015-0288 vuln mitigation
++# Check public key is not NULL.
++#
++# CVE-2015-0288
++# PR#3708
++
++--- crypto/x509/x509_req.c.orig	2014-12-06 23:15:50 UTC
+++++ crypto/x509/x509_req.c
++@@ -95,6 +95,8 @@ X509_to_X509_REQ(X509 *x, EVP_PKEY *pkey
++ 		goto err;
++ 
++ 	pktmp = X509_get_pubkey(x);
+++	if (pktmp == NULL)
+++		goto err;
++ 	i = X509_REQ_set_pubkey(ret, pktmp);
++ 	EVP_PKEY_free(pktmp);
++ 	if (!i)
+
+Property changes on: security/libressl/files/patch-crypto_x509_x509__req.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
