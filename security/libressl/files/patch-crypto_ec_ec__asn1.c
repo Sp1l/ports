@@ -1,28 +1,52 @@
-# Backport of CVE-2015-0209 vuln mitigation
-# Fix a failure to NULL a pointer freed on error.
-#
-# Inspired by BoringSSL commit 517073cd4b by Eric Roman <eroman@chromium.org>
-# CVE-2015-0209
-
 --- crypto/ec/ec_asn1.c.orig	2015-02-10 14:54:46 UTC
 +++ crypto/ec/ec_asn1.c
-@@ -1043,13 +1043,8 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
+@@ -1,4 +1,4 @@
+-/* $OpenBSD: ec_asn1.c,v 1.11 2015/02/10 04:01:26 jsing Exp $ */
++/* $OpenBSD: ec_asn1.c,v 1.12 2015/02/10 05:43:09 jsing Exp $ */
+ /*
+  * Written by Nils Larsch for the OpenSSL project.
+  */
+@@ -999,19 +999,19 @@ d2i_ECPKParameters(EC_GROUP ** a, const 
+ 
+ 	if ((params = d2i_ECPKPARAMETERS(NULL, in, len)) == NULL) {
+ 		ECerr(EC_F_D2I_ECPKPARAMETERS, EC_R_D2I_ECPKPARAMETERS_FAILURE);
+-		ECPKPARAMETERS_free(params);
+-		return NULL;
++		goto err;
+ 	}
+ 	if ((group = ec_asn1_pkparameters2group(params)) == NULL) {
+ 		ECerr(EC_F_D2I_ECPKPARAMETERS, EC_R_PKPARAMETERS2GROUP_FAILURE);
+-		ECPKPARAMETERS_free(params);
+-		return NULL;
++		goto err;
+ 	}
+-	if (a && *a)
++
++	if (a != NULL) {
+ 		EC_GROUP_clear_free(*a);
+-	if (a)
+ 		*a = group;
++	}
+ 
++err:
+ 	ECPKPARAMETERS_free(params);
+ 	return (group);
+ }
+@@ -1039,7 +1039,6 @@ i2d_ECPKParameters(const EC_GROUP * a, u
+ EC_KEY *
+ d2i_ECPrivateKey(EC_KEY ** a, const unsigned char **in, long len)
+ {
+-	int ok = 0;
  	EC_KEY *ret = NULL;
  	EC_PRIVATEKEY *priv_key = NULL;
  
--	if ((priv_key = EC_PRIVATEKEY_new()) == NULL) {
--		ECerr(EC_F_D2I_ECPRIVATEKEY, ERR_R_MALLOC_FAILURE);
--		return NULL;
--	}
--	if ((priv_key = d2i_EC_PRIVATEKEY(&priv_key, in, len)) == NULL) {
-+	if ((priv_key = d2i_EC_PRIVATEKEY(NULL, in, len)) == NULL) {
- 		ECerr(EC_F_D2I_ECPRIVATEKEY, ERR_R_EC_LIB);
--		EC_PRIVATEKEY_free(priv_key);
- 		return NULL;
+@@ -1054,12 +1053,9 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
  	}
  	if (a == NULL || *a == NULL) {
-@@ -1058,8 +1053,6 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
- 			    ERR_R_MALLOC_FAILURE);
+ 		if ((ret = EC_KEY_new()) == NULL) {
+-			ECerr(EC_F_D2I_ECPRIVATEKEY,
+-			    ERR_R_MALLOC_FAILURE);
++			ECerr(EC_F_D2I_ECPRIVATEKEY, ERR_R_MALLOC_FAILURE);
  			goto err;
  		}
 -		if (a)
@@ -30,17 +54,49 @@
  	} else
  		ret = *a;
  
-@@ -1109,10 +1102,12 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
+@@ -1109,17 +1105,19 @@ d2i_ECPrivateKey(EC_KEY ** a, const unsi
  			goto err;
  		}
  	}
-+	if (a)
+-	ok = 1;
++
++	EC_PRIVATEKEY_free(priv_key);
++	if (a != NULL)
 +		*a = ret;
- 	ok = 1;
++	return (ret);
++
  err:
- 	if (!ok) {
+-	if (!ok) {
 -		if (ret)
-+		if (ret && (a == NULL || *a != ret))
- 			EC_KEY_free(ret);
- 		ret = NULL;
+-			EC_KEY_free(ret);
+-		ret = NULL;
+-	}
++	if (a == NULL || *a != ret)
++		EC_KEY_free(ret);
+ 	if (priv_key)
+ 		EC_PRIVATEKEY_free(priv_key);
+ 
+-	return (ret);
++	return (NULL);
+ }
+ 
+ int 
+@@ -1232,8 +1230,6 @@ d2i_ECParameters(EC_KEY ** a, const unsi
+ 			ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_MALLOC_FAILURE);
+ 			return NULL;
+ 		}
+-		if (a)
+-			*a = ret;
+ 	} else
+ 		ret = *a;
+ 
+@@ -1241,6 +1237,9 @@ d2i_ECParameters(EC_KEY ** a, const unsi
+ 		ECerr(EC_F_D2I_ECPARAMETERS, ERR_R_EC_LIB);
+ 		return NULL;
  	}
++
++	if (a != NULL)
++		*a = ret;
+ 	return ret;
+ }
+ 
