@@ -1,0 +1,50 @@
+--- /var/db/pkg/vuln.xml	2015-03-19 03:19:20.329192949 +0100
++++ /usr/ports/security/vuxml/vuln.xml	2015-03-19 21:40:17.533630117 +0100
+@@ -57,6 +57,47 @@
+ 
+ -->
+ <vuxml xmlns="http://www.vuxml.org/apps/vuxml-1">
++  <vuln vid="c2227ea9-ce6a-11e4-b7c8-4061861086c1">
++    <topic>Multiple vulnerabilities found in LibreSSL</topic>
++    <affects>
++      <package>
++	<name>libressl</name>
++	<range><le>2.1.5</le></range>
++      </package>
++    </affects>
++    <description>
++      <body xmlns="http://www.w3.org/1999/xhtml">
++	<p>The LibreSSL project reports</p>
++	<blockquote cite="https://github.com/libressl-portable/portable/commit/df0c0cd146ec4ba7b68e7735766bf0b62af993f4">
++	  <p>* Fixes for the following issues are integrated into LibreSSL 2.1.6:
++	       - CVE-2015-0209 - Use After Free following d2i_ECPrivatekey error
++	       - CVE-2015-0286 - Segmentation fault in ASN1_TYPE_cmp
++	       - CVE-2015-0287 - ASN.1 structure reuse memory corruption
++	       - CVE-2015-0288 - X509_to_X509_REQ NULL pointer deref
++	       - CVE-2015-0289 - PKCS7 NULL pointer dereferences
++
++	     * The fix for CVE-2015-0207 - Segmentation fault in DTLSv1_listen
++	       is integrated for safety, but LibreSSL is not vulnerable.
++	</p>
++	</blockquote>
++      </body>
++    </description>
++    <references>
++      <freebsdpr>ports/198681</freebsdpr>
++      <cvename>CVE-2015-0209</cvename>
++      <cvename>CVE-2015-0286</cvename>
++      <cvename>CVE-2015-0287</cvename>
++      <cvename>CVE-2015-0288</cvename>
++      <cvename>CVE-2015-0289</cvename>
++      <url>https://openssl.org/news/secadv_20150319.txt</url>
++    </references>
++    <dates>
++      <discovery>2015-03-19</discovery>
++      <entry>2015-03-19</entry>
++      <modified>2015-03-19</modified>
++    </dates>
++  </vuln>
++
+   <vuln vid="f7d79fac-cd49-11e4-898f-bcaec565249c">
+     <topic>libXfont -- BDF parsing issues</topic>
+     <affects>

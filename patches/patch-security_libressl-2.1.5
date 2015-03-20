@@ -1,0 +1,51 @@
+Index: security/libressl/Makefile
+===================================================================
+--- security/libressl/Makefile	(revision 381469)
++++ security/libressl/Makefile	(working copy)
+@@ -2,7 +2,7 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	libressl
+-PORTVERSION=	2.1.4
++PORTVERSION=	2.1.5
+ CATEGORIES=	security devel
+ MASTER_SITES=	${MASTER_SITE_OPENBSD}
+ MASTER_SITE_SUBDIR=	LibreSSL
+@@ -16,7 +16,7 @@
+ CONFLICTS?=	openssl-*
+ 
+ GNU_CONFIGURE=	yes
+-USES=	libtool pkgconfig pathfix cpe
++USES=		cpe libtool pathfix pkgconfig
+ USE_LDCONFIG=	yes
+ 
+ INSTALL_TARGET=	install-strip
+Index: security/libressl/distinfo
+===================================================================
+--- security/libressl/distinfo	(revision 381469)
++++ security/libressl/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (libressl-2.1.4.tar.gz) = e8e08535928774119a979412ee8e307444b7a1a42c8c47ac06ee09423ca9a04e
+-SIZE (libressl-2.1.4.tar.gz) = 2865654
++SHA256 (libressl-2.1.5.tar.gz) = a82379913fd7f4e26e045fcf021aa92a1f683954816bf817b3b696de62e9c3bb
++SIZE (libressl-2.1.5.tar.gz) = 2865527
+Index: security/libressl/files/patch-include-openssl-opensslv.h
+===================================================================
+--- security/libressl/files/patch-include-openssl-opensslv.h	(revision 381469)
++++ security/libressl/files/patch-include-openssl-opensslv.h	(working copy)
+@@ -1,11 +1,11 @@
+---- include/openssl/opensslv.h.orig	2015-02-14 20:11:02.000000000 +0100
+-+++ include/openssl/opensslv.h	2015-03-04 08:47:30.514145411 +0100
++--- include/openssl/opensslv.h.orig	2015-03-08 23:21:45 UTC
+++++ include/openssl/opensslv.h
+ @@ -3,7 +3,7 @@
+  #define HEADER_OPENSSLV_H
+  
+  #define LIBRESSL_VERSION_NUMBER	0x20000000L
+ -#define OPENSSL_VERSION_NUMBER	0x20000000L
+-+#define OPENSSL_VERSION_NUMBER 0x1000107fL
+- #define OPENSSL_VERSION_TEXT	"LibreSSL 2.1.4"
+++#define OPENSSL_VERSION_NUMBER 	0x1000107fL
++ #define OPENSSL_VERSION_TEXT	"LibreSSL 2.1.5"
+  #define OPENSSL_VERSION_PTEXT	" part of " OPENSSL_VERSION_TEXT
+  
