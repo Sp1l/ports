@@ -1,0 +1,11 @@
+--- configure.in.orig	2013-09-17 00:11:46 UTC
++++ configure.in
+@@ -843,6 +843,8 @@ fi
+ #endif
+ cf_have_ssl=$cf_result
+ 
++AC_CHECK_LIB(crypto, RAND_egd, AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd]))
++
+ AC_ARG_WITH(zlib, [  --without-zlib          compile without zlib compression],[if test "$withval" = no; then disable_zlib=yes; else disable_zlib=no; fi])
+ AC_ARG_WITH(bzip2, [  --without-bzip2         compile without bzip2 compression],[if test "$withval" = no; then disable_bzip2=yes; else disable_bzip2=no; fi])
+ AC_ARG_WITH(lzma, [  --without-lzma          compile without lzma compression],[if test "$withval" = no; then disable_lzma=yes; else disable_lzma=no; fi])
