@@ -1,0 +1,99 @@
+Index: devel/ice/files/patch-cpp_src_Glacier2_CryptPermissionsVerifierI.cpp
+===================================================================
+--- devel/ice/files/patch-cpp_src_Glacier2_CryptPermissionsVerifierI.cpp	(revision 0)
++++ devel/ice/files/patch-cpp_src_Glacier2_CryptPermissionsVerifierI.cpp	(working copy)
+@@ -0,0 +1,10 @@
++--- cpp/src/Glacier2/CryptPermissionsVerifierI.cpp.orig	2013-10-04 15:48:14 UTC
+++++ cpp/src/Glacier2/CryptPermissionsVerifierI.cpp
++@@ -9,6 +9,7 @@
++ 
++ #include <Glacier2/CryptPermissionsVerifierI.h>
++ #include <openssl/des.h>
+++#include <openssl/opensslv.h>
++ 
++ using namespace std;
++ using namespace Ice;
+
+Property changes on: devel/ice/files/patch-cpp_src_Glacier2_CryptPermissionsVerifierI.cpp
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: devel/ice/files/patch-cpp_src_IceGrid_RegistryI.cpp
+===================================================================
+--- devel/ice/files/patch-cpp_src_IceGrid_RegistryI.cpp	(revision 0)
++++ devel/ice/files/patch-cpp_src_IceGrid_RegistryI.cpp	(working copy)
+@@ -0,0 +1,10 @@
++--- cpp/src/IceGrid/RegistryI.cpp.orig	2013-10-04 15:48:14 UTC
+++++ cpp/src/IceGrid/RegistryI.cpp
++@@ -41,6 +41,7 @@
++ #include <fstream>
++ 
++ #include <openssl/des.h> // For crypt() passwords
+++#include <openssl/opensslv.h>
++ 
++ #include <sys/types.h>
++ 
+
+Property changes on: devel/ice/files/patch-cpp_src_IceGrid_RegistryI.cpp
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: devel/ice/files/patch-cpp_src_IceSSL_Instance.cpp
+===================================================================
+--- devel/ice/files/patch-cpp_src_IceSSL_Instance.cpp	(revision 0)
++++ devel/ice/files/patch-cpp_src_IceSSL_Instance.cpp	(working copy)
+@@ -0,0 +1,19 @@
++--- cpp/src/IceSSL/Instance.cpp.orig	2013-10-04 15:48:14 UTC
+++++ cpp/src/IceSSL/Instance.cpp
++@@ -31,6 +31,7 @@
++ 
++ #include <openssl/rand.h>
++ #include <openssl/err.h>
+++#include <openssl/opensslv.h>
++ 
++ #include <IceUtil/DisableWarnings.h>
++ 
++@@ -266,7 +267,7 @@ IceSSL::Instance::Instance(const Communi
++                     }
++                 }
++             }
++-#ifndef _WIN32
+++#if !defined(_WIN32) && !defined(LIBRESSL_VERSION_NUMBER)
++             //
++             // The Entropy Gathering Daemon (EGD) is not available on Windows.
++             // The file should be a Unix domain socket for the daemon.
+
+Property changes on: devel/ice/files/patch-cpp_src_IceSSL_Instance.cpp
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
