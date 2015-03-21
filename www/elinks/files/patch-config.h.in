@@ -1,0 +1,12 @@
+--- config.h.in.orig	2009-08-22 11:23:40 UTC
++++ config.h.in
+@@ -474,6 +474,9 @@
+ /* Define to 1 if you have the `raise' function. */
+ #undef HAVE_RAISE
+ 
++/* Define to 1 if libcrypto has the RAND_egd function */
++#undef HAVE_RAND_EGD
++
+ /* Define if you have _read_kbd() */
+ #undef HAVE_READ_KBD
+ 
