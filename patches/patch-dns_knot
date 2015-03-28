@@ -1,0 +1,31 @@
+Index: dns/knot/files/patch-src_libknot_dnssec_config.h
+===================================================================
+--- dns/knot/files/patch-src_libknot_dnssec_config.h	(revision 0)
++++ dns/knot/files/patch-src_libknot_dnssec_config.h	(working copy)
+@@ -0,0 +1,11 @@
++--- src/libknot/dnssec/config.h.orig	2015-02-19 09:43:56 UTC
+++++ src/libknot/dnssec/config.h
++@@ -40,7 +40,7 @@
++   #undef KNOT_ENABLE_ECDSA
++ #endif
++ 
++-#if !defined(OPENSSL_NO_GOST) && OPENSSL_VERSION_NUMBER >= 0x1000001fL
+++#if !defined(OPENSSL_NO_GOST) && OPENSSL_VERSION_NUMBER >= 0x1000001fL && !defined(LIBRESSL_VERSION_NUMBER)
++   #define KNOT_ENABLE_GOST 1
++ #else
++   #undef KNOT_ENABLE_GOST
+
+Property changes on: dns/knot/files/patch-src_libknot_dnssec_config.h
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
