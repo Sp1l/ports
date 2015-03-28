@@ -1,0 +1,88 @@
+Index: comms/kermit/files/patch-ck__ssl.c
+===================================================================
+--- comms/kermit/files/patch-ck__ssl.c	(revision 0)
++++ comms/kermit/files/patch-ck__ssl.c	(working copy)
+@@ -0,0 +1,33 @@
++--- ck_ssl.c.orig	2011-07-06 13:03:32 UTC
+++++ ck_ssl.c
++@@ -1054,11 +1054,15 @@ ssl_display_comp(SSL * ssl)
++     if (ssl == NULL)
++         return;
++ 
+++#ifndef NO_COMP
++     if (ssl->expand == NULL || ssl->expand->meth == NULL)
+++#endif
++         printf("Compression: None\r\n");
+++#ifndef NO_COMP
++     else {
++         printf("Compression: %s\r\n",ssl->expand->meth->name);
++     }
+++#endif
++ }
++ 
++ int
++@@ -1483,9 +1487,13 @@ the build.\r\n\r\n");
++         }
++         debug(F110,"ssl_rnd_file",ssl_rnd_file,0);
++ 
+++#ifndef NO_EGD
++         rc1 = RAND_egd(ssl_rnd_file);
++         debug(F111,"ssl_once_init","RAND_egd()",rc1);
++-        if ( rc1 <= 0 ) {
+++        if ( rc1 <= 0 ) 
+++#endif
+++	{
+++
++             rc2 = RAND_load_file(ssl_rnd_file, -1);
++             debug(F111,"ssl_once_init","RAND_load_file()",rc1);
++         }
+
+Property changes on: comms/kermit/files/patch-ck__ssl.c
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: comms/kermit/files/patch-makefile
+===================================================================
+--- comms/kermit/files/patch-makefile	(revision 0)
++++ comms/kermit/files/patch-makefile	(working copy)
+@@ -0,0 +1,15 @@
++--- makefile.orig	2015-03-27 21:34:55 UTC
+++++ makefile
++@@ -1785,9 +1785,11 @@ freebsd+ssl freebsd+openssl freebsd50+op
++               echo "HAVE DES"; \
++            else echo "NO DES"; \
++ 	fi; \
+++	if test -n "$NO_EGD"  ; then EGD='-DNO_EGD' ; fi; \
+++	if test -n "$NO_COMP" ; then COMP='-DNO_COMP' ; fi; \
++ 	$(MAKE) freebsd KTARGET=$${KTARGET:-$(@)} "CC = $(CC)" "CC2 = $(CC2)" \
++ 	KFLAGS="-DCK_AUTHENTICATION -DCK_SSL $(SSLINC) -DZLIB $$OPENSSLOPTION \
++-	$$HAVE_DES $(KFLAGS)"  "LNKFLAGS = $(LNKFLAGS)" \
+++	$$HAVE_DES $$EGD $$COMP $(KFLAGS)"  "LNKFLAGS = $(LNKFLAGS)" \
++ 	"LIBS= -lncurses -lcrypt -lssl -lcrypto -lutil -lm \
++ 	$(SSLLIB) $$DES_LIB $(LIBS)"; \
++ 	if [ ! -f ./wermit ] || [ ./ckcmai.o -nt ./wermit ] ; then \
+
+Property changes on: comms/kermit/files/patch-makefile
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
