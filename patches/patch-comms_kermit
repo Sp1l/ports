@@ -1,3 +1,18 @@
+Index: comms/kermit/Makefile
+===================================================================
+--- comms/kermit/Makefile	(revision 382450)
++++ comms/kermit/Makefile	(working copy)
+@@ -25,6 +25,10 @@
+ 
+ OPTIONS_DEFINE=	DOCS EXAMPLES
+ 
++.if (${OPENSSL_PORT:tl} == 'security/libressl')
++MAKE_ARGS+=	-DNO_COMP -DNO_EGD
++.endif
++
+ post-patch:
+ 	@${REINPLACE_CMD} -e 's,-O2 -pipe,${CFLAGS},' ${WRKSRC}/${MAKEFILE}
+ 
 Index: comms/kermit/files/patch-ck__ssl.c
 ===================================================================
 --- comms/kermit/files/patch-ck__ssl.c	(revision 0)
