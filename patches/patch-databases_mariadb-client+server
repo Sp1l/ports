@@ -1,0 +1,35 @@
+Index: databases/mariadb-client/Makefile
+===================================================================
+--- databases/mariadb-client/Makefile	(revision 381948)
++++ databases/mariadb-client/Makefile	(working copy)
+@@ -38,6 +38,7 @@
+ 	@${REINPLACE_CMD} -e "s|install-exec-am: install-binPROGRAMS|install-exec-am:|g" ${WRKSRC}/extra/Makefile.in
+ 	@${REINPLACE_CMD} -e "s|%%MANS%%|${MANS}|" ${WRKSRC}/man/Makefile.in
+ 	@${REINPLACE_CMD} -e "s|^\(install-man: install-man1\).*|\1|" ${WRKSRC}/man/Makefile.in
++	@${REINPLACE_CMD} -e "s|-fno-implicit-templates||g" ${WRKSRC}/configure
+ 
+ post-install:
+ 	${INSTALL_DATA} ${WRKSRC}/support-files/mysql.m4 ${STAGEDIR}${PREFIX}/share/aclocal/
+Index: databases/mariadb-server/Makefile
+===================================================================
+--- databases/mariadb-server/Makefile	(revision 381948)
++++ databases/mariadb-server/Makefile	(working copy)
+@@ -87,10 +87,6 @@
+ 
+ .include <bsd.port.options.mk>
+ 
+-.if ${OSVERSION} >= 1000000
+-BROKEN=		Does not build under FreeBSD 10
+-.endif
+-
+ .if ${OSVERSION} > 900000 && ${PORT_OPTIONS:MSTATIC}
+ BROKEN=	WITH_STATIC is not functional on 9-current
+ .endif
+@@ -281,6 +277,7 @@
+ 	@${REINPLACE_CMD} -e "s|^\(pkginclude_HEADERS =\).*|\1|" ${WRKSRC}/cmd-line-utils/libedit/Makefile.in
+ 	@${REINPLACE_CMD} -e "s|^\(install-data-am:\) install-pkgincludeHEADERS|\1|g" ${WRKSRC}/extra/Makefile.in ${WRKSRC}/include/Makefile.in
+ 	@${REINPLACE_CMD} -e "s|^\(install-exec-am:\) install-pkglibLTLIBRARIES|\1|g" ${WRKSRC}/libmysql/Makefile.in
++	@${REINPLACE_CMD} -e "s|-fno-implicit-templates||g" ${WRKSRC}/configure
+ 
+ .endif	# .if !defined(MARIADB_CLIENT_SLAVE)
+ .endif	# .if !defined(MARIADB_SCRIPTS_SLAVE)

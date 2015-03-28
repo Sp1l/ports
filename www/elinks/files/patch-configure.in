@@ -1,0 +1,11 @@
+--- configure.in.orig	2009-08-22 11:15:08 UTC
++++ configure.in
+@@ -905,6 +905,8 @@ fi
+ 
+ AC_MSG_RESULT($cf_result)
+ 
++AC_CHECK_LIB(crypto, RAND_egd, AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd]))
++
+ CONFIG_GNUTLS_OPENSSL_COMPAT=no
+ dnl ---- GNU TLS
+ dnl We can't have AC_MSG_CHECKING here, because AC_PATH_PROG prints its own and

@@ -1,4 +1,4 @@
-# $FreeBSD: head/databases/mariadb-server/Makefile 373557 2014-11-28 11:33:14Z marino $
+# $FreeBSD: head/databases/mariadb-server/Makefile 380489 2015-03-05 13:02:15Z robak $
 
 PORTNAME=	mariadb
 PORTVERSION=	5.3.12
@@ -15,7 +15,7 @@ MASTER_SITES=	http://ftp.osuosl.org/pub/mariadb/${PORTNAME}-${PORTVERSION}/kvm-t
 		http://mirror.switch.ch/mirror/mariadb/${PORTNAME}-${PORTVERSION}/kvm-tarbake-jaunty-x86/
 PKGNAMESUFFIX?=	53-server
 
-MAINTAINER=	dgeo@centrale-marseille.fr
+MAINTAINER=	spil.oss@gmail.com
 COMMENT=	Database server - drop-in replacement for MySQL
 
 LICENSE=	GPLv2
@@ -49,7 +49,6 @@ OPTIONS_DEFAULT+=	SSL
 STATIC_DESC=	Statically link executables (not on 9.x)
 SSL_DESC=	Activate SSL support
 OPENSSL_DESC=	Use OpenSSL instead of bundled yassl
-
 
 .if !defined(MARIADB_CLIENT_SLAVE)
 LIB_DEPENDS=	libevent.so:${PORTSDIR}/devel/libevent2
@@ -87,10 +86,6 @@ OPTIONS_DEFAULT+=	ARIADB ARCHIVE BLACKHOLE SPHINX FEDX XTRADB HANDLERSOCKET
 .endif	# .if !defined(MARIADB_CLIENT_SLAVE)
 
 .include <bsd.port.options.mk>
-
-.if ${OSVERSION} >= 1000000
-BROKEN=		Does not build under FreeBSD 10
-.endif
 
 .if ${OSVERSION} > 900000 && ${PORT_OPTIONS:MSTATIC}
 BROKEN=	WITH_STATIC is not functional on 9-current
@@ -282,6 +277,7 @@ post-patch:
 	@${REINPLACE_CMD} -e "s|^\(pkginclude_HEADERS =\).*|\1|" ${WRKSRC}/cmd-line-utils/libedit/Makefile.in
 	@${REINPLACE_CMD} -e "s|^\(install-data-am:\) install-pkgincludeHEADERS|\1|g" ${WRKSRC}/extra/Makefile.in ${WRKSRC}/include/Makefile.in
 	@${REINPLACE_CMD} -e "s|^\(install-exec-am:\) install-pkglibLTLIBRARIES|\1|g" ${WRKSRC}/libmysql/Makefile.in
+	@${REINPLACE_CMD} -e "s|-fno-implicit-templates||g" ${WRKSRC}/configure
 
 .endif	# .if !defined(MARIADB_CLIENT_SLAVE)
 .endif	# .if !defined(MARIADB_SCRIPTS_SLAVE)

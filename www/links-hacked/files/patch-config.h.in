@@ -1,0 +1,22 @@
+--- config.h.in.orig	2008-06-07 13:51:29 UTC
++++ config.h.in
+@@ -176,6 +176,9 @@
+ /* Define to 1 if you have the `popen' function. */
+ #undef HAVE_POPEN
+ 
++/* Define if the libcrypto has RAND_egd */
++#undef HAVE_RAND_EGD
++
+ /* Define to 1 if you have the `resume_thread' function. */
+ #undef HAVE_RESUME_THREAD
+ 
+@@ -334,6 +337,9 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+ 

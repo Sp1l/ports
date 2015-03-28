@@ -1,6 +1,6 @@
---- types.c.orig	2012-06-06 15:49:37.000000000 -0400
-+++ types.c	2012-06-27 02:28:56.000000000 -0400
-@@ -841,7 +841,8 @@
+--- types.c.orig	2013-01-23 04:42:08 UTC
++++ types.c
+@@ -857,7 +857,8 @@ unsigned char *get_content_type_by_exten
  			ext = NULL;
  		}
  	if (ext) while (ext[extl] && ext[extl] != '.' && !dir_sep(ext[extl]) && !end_of_dir(url, ext[extl])) extl++;

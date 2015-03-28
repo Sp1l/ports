@@ -1,0 +1,32 @@
+Index: devel/dcmtk/files/patch-dcmtls_libsrc_tlslayer.cc
+===================================================================
+--- devel/dcmtk/files/patch-dcmtls_libsrc_tlslayer.cc	(revision 0)
++++ devel/dcmtk/files/patch-dcmtls_libsrc_tlslayer.cc	(working copy)
+@@ -0,0 +1,12 @@
++--- dcmtls/libsrc/tlslayer.cc.orig	2010-10-14 13:14:46 UTC
+++++ dcmtls/libsrc/tlslayer.cc
++@@ -371,7 +371,9 @@ void DcmTLSTransportLayer::seedPRNG(cons
++ #endif
++   if (randFile)
++   {
+++#ifndef LIBRESSL_VERSION_NUMBER
++     if (RAND_egd(randFile) <= 0)
+++#endif
++     {
++       RAND_load_file(randFile ,-1);
++     }
+
+Property changes on: devel/dcmtk/files/patch-dcmtls_libsrc_tlslayer.cc
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
