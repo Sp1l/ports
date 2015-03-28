@@ -16,10 +16,10 @@ LICENSE_FILE=	${WRKSRC}/COPYING
 
 WRKSRC=		${WRKDIR}/${PORTNAME}-${DISTVERSION:C/-.*//}
 
-USES=		gettext pkgconfig gmake libtool
+USES=		gettext gmake iconv libtool pkgconfig
 USE_OPENSSL=	yes
 GNU_CONFIGURE=	yes
-CONFIGURE_ARGS=	--enable-cfgpath="${ETCDIR}"
+CONFIGURE_ARGS=	--enable-cfgpath="${ETCDIR}" ${ICONV_CONFIGURE_ARG}
 MAKE_JOBS_UNSAFE=	yes
 INSTALL_TARGET=	install-strip
 
