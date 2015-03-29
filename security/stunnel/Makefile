@@ -1,8 +1,8 @@
 # Created by: Martti Kuparinen <martti.kuparinen@ericsson.com>
-# $FreeBSD: head/security/stunnel/Makefile 377704 2015-01-22 23:33:14Z zi $
+# $FreeBSD: head/security/stunnel/Makefile 382247 2015-03-25 16:07:20Z zi $
 
 PORTNAME=	stunnel
-PORTVERSION=	5.10
+PORTVERSION=	5.14
 CATEGORIES=	security
 MASTER_SITES=	https://www.stunnel.org/downloads/%SUBDIR%/ \
 		http://mirrors.zerg.biz/stunnel/%SUBDIR%/ \
@@ -63,14 +63,12 @@ LDFLAGS+=		-lwrap
 
 .if ${PORT_OPTIONS:MUCONTEXT}
 CONFIGURE_ARGS+=--with-threads=ucontext
-CPPFLAGS+=	${PTHREAD_CFLAGS}
-LDFLAGS+=	${PTHREAD_LIBS}
+LDFLAGS+=	-lpthread
 .elif ${PORT_OPTIONS:MFORK}
 CONFIGURE_ARGS+=--with-threads=fork
 .else
 CONFIGURE_ARGS+=--with-threads=pthread
-CPPFLAGS+=	${PTHREAD_CFLAGS}
-LDFLAGS+=	${PTHREAD_LIBS}
+LDFLAGS+=	-lpthread
 .endif
 
 post-patch:
