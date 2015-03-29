@@ -1,0 +1,15 @@
+Index: security/softhsm2/Makefile
+===================================================================
+--- security/softhsm2/Makefile	(revision 382621)
++++ security/softhsm2/Makefile	(working copy)
+@@ -37,6 +37,10 @@
+ 
+ CRYP_BOTAN_CONFIGURE_WITH=	crypto-backend=botan
+ 
++.if ${OPENSSL_PORT} == security/libressl
++CONFIGURE_ARGS+=	--disable-gost
++.endif
++
+ .include <bsd.port.options.mk>
+ 
+ .if ${PORT_OPTIONS:MCRYP_BOTAN}

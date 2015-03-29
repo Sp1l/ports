@@ -37,6 +37,10 @@ OPTIONS_DEFAULT=	CRYP_OPEN
 
 CRYP_BOTAN_CONFIGURE_WITH=	crypto-backend=botan
 
+.if ${OPENSSL_PORT} == security/libressl
+CONFIGURE_ARGS+=	--disable-gost
+.endif
+
 .include <bsd.port.options.mk>
 
 .if ${PORT_OPTIONS:MCRYP_BOTAN}
