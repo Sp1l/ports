@@ -1,0 +1,30 @@
+Index: net-p2p/twister/files/patch-libtorrent_include_libtorrent_pe__crypto.hpp
+===================================================================
+--- net-p2p/twister/files/patch-libtorrent_include_libtorrent_pe__crypto.hpp	(revision 0)
++++ net-p2p/twister/files/patch-libtorrent_include_libtorrent_pe__crypto.hpp	(working copy)
+@@ -0,0 +1,10 @@
++--- libtorrent/include/libtorrent/pe_crypto.hpp.orig	2014-11-29 15:20:43 UTC
+++++ libtorrent/include/libtorrent/pe_crypto.hpp
++@@ -43,6 +43,7 @@ POSSIBILITY OF SUCH DAMAGE.
++ #include <openssl/rc4.h>
++ #include <openssl/evp.h>
++ #include <openssl/aes.h>
+++#include <openssl/rand.h>
++ #else
++ // RC4 state from libtomcrypt
++ struct rc4 {
+
+Property changes on: net-p2p/twister/files/patch-libtorrent_include_libtorrent_pe__crypto.hpp
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
