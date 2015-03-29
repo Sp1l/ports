@@ -1,9 +1,8 @@
 # Created by: peter.thoenen@yahoo.com
-# $FreeBSD: head/security/tor/Makefile 374532 2014-12-11 13:57:31Z bf $
+# $FreeBSD: head/security/tor/Makefile 382200 2015-03-25 08:30:27Z marino $
 
 PORTNAME=	tor
-DISTVERSION=	0.2.5.10
-PORTREVISION=	1
+DISTVERSION=	0.2.6.6
 CATEGORIES=	security net ipv6
 MASTER_SITES=	TOR
 
@@ -52,10 +51,6 @@ empty(PORT_OPTIONS:MSTATIC_TOR) && empty(ARCH:Mia64)
 CONFIGURE_ARGS+=	--enable-gcc-hardening
 .else
 CONFIGURE_ARGS+=	--disable-gcc-hardening
-.endif
-
-.if ( "${OPENSSL_PORT:tl}" == "security/libressl" )
-CONFIGURE_ENV+=	ac_cv_member_struct_ssl_method_st_get_cipher_by_char=no
 .endif
 
 .if ${PORT_OPTIONS:MBUFFEREVENTS}
@@ -110,7 +105,6 @@ LIB_DEPENDS+=		libtcmalloc.so:${PORTSDIR}/devel/google-perftools
 
 .if ${PORT_OPTIONS:MTHREADS}
 CONFIGURE_ARGS+=	--enable-threads
-CFLAGS+=		${PTHREAD_CFLAGS}
 .else
 CONFIGURE_ARGS+=	--disable-threads
 .endif
@@ -131,8 +125,6 @@ post-patch:
 		${WRKSRC}/configure
 
 post-configure:
-	@${FIND} -X ${WRKSRC} -type f -name Makefile | ${XARGS} ${REINPLACE_CMD} -e \
-		"s|-lpthread|${PTHREAD_LIBS}|g"
 	@${REINPLACE_CMD} -e '\|^nodist_man1_MANS =|s|$$|$$(install_mans:=.1)|' \
 		${WRKSRC}/Makefile
 
