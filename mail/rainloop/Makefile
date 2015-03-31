@@ -1,7 +1,7 @@
-# $FreeBSD: head/mail/rainloop/Makefile 378481 2015-02-05 17:44:31Z pi $
+# $FreeBSD: head/mail/rainloop/Makefile 382795 2015-03-31 06:24:15Z antoine $
 
 PORTNAME=	rainloop
-PORTVERSION=	1.8.1
+PORTVERSION=	1.8.2
 CATEGORIES?=	mail www
 MASTER_SITES=	http://repository.rainloop.net/v2/webmail/${PORTVERSION}/
 DISTNAME=	${PORTNAME}-${PORTVERSION}.${RBUILD}-${RHASH}
@@ -15,11 +15,8 @@ LICENSE_TEXT=	License can be found at: https://github.com/RainLoop/rainloop-webm
 LICENSE_PERMS=	dist-mirror pkg-mirror auto-accept
 
 # Refresh using info from http://repository.rainloop.net/v2/core.stable.json
-RHASH=		7ef72935d0e81a2a9d5b158f19be0a3a
-RBUILD=		281
-
-OPTIONS_SINGLE=	DB
-OPTIONS_SINGLE_DB=	MYSQL PGSQL SQLITE
+RHASH=		3cd56183a7425a8750c19bc688aedd81
+RBUILD=		291
 
 USES=		zip
 NO_BUILD=	yes
@@ -31,6 +28,7 @@ PLIST_SUB=	VER="${RVER}" WWWOWN="${WWWOWN}" WWWGRP="${WWWGRP}"
 
 OPTIONS_SINGLE=	DB
 OPTIONS_SINGLE_DB=	MYSQL PGSQL SQLITE
+OPTIONS_DEFAULT=	MYSQL
 
 .include <bsd.port.options.mk>
 
