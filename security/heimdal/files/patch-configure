@@ -1,88 +1,51 @@
---- configure.orig	2014-10-20 14:24:44.000000000 +0900
-+++ configure	2014-10-20 14:27:30.000000000 +0900
-@@ -9567,29 +9567,6 @@
-       hardcode_shlibpath_var=no
-       ;;
- 
--    freebsd1*)
--      ld_shlibs=no
--      ;;
--
--    # FreeBSD 2.2.[012] allows us to include c++rt0.o to get C++ constructor
--    # support.  Future versions do this automatically, but an explicit c++rt0.o
--    # does not break anything, and helps significantly (at the cost of a little
--    # extra space).
--    freebsd2.2*)
--      archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags /usr/lib/c++rt0.o'
--      hardcode_libdir_flag_spec='-R$libdir'
--      hardcode_direct=yes
--      hardcode_shlibpath_var=no
--      ;;
--
--    # Unfortunately, older versions of FreeBSD 2 do not have this feature.
--    freebsd2*)
--      archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'
--      hardcode_direct=yes
--      hardcode_minus_L=yes
--      hardcode_shlibpath_var=no
--      ;;
--
-     # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
-     freebsd* | dragonfly*)
-       archive_cmds='$CC -shared $pic_flag -o $lib $libobjs $deplibs $compiler_flags'
-@@ -10561,10 +10538,6 @@
-   shlibpath_var=LD_LIBRARY_PATH
-   ;;
- 
--freebsd1*)
--  dynamic_linker=no
--  ;;
--
- freebsd* | dragonfly*)
-   # DragonFly does not have aout.  When/if they implement a new
-   # versioning mechanism, adjust this.
-@@ -10572,7 +10545,6 @@
-     objformat=`/usr/bin/objformat`
-   else
-     case $host_os in
--    freebsd[123]*) objformat=aout ;;
-     *) objformat=elf ;;
-     esac
-   fi
-@@ -10590,18 +10562,6 @@
-   esac
-   shlibpath_var=LD_LIBRARY_PATH
-   case $host_os in
--  freebsd2*)
--    shlibpath_overrides_runpath=yes
--    ;;
--  freebsd3.[01]* | freebsdelf3.[01]*)
--    shlibpath_overrides_runpath=yes
--    hardcode_into_libs=yes
--    ;;
--  freebsd3.[2-9]* | freebsdelf3.[2-9]* | \
--  freebsd4.[0-5] | freebsdelf4.[0-5] | freebsd4.1.1 | freebsdelf4.1.1)
--    shlibpath_overrides_runpath=no
--    hardcode_into_libs=yes
--    ;;
-   *) # from 4.6 on, and DragonFly
-     shlibpath_overrides_runpath=yes
-     hardcode_into_libs=yes
-@@ -14227,7 +14187,7 @@
- 	native_pthread_support="netbsd 3 uses explict pthread"
- 		PTHREAD_LIBADD="-lpthread"
- 	;;
--*-*-freebsd[56789]*)
-+*-*-freebsd*)
- 	native_pthread_support=yes
- 	PTHREAD_LIBADD="-pthread"
- 	;;
-@@ -28245,7 +28205,7 @@
- 
- krb_cv_compile_et="no"
- krb_cv_com_err_need_r=""
--krb_cv_compile_et_cross=no
-+krb_cv_compile_et_cross=yes
- if test "${COMPILE_ET}" = "compile_et"; then
- 
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compile_et has the features we need" >&5
+--- configure.orig	2012-12-09 23:09:32.000000000 +0100
++++ configure	2015-04-10 22:26:32.485912736 +0200
+@@ -14151,6 +14151,48 @@
+ 			break;
+ 		fi
+ 	done
++	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for RAND_egd in -lcrypto" >&5
++$as_echo_n "checking for RAND_egd in -lcrypto... " >&6; }
++if ${ac_cv_lib_crypto_RAND_egd+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  ac_check_lib_save_LIBS=$LIBS
++LIBS="-lcrypto  $LIBS"
++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++
++/* Override any GCC internal prototype to avoid an error.
++   Use char because int might match the return type of a GCC
++   builtin and then its argument prototype would still apply.  */
++#ifdef __cplusplus
++extern "C"
++#endif
++char RAND_egd ();
++int
++main ()
++{
++return RAND_egd ();
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_link "$LINENO"; then :
++  ac_cv_lib_crypto_RAND_egd=yes
++else
++  ac_cv_lib_crypto_RAND_egd=no
++fi
++rm -f core conftest.err conftest.$ac_objext \
++    conftest$ac_exeext conftest.$ac_ext
++LIBS=$ac_check_lib_save_LIBS
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_RAND_egd" >&5
++$as_echo "$ac_cv_lib_crypto_RAND_egd" >&6; }
++if test "x$ac_cv_lib_crypto_RAND_egd" = xyes; then :
++
++$as_echo "#define HAVE_RAND_EGD 1" >>confdefs.h
++
++fi
++
+ 	CFLAGS="$save_CFLAGS"
+ 	LIBS="$save_LIBS"
+ fi
