@@ -1,24 +1,20 @@
-Index: security/heimdal/files/patch-include_crypto-headers.h
+Index: security/heimdal/files/patch-cf_crypto.m4
 ===================================================================
---- security/heimdal/files/patch-include_crypto-headers.h	(revision 0)
-+++ security/heimdal/files/patch-include_crypto-headers.h	(working copy)
-@@ -0,0 +1,14 @@
-+--- include/crypto-headers.h.orig	2012-12-09 23:06:44.000000000 +0100
-++++ include/crypto-headers.h	2015-03-11 19:50:53.148719459 +0100
-+@@ -28,6 +28,11 @@
-+ #ifndef BN_is_negative
-+ #define BN_set_negative(bn, flag) ((bn)->neg=(flag)?1:0)
-+ #define BN_is_negative(bn) ((bn)->neg != 0)
-++
-++#ifndef LIBRESSL_VERSION_NUMBER
-++#define HAVE_RAND_EGD
-++#endif
-++
-+ #endif
-+ 
-+ #else /* !HAVE_OPENSSL */
+--- security/heimdal/files/patch-cf_crypto.m4	(revision 0)
++++ security/heimdal/files/patch-cf_crypto.m4	(working copy)
+@@ -0,0 +1,10 @@
++--- cf/crypto.m4.orig	2012-12-09 23:06:44.000000000 +0100
+++++ cf/crypto.m4	2015-04-10 22:22:32.902931044 +0200
++@@ -143,6 +143,7 @@
++ 			break;
++ 		fi
++ 	done
+++	AC_CHECK_LIB(crypto, RAND_egd, AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd]))
++ 	CFLAGS="$save_CFLAGS"
++ 	LIBS="$save_LIBS"
++ fi
 
-Property changes on: security/heimdal/files/patch-include_crypto-headers.h
+Property changes on: security/heimdal/files/patch-cf_crypto.m4
 ___________________________________________________________________
 Added: svn:mime-type
 ## -0,0 +1 ##
@@ -32,13 +28,157 @@ Added: svn:eol-style
 ## -0,0 +1 ##
 +native
 \ No newline at end of property
+Index: security/heimdal/files/patch-configure
+===================================================================
+--- security/heimdal/files/patch-configure	(revision 383757)
++++ security/heimdal/files/patch-configure	(working copy)
+@@ -1,88 +1,51 @@
+---- configure.orig	2014-10-20 14:24:44.000000000 +0900
+-+++ configure	2014-10-20 14:27:30.000000000 +0900
+-@@ -9567,29 +9567,6 @@
+-       hardcode_shlibpath_var=no
+-       ;;
+- 
+--    freebsd1*)
+--      ld_shlibs=no
+--      ;;
+--
+--    # FreeBSD 2.2.[012] allows us to include c++rt0.o to get C++ constructor
+--    # support.  Future versions do this automatically, but an explicit c++rt0.o
+--    # does not break anything, and helps significantly (at the cost of a little
+--    # extra space).
+--    freebsd2.2*)
+--      archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags /usr/lib/c++rt0.o'
+--      hardcode_libdir_flag_spec='-R$libdir'
+--      hardcode_direct=yes
+--      hardcode_shlibpath_var=no
+--      ;;
+--
+--    # Unfortunately, older versions of FreeBSD 2 do not have this feature.
+--    freebsd2*)
+--      archive_cmds='$LD -Bshareable -o $lib $libobjs $deplibs $linker_flags'
+--      hardcode_direct=yes
+--      hardcode_minus_L=yes
+--      hardcode_shlibpath_var=no
+--      ;;
+--
+-     # FreeBSD 3 and greater uses gcc -shared to do shared libraries.
+-     freebsd* | dragonfly*)
+-       archive_cmds='$CC -shared $pic_flag -o $lib $libobjs $deplibs $compiler_flags'
+-@@ -10561,10 +10538,6 @@
+-   shlibpath_var=LD_LIBRARY_PATH
+-   ;;
+- 
+--freebsd1*)
+--  dynamic_linker=no
+--  ;;
+--
+- freebsd* | dragonfly*)
+-   # DragonFly does not have aout.  When/if they implement a new
+-   # versioning mechanism, adjust this.
+-@@ -10572,7 +10545,6 @@
+-     objformat=`/usr/bin/objformat`
+-   else
+-     case $host_os in
+--    freebsd[123]*) objformat=aout ;;
+-     *) objformat=elf ;;
+-     esac
+-   fi
+-@@ -10590,18 +10562,6 @@
+-   esac
+-   shlibpath_var=LD_LIBRARY_PATH
+-   case $host_os in
+--  freebsd2*)
+--    shlibpath_overrides_runpath=yes
+--    ;;
+--  freebsd3.[01]* | freebsdelf3.[01]*)
+--    shlibpath_overrides_runpath=yes
+--    hardcode_into_libs=yes
+--    ;;
+--  freebsd3.[2-9]* | freebsdelf3.[2-9]* | \
+--  freebsd4.[0-5] | freebsdelf4.[0-5] | freebsd4.1.1 | freebsdelf4.1.1)
+--    shlibpath_overrides_runpath=no
+--    hardcode_into_libs=yes
+--    ;;
+-   *) # from 4.6 on, and DragonFly
+-     shlibpath_overrides_runpath=yes
+-     hardcode_into_libs=yes
+-@@ -14227,7 +14187,7 @@
+- 	native_pthread_support="netbsd 3 uses explict pthread"
+- 		PTHREAD_LIBADD="-lpthread"
+- 	;;
+--*-*-freebsd[56789]*)
+-+*-*-freebsd*)
+- 	native_pthread_support=yes
+- 	PTHREAD_LIBADD="-pthread"
+- 	;;
+-@@ -28245,7 +28205,7 @@
+- 
+- krb_cv_compile_et="no"
+- krb_cv_com_err_need_r=""
+--krb_cv_compile_et_cross=no
+-+krb_cv_compile_et_cross=yes
+- if test "${COMPILE_ET}" = "compile_et"; then
+- 
+- { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compile_et has the features we need" >&5
++--- configure.orig	2012-12-09 23:09:32.000000000 +0100
+++++ configure	2015-04-10 22:26:32.485912736 +0200
++@@ -14151,6 +14151,48 @@
++ 			break;
++ 		fi
++ 	done
+++	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for RAND_egd in -lcrypto" >&5
+++$as_echo_n "checking for RAND_egd in -lcrypto... " >&6; }
+++if ${ac_cv_lib_crypto_RAND_egd+:} false; then :
+++  $as_echo_n "(cached) " >&6
+++else
+++  ac_check_lib_save_LIBS=$LIBS
+++LIBS="-lcrypto  $LIBS"
+++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+++/* end confdefs.h.  */
+++
+++/* Override any GCC internal prototype to avoid an error.
+++   Use char because int might match the return type of a GCC
+++   builtin and then its argument prototype would still apply.  */
+++#ifdef __cplusplus
+++extern "C"
+++#endif
+++char RAND_egd ();
+++int
+++main ()
+++{
+++return RAND_egd ();
+++  ;
+++  return 0;
+++}
+++_ACEOF
+++if ac_fn_c_try_link "$LINENO"; then :
+++  ac_cv_lib_crypto_RAND_egd=yes
+++else
+++  ac_cv_lib_crypto_RAND_egd=no
+++fi
+++rm -f core conftest.err conftest.$ac_objext \
+++    conftest$ac_exeext conftest.$ac_ext
+++LIBS=$ac_check_lib_save_LIBS
+++fi
+++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_RAND_egd" >&5
+++$as_echo "$ac_cv_lib_crypto_RAND_egd" >&6; }
+++if test "x$ac_cv_lib_crypto_RAND_egd" = xyes; then :
+++
+++$as_echo "#define HAVE_RAND_EGD 1" >>confdefs.h
+++
+++fi
+++
++ 	CFLAGS="$save_CFLAGS"
++ 	LIBS="$save_LIBS"
++ fi
 Index: security/heimdal/files/patch-lib_hcrypto_rand-egd.c
 ===================================================================
 --- security/heimdal/files/patch-lib_hcrypto_rand-egd.c	(revision 0)
 +++ security/heimdal/files/patch-lib_hcrypto_rand-egd.c	(working copy)
-@@ -0,0 +1,17 @@
-+--- lib/hcrypto/rand-egd.c.orig	2012-12-09 23:06:44.000000000 +0100
-++++ lib/hcrypto/rand-egd.c	2015-03-11 18:59:17.067934065 +0100
+@@ -0,0 +1,16 @@
++--- lib/hcrypto/rand-egd.c.orig	2012-12-09 22:06:44.000000000 +0000
+++++ lib/hcrypto/rand-egd.c	2015-04-10 11:58:58.243409314 +0100
 +@@ -33,6 +33,8 @@
 + 
 + #include <config.h>
@@ -48,11 +188,10 @@ Index: security/heimdal/files/patch-lib_hcrypto_rand-egd.c
 + #include <sys/types.h>
 + #ifdef HAVE_SYS_UN_H
 + #include <sys/un.h>
-+@@ -258,3 +260,5 @@
++@@ -258,3 +260,4 @@
 + 
 +     return 1;
 + }
-++
 ++#endif
 
 Property changes on: security/heimdal/files/patch-lib_hcrypto_rand-egd.c
@@ -74,8 +213,8 @@ Index: security/heimdal/files/patch-lib_krb5_crypto-rand.c
 --- security/heimdal/files/patch-lib_krb5_crypto-rand.c	(revision 0)
 +++ security/heimdal/files/patch-lib_krb5_crypto-rand.c	(working copy)
 @@ -0,0 +1,18 @@
-+--- lib/krb5/crypto-rand.c.orig	2012-12-09 23:06:44.000000000 +0100
-++++ lib/krb5/crypto-rand.c	2015-03-11 19:01:30.449923193 +0100
++--- lib/krb5/crypto-rand.c.orig	2012-12-09 22:06:44.000000000 +0000
+++++ lib/krb5/crypto-rand.c	2015-04-10 11:58:58.249427321 +0100
 +@@ -66,6 +66,7 @@
 + 	krb5_context context;
 + 	const char *p;
@@ -95,10 +234,6 @@ Index: security/heimdal/files/patch-lib_krb5_crypto-rand.c
 
 Property changes on: security/heimdal/files/patch-lib_krb5_crypto-rand.c
 ___________________________________________________________________
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
-\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -106,4 +241,8 @@ Added: fbsd:nokeywords
 Added: svn:eol-style
 ## -0,0 +1 ##
 +native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
 \ No newline at end of property
