@@ -1,0 +1,184 @@
+Index: mail/rainloop/Makefile
+===================================================================
+--- mail/rainloop/Makefile	(revision 380620)
++++ mail/rainloop/Makefile	(working copy)
+@@ -1,9 +1,10 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	rainloop
+-PORTVERSION=	1.8.0
++PORTVERSION=	1.8.1
+ CATEGORIES?=	mail www
+-MASTER_SITES=	SF/${PORTNAME}-webmail/
++MASTER_SITES=	http://repository.rainloop.net/v2/webmail/${PORTVERSION}/
++DISTNAME=	${PORTNAME}-${PORTVERSION}.${RBUILD}-${RHASH}
+ 
+ MAINTAINER=	loic.blot@unix-experience.fr
+ COMMENT=	Modern and interactive webmail
+@@ -13,15 +14,38 @@
+ LICENSE_TEXT=	License can be found at: https://github.com/RainLoop/rainloop-webmail/blob/master/LICENSE
+ LICENSE_PERMS=	dist-mirror pkg-mirror auto-accept
+ 
++# Refresh using info from http://repository.rainloop.net/v2/core.stable.json
++RHASH=		7ef72935d0e81a2a9d5b158f19be0a3a
++RBUILD=		281
++
++OPTIONS_SINGLE=	DB
++OPTIONS_SINGLE_DB=	MYSQL PGSQL SQLITE
++
+ USES=		zip
+ NO_BUILD=	yes
+ NO_WRKSUBDIR=	yes
+ WANT_PHP_WEB=	yes
+ USE_PHP=	curl iconv json xml dom openssl pcre spl zlib
+-RVER=		1.8.0.250
++RVER=		${PORTVERSION}.${RBUILD}
+ PLIST_SUB=	VER="${RVER}" WWWOWN="${WWWOWN}" WWWGRP="${WWWGRP}"
+-# @TODO: PDO also for different backends
+ 
++OPTIONS_SINGLE=	DB
++OPTIONS_SINGLE_DB=	MYSQL PGSQL SQLITE
++
++.include <bsd.port.options.mk>
++
++.if ${PORT_OPTIONS:MMYSQL}
++USE_PHP+=	pdo_mysql
++.endif
++
++.if ${PORT_OPTIONS:MPGSQL}
++USE_PHP+=	pdo_pgsql
++.endif
++
++.if ${PORT_OPTIONS:MSQLITE}
++USE_PHP+=	pdo_sqlite
++.endif
++
+ do-install:
+ 	@${MKDIR} ${STAGEDIR}${WWWDIR}/data
+ 	${INSTALL_DATA} ${WRKSRC}/data/* ${STAGEDIR}${WWWDIR}/data
+Index: mail/rainloop/distinfo
+===================================================================
+--- mail/rainloop/distinfo	(revision 380620)
++++ mail/rainloop/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (rainloop-1.8.0.zip) = 3ae6e1260d4b3e44046860b70fd7313cbcd15316107ba60fa02f604c4c20aa8d
+-SIZE (rainloop-1.8.0.zip) = 4795462
++SHA256 (rainloop-1.8.1.281-7ef72935d0e81a2a9d5b158f19be0a3a.zip) = ec66db8f70544e9d4f69bb4eb174b6d94d2e11d5ac938f6388ddc4ebbda0c8ff
++SIZE (rainloop-1.8.1.281-7ef72935d0e81a2a9d5b158f19be0a3a.zip) = 5034949
+Index: mail/rainloop/pkg-plist
+===================================================================
+--- mail/rainloop/pkg-plist	(revision 380620)
++++ mail/rainloop/pkg-plist	(working copy)
+@@ -359,6 +359,7 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/KeyPathHelper.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Model/Account.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Model/Domain.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Model/Template.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Model/Identity.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Notifications.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Plugins/AbstractPlugin.php
+@@ -380,8 +381,8 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Domain/DomainAdminInterface.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Domain/DomainInterface.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Files.php
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Files/DefaultStorage.php
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Files/FilesInterface.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Files/FileStorage.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Files/IFiles.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Filters.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Filters/Classes/Filter.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Filters/Classes/FilterCondition.php
+@@ -392,14 +393,17 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Filters/FiltersInterface.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Filters/SieveStorage.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Settings.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Settings/ISettings.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Settings/DefaultSettings.php
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Settings/SettingsInterface.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Storage.php
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Storage/DefaultStorage.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Storage/Enumerations/StorageType.php
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Storage/StorageInterface.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Storage/FileStorage.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Storage/IStorage.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Storage/TemproryApcStorage.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Suggestions.php
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Suggestions/SuggestionsInterface.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Suggestions/ISuggestions.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Suggestions/OwnCloudSuggestions.php
++%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/Suggestions/TestSuggestions.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/TwoFactorAuth.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/TwoFactorAuth/AbstractTwoFactorAuth.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/Providers/TwoFactorAuth/GoogleTwoFactorAuth.php
+@@ -770,7 +774,7 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/MailMessageListItemNoPreviewPane.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/MailMessageView.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PhotoSwipe.html
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsAddAccount.html
++%%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsAccount.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsAddOpenPgpKey.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsAdvancedSearch.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsCompose.html
+@@ -782,6 +786,7 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsFolderSystem.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsIdentity.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsNewOpenPgpKey.html
++%%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsTemplate.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsTwoFactorTest.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsViewOpenPgpKey.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/PopupsWindowSimpleMessage.html
+@@ -800,13 +805,12 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsFolderItem.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsFolders.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsGeneral.html
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsIdentities.html
+-%%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsIdentity.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsMenu.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsOpenPGP.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsPane.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsSecurity.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsSocial.html
++%%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsTemplates.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SettingsThemes.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/app/templates/Views/User/SystemDropDown.html
+ %%WWWDIR%%/rainloop/v/%%VER%%/check.php
+@@ -814,6 +818,7 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/index.php
+ %%WWWDIR%%/rainloop/v/%%VER%%/index.php.root
+ %%WWWDIR%%/rainloop/v/%%VER%%/langs/bg.ini
++%%WWWDIR%%/rainloop/v/%%VER%%/langs/cs.ini
+ %%WWWDIR%%/rainloop/v/%%VER%%/langs/de.ini
+ %%WWWDIR%%/rainloop/v/%%VER%%/langs/en.ini
+ %%WWWDIR%%/rainloop/v/%%VER%%/langs/es.ini
+@@ -844,11 +849,13 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/browsers/opera.gif
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/browsers/safari.gif
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/CHANGES.md
++%%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/CUSTOMS
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/LICENSE.md
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/README.md
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/adapters/jquery.js
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/build-config.js
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/ckeditor.js
++%%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/ckeditor.orig.js
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/config.js
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/contents.css
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/lang/af.js
+@@ -940,6 +947,7 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/plugins/plain/icons/plain-rtl.png
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/plugins/plain/icons/plain.png
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/plugins/plain/plugin.js
++%%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/plugins/signature/plugin.js
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/plugins/table/dialogs/table.js
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/plugins/tabletools/dialogs/tableCell.js
+ %%WWWDIR%%/rainloop/v/%%VER%%/static/ckeditor/plugins/widget/images/handle.png
+@@ -1044,6 +1052,9 @@
+ %%WWWDIR%%/rainloop/v/%%VER%%/themes/Blurred/styles.less
+ %%WWWDIR%%/rainloop/v/%%VER%%/themes/Clear/images/preview.png
+ %%WWWDIR%%/rainloop/v/%%VER%%/themes/Clear/styles.less
++%%WWWDIR%%/rainloop/v/%%VER%%/themes/DarkShine/images/background.jpg
++%%WWWDIR%%/rainloop/v/%%VER%%/themes/DarkShine/images/preview.png
++%%WWWDIR%%/rainloop/v/%%VER%%/themes/DarkShine/styles.less
+ %%WWWDIR%%/rainloop/v/%%VER%%/themes/Default/images/background.jpg
+ %%WWWDIR%%/rainloop/v/%%VER%%/themes/Default/images/background.png
+ %%WWWDIR%%/rainloop/v/%%VER%%/themes/Default/images/preview.png

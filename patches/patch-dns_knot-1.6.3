@@ -1,0 +1,55 @@
+--- Makefile.orig	2015-04-11 10:53:01.742825829 +0200
++++ Makefile	2015-04-11 10:51:28.838833198 +0200
+@@ -19,18 +19,18 @@
+ USES=		alias libtool tar:xz
+ 
+ USE_LDCONFIG=	yes
++USE_OPENSSL=	yes
+ 
+ INSTALL_TARGET=	install-strip
+ 
+ GNU_CONFIGURE=	yes
+ 
+-CONFIGURE_ARGS+=	--with-storage=/var/db/knot
+-CONFIGURE_ARGS+=	--with-rundir=/var/run/knot
++CONFIGURE_ARGS+=	--with-storage=/var/db/knot \
++			--with-rundir=/var/run/knot \
++			--with-openssl=${OPENSSLBASE}
+ 
+ OPTIONS_DEFINE=		DNSTAP FASTPARSER GOST IDNA LMDB
+-OPTIONS_SINGLE=		SSL
+-OPTIONS_SINGLE_SSL=	LIBRESSL OPENSSL
+-OPTIONS_DEFAULT=	GOST OPENSSL
++OPTIONS_DEFAULT=	GOST
+ 
+ DNSTAP_DESC=		dnstap support (see dnstap.info)
+ DNSTAP_CONFIGURE_ENABLE=	dnstap
+@@ -50,23 +50,15 @@
+ LMDB_CONFIGURE_ENABLE=	lmdb
+ LMDB_LIB_DEPENDS=	liblmdb.so:${PORTSDIR}/databases/lmdb
+ 
+-SSL_DESC=		DNSSEC support using:
+-
+-LIBRESSL_DESC=		LibreSSL (experimental)
+-LIBRESSL_LIB_DEPENDS=	libressl.so:${PORTSDIR}/security/libressl
+-
+-OPENSSL_DESC=		OpenSSL (default)
+-OPENSSL_USE=		OPENSSL=yes
+-OPENSSL_CONFIGURE_ON=	--with-openssl=${OPENSSLBASE}
+-
+ .include <bsd.port.options.mk>
+ 
+-.if ${PORT_OPTIONS:MLIBRESSL} && ${PORT_OPTIONS:MGOST}
++.if ${PORT_OPTIONS:MGOST} 
++. if ${OPENSSL_PORT} == security/libressl
+ IGNORE=			the (not impossible) combination of LibreSSL and GOST is not implemented (yet). Either disable GOST or use OpenSSL
+-.endif
+-
+-.if ${PORT_OPTIONS:MOPENSSL} && ${PORT_OPTIONS:MGOST} && ${OSVERSION} < 1000015
++. endif
++. if ${OSVERSION} < 1000015
+ WITH_OPENSSL_PORT=	yes
++. endif
+ .endif
+ 
+ SUB_FILES=	pkg-message

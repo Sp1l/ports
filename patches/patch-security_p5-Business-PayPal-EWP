@@ -1,0 +1,31 @@
+Index: security/p5-Business-PayPal-EWP/files/patch-Makefile.PL
+===================================================================
+--- security/p5-Business-PayPal-EWP/files/patch-Makefile.PL	(revision 0)
++++ security/p5-Business-PayPal-EWP/files/patch-Makefile.PL	(working copy)
+@@ -0,0 +1,11 @@
++--- Makefile.PL.orig	2015-02-28 21:17:47.891583000 +0100
+++++ Makefile.PL	2015-02-28 21:21:30.013978756 +0100
++@@ -78,7 +78,7 @@
++     or die "Couldn't run `$exe_path' ($?)\n";
++ 
++ unless (($lib_name, $maj, $min, $letter) = $vers =~
++-	/^(OpenSSL)\s+(\d+\.\d+)\.(\d+)([a-z]*)/) {
+++	/^(OpenSSL|LibreSSL)\s+(\d+\.\d+)\.(\d+)([a-z]*)/) {
++     die "OpenSSL version test failed (`$vers' was returned, but\n"
++     . "couldn't be parsed). Either you have bogus OpenSSL or a new version\n"
++     . "has changed the version number format.\n";
+
+Property changes on: security/p5-Business-PayPal-EWP/files/patch-Makefile.PL
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
