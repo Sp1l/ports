@@ -1,0 +1,12 @@
+Index: emulators/virtualbox-ose/Makefile
+===================================================================
+--- emulators/virtualbox-ose/Makefile	(revision 383801)
++++ emulators/virtualbox-ose/Makefile	(working copy)
+@@ -36,6 +36,7 @@
+ USES=		compiler cpe iconv pkgconfig tar:bzip2
+ USE_GNOME=	libidl
+ USE_LDCONFIG=	${VBOX_DIR}
++USE_OPENSSL=	yes
+ 
+ HAS_CONFIGURE=	yes
+ CONFIGURE_ARGS+=	--disable-java --passive-mesa
