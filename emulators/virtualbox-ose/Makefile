@@ -36,6 +36,7 @@ ONLY_FOR_ARCHS=	i386 amd64
 USES=		compiler cpe iconv pkgconfig tar:bzip2
 USE_GNOME=	libidl
 USE_LDCONFIG=	${VBOX_DIR}
+USE_OPENSSL=	yes
 
 HAS_CONFIGURE=	yes
 CONFIGURE_ARGS+=	--disable-java --passive-mesa
