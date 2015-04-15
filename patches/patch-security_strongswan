@@ -51,6 +51,48 @@ Added: svn:eol-style
 ## -0,0 +1 ##
 +native
 \ No newline at end of property
+Index: security/strongswan/files/patch-conf__Makefile.in
+===================================================================
+--- security/strongswan/files/patch-conf__Makefile.in	(revision 384037)
++++ security/strongswan/files/patch-conf__Makefile.in	(working copy)
+@@ -1,21 +0,0 @@
+---- conf/Makefile.in.orig	2014-10-18 08:23:39 UTC
+-+++ conf/Makefile.in
+-@@ -852,15 +852,15 @@
+- 	test -e "$(DESTDIR)${strongswanconfdir}" || $(INSTALL) -d "$(DESTDIR)$(strongswanconfdir)" || true
+- 	test -e "$(DESTDIR)${strongswanddir}" || $(INSTALL) -d "$(DESTDIR)$(strongswanddir)" || true
+- 	test -e "$(DESTDIR)${charonconfdir}" || $(INSTALL) -d "$(DESTDIR)$(charonconfdir)" || true
+--	test -e "$(DESTDIR)$(strongswanconfdir)/strongswan.conf" || $(INSTALL) -m 644 $(srcdir)/strongswan.conf $(DESTDIR)$(strongswanconfdir)/strongswan.conf || true
+-+	test -e "$(DESTDIR)$(strongswanconfdir)/strongswan.conf" || $(INSTALL) -m 644 $(srcdir)/strongswan.conf $(DESTDIR)$(strongswanconfdir)/strongswan.conf.sample || true
+- 	for f in $(options_install_src); do \
+- 		name=`basename $$f`; \
+--		test -f "$(DESTDIR)$(strongswanddir)/$$name" || $(INSTALL) -m 644 "$(srcdir)/$$f" "$(DESTDIR)$(strongswanddir)/$$name" || true; \
+-+		test -f "$(DESTDIR)$(strongswanddir)/$$name" || $(INSTALL) -m 644 "$(srcdir)/$$f" "$(DESTDIR)$(strongswanddir)/$$name.sample" || true; \
+- 	done
+- 	for f in $(plugins_install_src); do \
+- 		name=`basename $$f`; \
+- 		if test -f "$$f"; then dir=; else dir="$(srcdir)/"; fi; \
+--		test -f "$(DESTDIR)$(charonconfdir)/$$name" || $(INSTALL) -m 644 "$$dir$$f" "$(DESTDIR)$(charonconfdir)/$$name" || true; \
+-+		test -f "$(DESTDIR)$(charonconfdir)/$$name" || $(INSTALL) -m 644 "$$dir$$f" "$(DESTDIR)$(charonconfdir)/$$name.sample" || true; \
+- 	done
+- 
+- # Tell versions [3.59,3.63) of GNU make to not export all variables.
+Index: security/strongswan/files/patch-src__starter__Makefile.in
+===================================================================
+--- security/strongswan/files/patch-src__starter__Makefile.in	(revision 384037)
++++ security/strongswan/files/patch-src__starter__Makefile.in	(working copy)
+@@ -1,11 +0,0 @@
+---- ./src/starter/Makefile.in.orig	2014-07-08 16:06:21.000000000 +0200
+-+++ ./src/starter/Makefile.in	2014-08-19 09:48:46.000000000 +0200
+-@@ -972,7 +972,7 @@
+- 		test -e "$(DESTDIR)${sysconfdir}/ipsec.d/crls" || $(INSTALL) -d "$(DESTDIR)$(sysconfdir)/ipsec.d/crls" || true
+- 		test -e "$(DESTDIR)${sysconfdir}/ipsec.d/reqs" || $(INSTALL) -d "$(DESTDIR)$(sysconfdir)/ipsec.d/reqs" || true
+- 		test -e "$(DESTDIR)${sysconfdir}/ipsec.d/private" || $(INSTALL) -d -m 750 "$(DESTDIR)$(sysconfdir)/ipsec.d/private" || true
+--		test -e "$(DESTDIR)$(sysconfdir)/ipsec.conf" || $(INSTALL) -m 644 $(srcdir)/ipsec.conf $(DESTDIR)$(sysconfdir)/ipsec.conf || true
+-+		test -e "$(DESTDIR)$(sysconfdir)/ipsec.conf" || $(INSTALL) -m 644 $(srcdir)/ipsec.conf $(DESTDIR)$(sysconfdir)/ipsec.conf.sample || true
+- 
+- # Tell versions [3.59,3.63) of GNU make to not export all variables.
+- # Otherwise a system limit (for SysV at least) may be exceeded.
 Index: security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c
 ===================================================================
 --- security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c	(revision 0)
@@ -82,6 +124,10 @@ Index: security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c
 
 Property changes on: security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c
 ___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -89,10 +135,6 @@ Added: fbsd:nokeywords
 Added: svn:eol-style
 ## -0,0 +1 ##
 +native
-\ No newline at end of property
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
 \ No newline at end of property
 Index: security/strongswan/files/patch-src_starter_Makefile.in
 ===================================================================
@@ -113,6 +155,10 @@ Index: security/strongswan/files/patch-src_starter_Makefile.in
 
 Property changes on: security/strongswan/files/patch-src_starter_Makefile.in
 ___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -120,8 +166,4 @@ Added: fbsd:nokeywords
 Added: svn:eol-style
 ## -0,0 +1 ##
 +native
-\ No newline at end of property
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
 \ No newline at end of property
