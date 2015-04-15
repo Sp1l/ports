@@ -1,0 +1,17 @@
+Index: security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_ssl.py
+===================================================================
+--- security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_ssl.py	(revision 384037)
++++ security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_ssl.py	(working copy)
+@@ -28,3 +28,12 @@
+  #ifdef SSL_OP_NO_COMPRESSION
+  static const long Cryptography_HAS_OP_NO_COMPRESSION = 1;
+  #else
++@@ -524,7 +530,7 @@ static const long Cryptography_HAS_NEXTP
++ #endif
++ 
++ /* ALPN was added in OpenSSL 1.0.2. */
++-#if OPENSSL_VERSION_NUMBER < 0x10002001L
+++#if OPENSSL_VERSION_NUMBER < 0x10002001L && !defined(LIBRESSL_VERSION_NUMBER)
++ int (*SSL_CTX_set_alpn_protos)(SSL_CTX *,
++                                const unsigned char *,
++                                unsigned) = NULL;
