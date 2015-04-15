@@ -1,0 +1,127 @@
+Index: security/strongswan/Makefile
+===================================================================
+--- security/strongswan/Makefile	(revision 384037)
++++ security/strongswan/Makefile	(working copy)
+@@ -3,6 +3,7 @@
+ 
+ PORTNAME=	strongswan
+ PORTVERSION=	5.3.0
++PORTREVISION=	1
+ CATEGORIES=	security
+ MASTER_SITES=	http://download.strongswan.org/ \
+ 		http://download2.strongswan.org/
+Index: security/strongswan/files/patch-conf_Makefile.in
+===================================================================
+--- security/strongswan/files/patch-conf_Makefile.in	(revision 0)
++++ security/strongswan/files/patch-conf_Makefile.in	(working copy)
+@@ -0,0 +1,21 @@
++--- conf/Makefile.in.orig	2015-03-27 20:02:47 UTC
+++++ conf/Makefile.in
++@@ -860,15 +860,15 @@ install-data-local: $(plugins_install_sr
++ 	test -e "$(DESTDIR)${strongswanconfdir}" || $(INSTALL) -d "$(DESTDIR)$(strongswanconfdir)" || true
++ 	test -e "$(DESTDIR)${strongswanddir}" || $(INSTALL) -d "$(DESTDIR)$(strongswanddir)" || true
++ 	test -e "$(DESTDIR)${charonconfdir}" || $(INSTALL) -d "$(DESTDIR)$(charonconfdir)" || true
++-	test -e "$(DESTDIR)$(strongswanconfdir)/strongswan.conf" || $(INSTALL) -m 644 $(srcdir)/strongswan.conf $(DESTDIR)$(strongswanconfdir)/strongswan.conf || true
+++	test -e "$(DESTDIR)$(strongswanconfdir)/strongswan.conf" || $(INSTALL) -m 644 $(srcdir)/strongswan.conf $(DESTDIR)$(strongswanconfdir)/strongswan.conf.sample || true
++ 	for f in $(options_install_src); do \
++ 		name=`basename $$f`; \
++-		test -f "$(DESTDIR)$(strongswanddir)/$$name" || $(INSTALL) -m 644 "$(srcdir)/$$f" "$(DESTDIR)$(strongswanddir)/$$name" || true; \
+++		test -f "$(DESTDIR)$(strongswanddir)/$$name" || $(INSTALL) -m 644 "$(srcdir)/$$f" "$(DESTDIR)$(strongswanddir)/$$name.sample" || true; \
++ 	done
++ 	for f in $(plugins_install_src); do \
++ 		name=`basename $$f`; \
++ 		if test -f "$$f"; then dir=; else dir="$(srcdir)/"; fi; \
++-		test -f "$(DESTDIR)$(charonconfdir)/$$name" || $(INSTALL) -m 644 "$$dir$$f" "$(DESTDIR)$(charonconfdir)/$$name" || true; \
+++		test -f "$(DESTDIR)$(charonconfdir)/$$name" || $(INSTALL) -m 644 "$$dir$$f" "$(DESTDIR)$(charonconfdir)/$$name.sample" || true; \
++ 	done
++ 
++ # Tell versions [3.59,3.63) of GNU make to not export all variables.
+
+Property changes on: security/strongswan/files/patch-conf_Makefile.in
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c
+===================================================================
+--- security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c	(revision 0)
++++ security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c	(working copy)
+@@ -0,0 +1,23 @@
++--- src/libcharon/plugins/smp/smp.c.orig	2013-11-01 10:40:35 UTC
+++++ src/libcharon/plugins/smp/smp.c
++@@ -737,7 +737,7 @@ METHOD(plugin_t, destroy, void,
++  */
++ plugin_t *smp_plugin_create()
++ {
++-	struct sockaddr_un unix_addr = { AF_UNIX, IPSEC_PIDDIR "/charon.xml"};
+++	struct sockaddr_un unix_addr;
++ 	private_smp_t *this;
++ 	mode_t old;
++ 
++@@ -766,6 +766,11 @@ plugin_t *smp_plugin_create()
++ 		return NULL;
++ 	}
++ 
+++	strlcpy(unix_addr.sun_path, IPSEC_PIDDIR "/charon.xml",
+++	    sizeof(unix_addr.sun_path));
+++	unix_addr.sun_len = sizeof(unix_addr);
+++	unix_addr.sun_family = PF_LOCAL;
+++
++ 	unlink(unix_addr.sun_path);
++ 	old = umask(S_IRWXO);
++ 	if (bind(this->socket, (struct sockaddr *)&unix_addr, sizeof(unix_addr)) < 0)
+
+Property changes on: security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: security/strongswan/files/patch-src_starter_Makefile.in
+===================================================================
+--- security/strongswan/files/patch-src_starter_Makefile.in	(revision 0)
++++ security/strongswan/files/patch-src_starter_Makefile.in	(working copy)
+@@ -0,0 +1,11 @@
++--- src/starter/Makefile.in.orig	2015-03-27 20:03:00 UTC
+++++ src/starter/Makefile.in
++@@ -985,7 +985,7 @@ install-exec-local :
++ 		test -e "$(DESTDIR)${sysconfdir}/ipsec.d/crls" || $(INSTALL) -d "$(DESTDIR)$(sysconfdir)/ipsec.d/crls" || true
++ 		test -e "$(DESTDIR)${sysconfdir}/ipsec.d/reqs" || $(INSTALL) -d "$(DESTDIR)$(sysconfdir)/ipsec.d/reqs" || true
++ 		test -e "$(DESTDIR)${sysconfdir}/ipsec.d/private" || $(INSTALL) -d -m 750 "$(DESTDIR)$(sysconfdir)/ipsec.d/private" || true
++-		test -e "$(DESTDIR)$(sysconfdir)/ipsec.conf" || $(INSTALL) -m 644 $(srcdir)/ipsec.conf $(DESTDIR)$(sysconfdir)/ipsec.conf || true
+++		test -e "$(DESTDIR)$(sysconfdir)/ipsec.conf" || $(INSTALL) -m 644 $(srcdir)/ipsec.conf $(DESTDIR)$(sysconfdir)/ipsec.conf.sample || true
++ 
++ # Tell versions [3.59,3.63) of GNU make to not export all variables.
++ # Otherwise a system limit (for SysV at least) may be exceeded.
+
+Property changes on: security/strongswan/files/patch-src_starter_Makefile.in
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
