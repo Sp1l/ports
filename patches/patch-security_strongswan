@@ -65,6 +65,49 @@ Index: security/strongswan/files/patch-src__starter__Makefile.in
 - 
 - # Tell versions [3.59,3.63) of GNU make to not export all variables.
 - # Otherwise a system limit (for SysV at least) may be exceeded.
+Index: security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c
+===================================================================
+--- security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c	(revision 0)
++++ security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c	(working copy)
+@@ -0,0 +1,23 @@
++--- src/libcharon/plugins/smp/smp.c.orig	2013-11-01 10:40:35 UTC
+++++ src/libcharon/plugins/smp/smp.c
++@@ -737,7 +737,7 @@ METHOD(plugin_t, destroy, void,
++  */
++ plugin_t *smp_plugin_create()
++ {
++-	struct sockaddr_un unix_addr = { AF_UNIX, IPSEC_PIDDIR "/charon.xml"};
+++	struct sockaddr_un unix_addr;
++ 	private_smp_t *this;
++ 	mode_t old;
++ 
++@@ -766,6 +766,11 @@ plugin_t *smp_plugin_create()
++ 		return NULL;
++ 	}
++ 
+++	strlcpy(unix_addr.sun_path, IPSEC_PIDDIR "/charon.xml",
+++	    sizeof(unix_addr.sun_path));
+++	unix_addr.sun_len = sizeof(unix_addr);
+++	unix_addr.sun_family = PF_LOCAL;
+++
++ 	unlink(unix_addr.sun_path);
++ 	old = umask(S_IRWXO);
++ 	if (bind(this->socket, (struct sockaddr *)&unix_addr, sizeof(unix_addr)) < 0)
+
+Property changes on: security/strongswan/files/patch-src_libcharon_plugins_smp_smp.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
 Index: security/strongswan/files/patch-src_starter_Makefile.in
 ===================================================================
 --- security/strongswan/files/patch-src_starter_Makefile.in	(revision 384037)
