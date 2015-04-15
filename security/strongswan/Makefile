@@ -1,5 +1,5 @@
 # Created by: Riaan Kruger <riaank@gmail.com>
-# $FreeBSD: head/security/strongswan/Makefile 382902 2015-04-01 10:28:09Z garga $
+# $FreeBSD$
 
 PORTNAME=	strongswan
 PORTVERSION=	5.3.0
