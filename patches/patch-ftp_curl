@@ -2,32 +2,32 @@ Index: ftp/curl/Makefile
 ===================================================================
 --- ftp/curl/Makefile	(revision 384340)
 +++ ftp/curl/Makefile	(working copy)
-@@ -12,12 +12,12 @@
+@@ -12,13 +12,13 @@
  
  LICENSE=	MIT
  
 -OPTIONS_DEFINE=	CA_BUNDLE COOKIES CURL_DEBUG DEBUG DOCS EXAMPLES HTTP2 IDN IPV6 LDAP LDAPS LIBSSH2 PROXY RTMP TLS_SRP
-+OPTIONS_DEFINE=	CA_BUNDLE COOKIES CURL_DEBUG DEBUG DOCS EXAMPLES HTTP2 IDN IPV6 LDAP LDAPS LIBSSH2 PROXY RTMP TLS_SRP GSSAPI
++OPTIONS_DEFINE=	CA_BUNDLE COOKIES CURL_DEBUG DEBUG DOCS EXAMPLES GSSAPI HTTP2 IDN IPV6 LDAP LDAPS LIBSSH2 PROXY RTMP TLS_SRP
  OPTIONS_RADIO=	RESOLV SSL
--OPTIONS_SINGLE=	GSSAPI
-+OPTIONS_RADIO=	GSSAPIIMPL
+ OPTIONS_SINGLE=	GSSAPI
  OPTIONS_RADIO_RESOLV=	CARES THREADED_RESOLVER
  OPTIONS_RADIO_SSL=	GNUTLS NSS OPENSSL POLARSSL
 -OPTIONS_SINGLE_GSSAPI=	GSSAPI_BASE GSSAPI_HEIMDAL GSSAPI_MIT GSSAPI_NONE
-+OPTIONS_RADIO_GSSAPIIMPL=	GSSAPI_BASE GSSAPI_HEIMDAL GSSAPI_MIT
- OPTIONS_DEFAULT=CA_BUNDLE COOKIES GSSAPI_BASE IPV6 OPENSSL PROXY RESOLV THREADED_RESOLVER SSL TLS_SRP
+-OPTIONS_DEFAULT=CA_BUNDLE COOKIES GSSAPI_BASE IPV6 OPENSSL PROXY RESOLV THREADED_RESOLVER SSL TLS_SRP
++OPTIONS_SINGLE_GSSAPI=	GSSAPI_BASE GSSAPI_HEIMDAL GSSAPI_MIT
++OPTIONS_DEFAULT=CA_BUNDLE COOKIES GSSAPI GSSAPI_BASE IPV6 OPENSSL PROXY RESOLV THREADED_RESOLVER SSL TLS_SRP
  CA_BUNDLE_DESC=	Install CA bundle for OpenSSL
  COOKIES_DESC=	Cookies support
-@@ -25,7 +25,7 @@
+ CURL_DEBUG_DESC=cURL debug memory tracking
+@@ -25,7 +25,6 @@
  GSSAPI_BASE_DESC=	GSSAPI support via base system
  GSSAPI_HEIMDAL_DESC=	GSSAPI support via security/heimdal
  GSSAPI_MIT_DESC=	GSSAPI support via security/krb5
 -GSSAPI_NONE_DESC=	Disable GSSAPI support
-+GSSAPIIMPL_DESC=	GSS-API implementation (depends on GSSAPI knob)
  LIBSSH2_DESC=	SCP/SFTP support via libssh2
  RESOLV_DESC=	DNS resolving options
  THREADED_RESOLVER_DESC=	Threaded DNS resolver
-@@ -77,22 +77,6 @@
+@@ -77,22 +76,6 @@
  GNUTLS_CONFIGURE_OFF=	--without-gnutls
  GNUTLS_CONFIGURE_ON=	--with-gnutls=${LOCALBASE}
  GNUTLS_LIB_DEPENDS=	libgnutls.so:${PORTSDIR}/security/gnutls
@@ -50,57 +50,42 @@ Index: ftp/curl/Makefile
  HTTP2_BUILD_DEPENDS=	nghttp2>=0.6.0:${PORTSDIR}/www/nghttp2
  HTTP2_CONFIGURE_OFF=	--without-nghttp2
  HTTP2_CONFIGURE_ON=	--with-nghttp2=${LOCALBASE}
-@@ -140,13 +124,35 @@
- .include <bsd.port.options.mk>
- 
- .if ${PORT_OPTIONS:MCA_BUNDLE} && !${PORT_OPTIONS:MOPENSSL}
--IGNORE=		only supports CA bundle with OpenSSL
-+IGNORE=         only supports CA bundle with OpenSSL
- .endif
- 
- .if !${PORT_OPTIONS:MGNUTLS} && !${PORT_OPTIONS:MOPENSSL} && ${PORT_OPTIONS:MTLS_SRP}
--IGNORE=		only supports TLS-SRP with either OpenSSL or GnuTLS
-+IGNORE=         only supports TLS-SRP with either OpenSSL or GnuTLS
+@@ -147,6 +130,21 @@
+ IGNORE=		only supports TLS-SRP with either OpenSSL or GnuTLS
  .endif
  
 +.if ${PORT_OPTIONS:MGSSAPI}
 +CONFIGURE_ARGS+=	--with-gssapi=${GSSAPIBASEDIR} ${GSSAPI_CONFIGURE_ARGS}
-+CPPFLAGS+=	${GSSAPICPPFLAGS}
-+LDFLAGS+=	${GSSAPILDFLAGS}
-+LIBS+=	${GSSAPILIBS}
 +.if ${PORT_OPTIONS:MGSSAPI_BASE}
 +USES+=	gssapi
-+.endif
-+.if ${PORT_OPTIONS:MGSSAPI_HEIMDAL}
-+USES+=	gssapi:heimdal
 +.endif
 +.if ${PORT_OPTIONS:MGSSAPI_MIT}
 +USES+=	gssapi:mit
 +.endif
-+.else
-+CONFIGURE_ARGS+=	--without-gssapi
++.if ${PORT_OPTIONS:MGSSAPI_HEIMDAL}
++USES+=	gssapi:heimdal
 +.endif
-+
-+.if ${PORT_OPTIONS:MGSSAPI} && ${PORT_OPTIONS:MGSSAPI_BASE} && ${PORT_OPTIONS:MOPENSSL} && defined(WITH_OPENSSL_PORT)
-+IGNORE=		GSSAPI in base depends on base OpenSSL leading to conflicts with OpenSSL/LibreSSL from ports
++.else
++CONFIGURE_ARGS+=--without-gssapi
 +.endif
 +
  .if !${PORT_OPTIONS:MLDAP} && ${PORT_OPTIONS:MLDAPS}
  IGNORE=		only supports LDAPS with LDAP
  .endif
-@@ -159,14 +165,9 @@
+@@ -159,14 +157,13 @@
  IGNORE=		only supports LIBSSH2 with OpenSSL
  .endif
  
 -.if ${PORT_OPTIONS:MOPENSSL} && defined(OPENSSL_PORT) && ${OPENSSL_PORT} == "security/libressl"
 -.if ${PORT_OPTIONS:MGSSAPI_BASE}
--IGNORE=		with GSSAPI_BASE, configure failed to detect OpenSSL/LibreSSL from ports and link against base OpenSSL
-+.if ${PORT_OPTIONS:MTLS_SRP} && ${OPENSSL_PORT} == "security/libressl"
-+IGNORE=		LibreSSL removed TLS-SRP
++.if ${PORT_OPTIONS:MOPENSSL} && defined(OPENSSL_PORT) && ${PORT_OPTIONS:MGSSAPI_BASE}
+ IGNORE=		with GSSAPI_BASE, configure failed to detect OpenSSL/LibreSSL from ports and link against base OpenSSL
  .endif
 -.if ${PORT_OPTIONS:MTLS_SRP}
--IGNORE=		unsupported TLS-SRP in LibreSSL
--.endif
++
++.if ${PORT_OPTIONS:MTLS_SRP} && "${OPENSSL_PORT}" == "security/libressl"
+ IGNORE=		unsupported TLS-SRP in LibreSSL
+ .endif
 -.endif
  
  post-patch:
