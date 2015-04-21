@@ -1,0 +1,122 @@
+Index: security/py-cryptography/Makefile
+===================================================================
+--- security/py-cryptography/Makefile	(revision 384415)
++++ security/py-cryptography/Makefile	(working copy)
+@@ -2,7 +2,7 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	cryptography
+-PORTVERSION=	0.7.2
++PORTVERSION=	0.8.2
+ CATEGORIES=	security python
+ MASTER_SITES=	CHEESESHOP
+ PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
+Index: security/py-cryptography/distinfo
+===================================================================
+--- security/py-cryptography/distinfo	(revision 384415)
++++ security/py-cryptography/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (cryptography-0.7.2.tar.gz) = fab7fcdde360ec6614442d0321dcd0eff5e43544cb30d975e9d75a914a4cdf78
+-SIZE (cryptography-0.7.2.tar.gz) = 247477
++SHA256 (cryptography-0.8.2.tar.gz) = 1c9a022ab3decaf152093e2ef2d5ee4258c72c7d429446c86bd68ff8c0929db6
++SIZE (cryptography-0.8.2.tar.gz) = 268288
+Index: security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_engine.py
+===================================================================
+--- security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_engine.py	(revision 384415)
++++ security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_engine.py	(working copy)
+@@ -1,10 +0,0 @@
+---- src/cryptography/hazmat/bindings/openssl/engine.py.orig	2015-01-16 13:26:59 UTC
+-+++ src/cryptography/hazmat/bindings/openssl/engine.py
+-@@ -49,7 +49,6 @@ int ENGINE_init(ENGINE *);
+- int ENGINE_finish(ENGINE *);
+- void ENGINE_load_openssl(void);
+- void ENGINE_load_dynamic(void);
+--void ENGINE_load_cryptodev(void);
+- void ENGINE_load_builtin_engines(void);
+- void ENGINE_cleanup(void);
+- ENGINE *ENGINE_get_default_RSA(void);
+Index: security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_rand.py
+===================================================================
+--- security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_rand.py	(revision 384415)
++++ security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_rand.py	(working copy)
+@@ -1,12 +0,0 @@
+---- src/cryptography/hazmat/bindings/openssl/rand.py.orig	2015-01-16 13:26:59 UTC
+-+++ src/cryptography/hazmat/bindings/openssl/rand.py
+-@@ -16,9 +16,6 @@ void ERR_load_RAND_strings(void);
+- void RAND_seed(const void *, int);
+- void RAND_add(const void *, int, double);
+- int RAND_status(void);
+--int RAND_egd(const char *);
+--int RAND_egd_bytes(const char *, int);
+--int RAND_query_egd_bytes(const char *, unsigned char *, int);
+- const char *RAND_file_name(char *, size_t);
+- int RAND_load_file(const char *, long);
+- int RAND_write_file(const char *);
+Index: security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_ssl.py
+===================================================================
+--- security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_ssl.py	(revision 384415)
++++ security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_ssl.py	(working copy)
+@@ -1,30 +1,11 @@
+---- src/cryptography/hazmat/bindings/openssl/ssl.py.orig	2015-01-16 13:26:59 UTC
++--- src/cryptography/hazmat/bindings/openssl/ssl.py.orig	2015-04-21 08:58:58 UTC
+ +++ src/cryptography/hazmat/bindings/openssl/ssl.py
+-@@ -189,10 +189,6 @@ int SSL_shutdown(SSL *);
+- const char *SSL_get_cipher_list(const SSL *, int);
+- Cryptography_STACK_OF_SSL_CIPHER *SSL_get_ciphers(const SSL *);
+- 
+--const COMP_METHOD *SSL_get_current_compression(SSL *);
+--const COMP_METHOD *SSL_get_current_expansion(SSL *);
+--const char *SSL_COMP_get_name(const COMP_METHOD *);
+--
+- /*  context */
+- void SSL_CTX_free(SSL_CTX *);
+- long SSL_CTX_set_timeout(SSL_CTX *, long);
+-@@ -415,6 +411,16 @@ static const long Cryptography_HAS_RELEA
+- const long SSL_MODE_RELEASE_BUFFERS = 0;
++@@ -526,7 +526,7 @@ static const long Cryptography_HAS_NEXTP
+  #endif
+  
+-+#ifndef OPENSSL_NO_COMP
+-+const COMP_METHOD *SSL_get_current_compression(SSL *s);
+-+const COMP_METHOD *SSL_get_current_expansion(SSL *s);
+-+const char *SSL_COMP_get_name(const COMP_METHOD *comp);
+-+#else
+-+const void *SSL_get_current_compression(SSL *s);
+-+const void *SSL_get_current_expansion(SSL *s);
+-+const char *SSL_COMP_get_name(const void *comp);
+-+#endif
+-+
+- #ifdef SSL_OP_NO_COMPRESSION
+- static const long Cryptography_HAS_OP_NO_COMPRESSION = 1;
+- #else
++ /* ALPN was added in OpenSSL 1.0.2. */
++-#if OPENSSL_VERSION_NUMBER < 0x10002001L
+++#if OPENSSL_VERSION_NUMBER < 0x10002001L && !defined(LIBRESSL_VERSION_NUMBER)
++ int (*SSL_CTX_set_alpn_protos)(SSL_CTX *,
++                                const unsigned char *,
++                                unsigned) = NULL;
+Index: security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_x509__vfy.py
+===================================================================
+--- security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_x509__vfy.py	(revision 384415)
++++ security/py-cryptography/files/patch-src_cryptography_hazmat_bindings_openssl_x509__vfy.py	(working copy)
+@@ -1,20 +0,0 @@
+---- src/cryptography/hazmat/bindings/openssl/x509_vfy.py.orig	2015-01-16 13:26:59 UTC
+-+++ src/cryptography/hazmat/bindings/openssl/x509_vfy.py
+-@@ -191,7 +191,7 @@ int X509_VERIFY_PARAM_set1_ip_asc(X509_V
+- 
+- CUSTOMIZATIONS = """
+- /* OpenSSL 1.0.2+ verification error codes */
+--#if OPENSSL_VERSION_NUMBER >= 0x10002000L
+-+#if X509_V_ERR_EMAIL_MISMATCH
+- static const long Cryptography_HAS_102_VERIFICATION_ERROR_CODES = 1;
+- #else
+- static const long Cryptography_HAS_102_VERIFICATION_ERROR_CODES = 0;
+-@@ -207,7 +207,7 @@ static const long X509_V_ERR_IP_ADDRESS_
+- #endif
+- 
+- /* OpenSSL 1.0.2+ verification parameters */
+--#if OPENSSL_VERSION_NUMBER >= 0x10002000L
+-+#if X509_V_FLAG_PARTIAL_CHAIN
+- static const long Cryptography_HAS_102_VERIFICATION_PARAMS = 1;
+- #else
+- static const long Cryptography_HAS_102_VERIFICATION_PARAMS = 0;

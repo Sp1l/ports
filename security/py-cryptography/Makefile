@@ -2,7 +2,7 @@
 # $FreeBSD: head/security/py-cryptography/Makefile 377287 2015-01-18 09:38:15Z koobs $
 
 PORTNAME=	cryptography
-PORTVERSION=	0.7.2
+PORTVERSION=	0.8.2
 CATEGORIES=	security python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
