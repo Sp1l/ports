@@ -1,0 +1,337 @@
+Index: net/socat/files/patch-configure
+===================================================================
+--- net/socat/files/patch-configure	(revision 0)
++++ net/socat/files/patch-configure	(working copy)
+@@ -0,0 +1,52 @@
++--- configure.orig	2015-01-24 16:30:38 UTC
+++++ configure
++@@ -5367,6 +5367,49 @@ fi
++ $as_echo "$sc_cv_have_libcrypto" >&6; }
++ fi
++ 
+++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for RAND_egd in -lcrypto" >&5
+++$as_echo_n "checking for RAND_egd in -lcrypto... " >&6; }
+++if ${ac_cv_lib_crypto_RAND_egd+:} false; then :
+++  $as_echo_n "(cached) " >&6
+++else
+++  ac_check_lib_save_LIBS=$LIBS
+++LIBS="-lcrypto  $LIBS"
+++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+++/* end confdefs.h.  */
+++
+++/* Override any GCC internal prototype to avoid an error.
+++   Use char because int might match the return type of a GCC
+++   builtin and then its argument prototype would still apply.  */
+++#ifdef __cplusplus
+++extern "C"
+++#endif
+++char RAND_egd ();
+++int
+++main ()
+++{
+++return RAND_egd ();
+++  ;
+++  return 0;
+++}
+++_ACEOF
+++if ac_fn_c_try_link "$LINENO"; then :
+++  ac_cv_lib_crypto_RAND_egd=yes
+++else
+++  ac_cv_lib_crypto_RAND_egd=no
+++fi
+++rm -f core conftest.err conftest.$ac_objext \
+++    conftest$ac_exeext conftest.$ac_ext
+++LIBS=$ac_check_lib_save_LIBS
+++fi
+++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_RAND_egd" >&5
+++$as_echo "$ac_cv_lib_crypto_RAND_egd" >&6; }
+++if test "x$ac_cv_lib_crypto_RAND_egd" = xyes; then :
+++
+++$as_echo "#define HAVE_RAND_EGD 1" >>confdefs.h
+++
+++fi
+++
+++
++ if test -n "$WITH_FIPS"; then
++   if test "$sc_cv_have_openssl_fips_h" = 'yes' -a "$sc_cv_have_libcrypto" = 'yes'; then
++     $as_echo "#define WITH_FIPS 1" >>confdefs.h
+
+Property changes on: net/socat/files/patch-configure
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: net/socat/files/patch-configure.in
+===================================================================
+--- net/socat/files/patch-configure.in	(revision 0)
++++ net/socat/files/patch-configure.in	(working copy)
+@@ -0,0 +1,11 @@
++--- configure.in.orig	2015-01-24 10:15:22 UTC
+++++ configure.in
++@@ -647,6 +647,8 @@ if test -n "$WITH_FIPS" -a "$sc_cv_have_
++   AC_MSG_RESULT($sc_cv_have_libcrypto)
++ fi
++ 
+++AC_CHECK_LIB(crypto, RAND_egd, AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd]))
+++
++ if test -n "$WITH_FIPS"; then
++   if test "$sc_cv_have_openssl_fips_h" = 'yes' -a "$sc_cv_have_libcrypto" = 'yes'; then
++     AC_DEFINE(WITH_FIPS)
+
+Property changes on: net/socat/files/patch-configure.in
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: net/socat/files/patch-error.h
+===================================================================
+--- net/socat/files/patch-error.h	(revision 384518)
++++ net/socat/files/patch-error.h	(working copy)
+@@ -1,4 +1,4 @@
+---- error.h.orig	2015-01-26 09:59:47 UTC
++--- error.h.orig	2015-01-24 10:15:22 UTC
+ +++ error.h
+ @@ -229,8 +229,8 @@ struct diag_dgram {
+  } ;
+Index: net/socat/files/patch-sslcls.c
+===================================================================
+--- net/socat/files/patch-sslcls.c	(revision 0)
++++ net/socat/files/patch-sslcls.c	(working copy)
+@@ -0,0 +1,27 @@
++--- sslcls.c.orig	2015-01-24 10:15:22 UTC
+++++ sslcls.c
++@@ -331,6 +331,7 @@ void sycSSL_free(SSL *ssl) {
++    return;
++ }
++ 
+++#ifdef HAVE_RAND_EGD
++ int sycRAND_egd(const char *path) {
++    int result;
++    Debug1("RAND_egd(\"%s\")", path);
++@@ -338,6 +339,7 @@ int sycRAND_egd(const char *path) {
++    Debug1("RAND_egd() -> %d", result);
++    return result;
++ }
+++#endif
++ 
++ DH *sycPEM_read_bio_DHparams(BIO *bp, DH **x, pem_password_cb *cb, void *u) {
++    DH *result;
++@@ -375,7 +377,7 @@ int sycFIPS_mode_set(int onoff) {
++ }
++ #endif /* WITH_FIPS */
++ 
++-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+++#if OPENSSL_VERSION_NUMBER >= 0x00908000L && !defined(OPENSSL_NO_COMP)
++ const COMP_METHOD *sycSSL_get_current_compression(SSL *ssl) {
++    const COMP_METHOD *result;
++    Debug1("SSL_get_current_compression(%p)", ssl);
+
+Property changes on: net/socat/files/patch-sslcls.c
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: net/socat/files/patch-sslcls.h
+===================================================================
+--- net/socat/files/patch-sslcls.h	(revision 0)
++++ net/socat/files/patch-sslcls.h	(working copy)
+@@ -0,0 +1,11 @@
++--- sslcls.h.orig	2015-01-24 10:15:22 UTC
+++++ sslcls.h
++@@ -55,7 +55,7 @@ BIO *sycBIO_new_file(const char *filenam
++ 
++ int sycFIPS_mode_set(int onoff);
++ 
++-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+++#if OPENSSL_VERSION_NUMBER >= 0x00908000L && !defined(OPENSSL_NO_COMP)
++ const COMP_METHOD *sycSSL_get_current_compression(SSL *ssl);
++ const COMP_METHOD *sycSSL_get_current_expansion(SSL *ssl);
++ const char *sycSSL_COMP_get_name(const COMP_METHOD *comp);
+
+Property changes on: net/socat/files/patch-sslcls.h
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: net/socat/files/patch-xio-openssl.c
+===================================================================
+--- net/socat/files/patch-xio-openssl.c	(revision 0)
++++ net/socat/files/patch-xio-openssl.c	(working copy)
+@@ -0,0 +1,30 @@
++--- xio-openssl.c.orig	2015-01-24 14:33:42 UTC
+++++ xio-openssl.c
++@@ -110,7 +110,7 @@ const struct optdesc opt_openssl_cafile 
++ const struct optdesc opt_openssl_capath      = { "openssl-capath",     "capath", OPT_OPENSSL_CAPATH,      GROUP_OPENSSL, PH_SPEC, TYPE_FILENAME, OFUNC_SPEC };
++ const struct optdesc opt_openssl_egd         = { "openssl-egd",        "egd",    OPT_OPENSSL_EGD,         GROUP_OPENSSL, PH_SPEC, TYPE_FILENAME, OFUNC_SPEC };
++ const struct optdesc opt_openssl_pseudo      = { "openssl-pseudo",     "pseudo", OPT_OPENSSL_PSEUDO,      GROUP_OPENSSL, PH_SPEC, TYPE_BOOL,     OFUNC_SPEC };
++-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+++#if OPENSSL_VERSION_NUMBER >= 0x00908000L && !defined(OPENSSL_NO_COMP)
++ const struct optdesc opt_openssl_compress    = { "openssl-compress",   "compress", OPT_OPENSSL_COMPRESS,  GROUP_OPENSSL, PH_SPEC, TYPE_STRING,   OFUNC_SPEC };
++ #endif
++ #if WITH_FIPS
++@@ -147,7 +147,7 @@ int xio_reset_fips_mode(void) {
++ static void openssl_conn_loginfo(SSL *ssl) {
++    Notice1("SSL connection using %s", SSL_get_cipher(ssl));
++ 
++-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+++#if OPENSSL_VERSION_NUMBER >= 0x00908000L && !defined(OPENSSL_NO_COMP)
++    {
++       const COMP_METHOD *comp, *expansion;
++ 
++@@ -878,7 +878,9 @@ int
++    }
++ 
++    if (opt_egd) {
+++#ifdef HAVE_RAND_EGD
++       sycRAND_egd(opt_egd);
+++#endif
++    }
++ 
++    if (opt_pseudo) {
+
+Property changes on: net/socat/files/patch-xio-openssl.c
+___________________________________________________________________
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Index: net/socat/files/patch-xioopts.c
+===================================================================
+--- net/socat/files/patch-xioopts.c	(revision 384518)
++++ net/socat/files/patch-xioopts.c	(working copy)
+@@ -1,73 +1,20 @@
+ --- xioopts.c.orig	2015-01-24 10:15:22 UTC
+ +++ xioopts.c
+-@@ -2971,6 +2971,25 @@ int retropt_bind(struct opt *opts,
+-    OFUNC_TERMIOS_FLAG, OFUNC_TERMIOS_PATTERN, and some OFUNC_SPEC */
+- int applyopts(int fd, struct opt *opts, enum e_phase phase) {
+-    struct opt *opt;
+-+#ifdef HAVE_TERMIOS_ISPEED
+-+   int ispeed_major = -1, ospeed_major = -1;
+-+   unsigned int ispeed_value, ospeed_value;
+-+   bool speed_done = false;
+-+
+-+   opt = opts; while (opt && opt->desc != ODESC_END) {
+-+      if (opt->desc == ODESC_DONE ||
+-+          (phase != PH_ALL && opt->desc->phase != phase)) {
+-+         ++opt; continue; }
+-+         if (opt->desc->optcode == OPT_ISPEED) {
+-+           ispeed_major = opt->desc->major;
+-+           ispeed_value = opt->value.u_uint; }
+-+         if (opt->desc->optcode == OPT_OSPEED) {
+-+           ospeed_major = opt->desc->major;
+-+           ospeed_value = opt->value.u_uint; }
+-+      ++opt;
+-+      continue;
+-+   }
+-+#endif /* HAVE_TERMIOS_ISPEED */
+- 
+-    opt = opts; while (opt && opt->desc != ODESC_END) {
+-       if (opt->desc == ODESC_DONE ||
+-@@ -3605,21 +3624,29 @@ int applyopts(int fd, struct opt *opts, 
+- 
+- #ifdef HAVE_TERMIOS_ISPEED
+-       } else if (opt->desc->func == OFUNC_TERMIOS_SPEED) {
+--	 union {
+--	    struct termios termarg;
+--	    speed_t speeds[sizeof(struct termios)/sizeof(speed_t)];
+--	 } tdata;
+--	 if (Tcgetattr(fd, &tdata.termarg) < 0) {
+--	    Error3("tcgetattr(%d, %p): %s",
+--		   fd, &tdata.termarg, strerror(errno));
+--	    opt->desc = ODESC_ERROR; ++opt; continue;
+--	 }
+--	 tdata.speeds[opt->desc->major] = opt->value.u_uint;
+--	 if (Tcsetattr(fd, TCSADRAIN, &tdata.termarg) < 0) {
+--	    Error3("tcsetattr(%d, TCSADRAIN, %p): %s",
+--		   fd, &tdata.termarg, strerror(errno));
+--	    opt->desc = ODESC_ERROR; ++opt; continue;
+--	 }
+-+         if (speed_done == false) {
+-+           union {
+-+              struct termios termarg;
+-+              speed_t speeds[sizeof(struct termios)/sizeof(speed_t)];
+-+           } tdata;
+-+           if (Tcgetattr(fd, &tdata.termarg) < 0) {
+-+              Error3("tcgetattr(%d, %p): %s",
+-+                     fd, &tdata.termarg, strerror(errno));
+-+              opt->desc = ODESC_ERROR; ++opt; continue;
+-+           }
+-+           if (ispeed_major < 0 || ospeed_major < 0)
+-+             tdata.speeds[opt->desc->major] = opt->value.u_uint;
+-+           else{ 
+-+             tdata.speeds[ispeed_major] = ispeed_value;
+-+             tdata.speeds[ospeed_major] = ospeed_value;
+-+             speed_done = true;
+-+           }
+-+           if (Tcsetattr(fd, TCSADRAIN, &tdata.termarg) < 0) {
+-+             Error3("tcsetattr(%d, TCSADRAIN, %p): %s",
+-+                     fd, &tdata.termarg, strerror(errno));
+-+              opt->desc = ODESC_ERROR; ++opt; continue;
+-+           }
+-+         }
+- #endif /* HAVE_TERMIOS_ISPEED */
+- 
+-       } else if (opt->desc->func == OFUNC_TERMIOS_SPEC) {
++@@ -296,7 +296,7 @@ const struct optname optionnames[] = {
++ #if WITH_EXT2 && defined(EXT2_COMPR_FL)
++ 	IF_ANY    ("compr",	&opt_ext2_compr)
++ #endif
++-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+++#if OPENSSL_VERSION_NUMBER >= 0x00908000L && !defined(OPENSSL_NO_COMP)
++ 	IF_OPENSSL("compress",	&opt_openssl_compress)
++ #endif
++ #ifdef TCP_CONN_ABORT_THRESHOLD  /* HP_UX */
++@@ -1098,7 +1098,7 @@ const struct optname optionnames[] = {
++ 	IF_OPENSSL("openssl-certificate",	&opt_openssl_certificate)
++ 	IF_OPENSSL("openssl-cipherlist",	&opt_openssl_cipherlist)
++ 	IF_OPENSSL("openssl-commonname",	&opt_openssl_commonname)
++-#if OPENSSL_VERSION_NUMBER >= 0x00908000L
+++#if OPENSSL_VERSION_NUMBER >= 0x00908000L && !defined(OPENSSL_NO_COMP)
++ 	IF_OPENSSL("openssl-compress",	&opt_openssl_compress)
++ #endif
++ 	IF_OPENSSL("openssl-dhparam",	&opt_openssl_dhparam)
