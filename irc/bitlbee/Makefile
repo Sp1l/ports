@@ -65,6 +65,8 @@ OSCAR_CONFIGURE_OFF=	--oscar=0
 OTR_CONFIGURE_ON=	--otr=1
 OTR_LIB_DEPENDS=	libotr.so:${PORTSDIR}/security/libotr
 SKYPE_CONFIGURE_ON=     --skype=1
+SKYPE_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}Skype4Py>0:${PORTSDIR}/net-im/py-skype4py
+SKYPE_USES=		python
 TWITTER_CONFIGURE_OFF=	--twitter=0
 YAHOO_CONFIGURE_OFF=	--yahoo=0
 

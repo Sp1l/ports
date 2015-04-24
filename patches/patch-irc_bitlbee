@@ -17,7 +17,7 @@ Index: irc/bitlbee/Makefile
  TWITTER_DESC=		Twitter support
  YAHOO_DESC=		Yahoo! Messenger support
  GLIB_DESC=		Use glib as event handler
-@@ -46,80 +47,32 @@
+@@ -46,80 +47,34 @@
  
  CONFIGURE_ARGS=	--config=/var/db/bitlbee --strip=0
  
@@ -39,6 +39,8 @@ Index: irc/bitlbee/Makefile
 +OTR_CONFIGURE_ON=	--otr=1
 +OTR_LIB_DEPENDS=	libotr.so:${PORTSDIR}/security/libotr
 +SKYPE_CONFIGURE_ON=     --skype=1
++SKYPE_RUN_DEPENDS=	${PYTHON_PKGNAMEPREFIX}Skype4Py>0:${PORTSDIR}/net-im/py-skype4py
++SKYPE_USES=		python
 +TWITTER_CONFIGURE_OFF=	--twitter=0
 +YAHOO_CONFIGURE_OFF=	--yahoo=0
 +
@@ -119,3 +121,17 @@ Index: irc/bitlbee/Makefile
  post-patch:
  	@${REINPLACE_CMD} \
  		-e "s|^\(EFLAGS=.*\)|\1 ${LDFLAGS}|" \
+Index: irc/bitlbee/pkg-plist
+===================================================================
+--- irc/bitlbee/pkg-plist	(revision 384625)
++++ irc/bitlbee/pkg-plist	(working copy)
+@@ -1,5 +1,9 @@
+ man/man5/bitlbee.conf.5.gz
+ man/man8/bitlbee.8.gz
+ sbin/bitlbee
++%%SKYPE%%bin/skyped
++%%SKYPE%%lib/bitlbee/skype.so
++%%SKYPE%%etc/skyped/skyped.conf
++%%SKYPE%%etc/skyped/skyped.cnf
+ %%DATADIR%%/help.txt
+ @dir etc/bitlbee
