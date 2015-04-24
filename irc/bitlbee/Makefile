@@ -1,0 +1,148 @@
+# $FreeBSD: head/irc/bitlbee/Makefile 383633 2015-04-09 10:38:48Z garga $
+
+PORTNAME=	bitlbee
+PORTVERSION=	3.4
+CATEGORIES=	irc
+MASTER_SITES=	http://get.bitlbee.org/src/ \
+		${MASTER_SITE_LOCAL}
+MASTER_SITE_SUBDIR=	brix
+
+MAINTAINER=	garga@FreeBSD.org
+COMMENT=	IRC to other chat networks gateway
+
+LICENSE=	GPLv2
+
+BUILD_DEPENDS=	xmlto:${PORTSDIR}/textproc/xmlto \
+		xsltproc:${PORTSDIR}/textproc/libxslt
+
+SUB_FILES=	pkg-message
+PORTDOCS=	AUTHORS CHANGES CREDITS FAQ README
+PORTEXAMPLES=	bitlbee.conf motd.txt
+
+GNU_CONFIGURE=	yes
+USES=		gmake pkgconfig
+USE_RC_SUBR=	bitlbee
+PKGMESSAGE=	${WRKDIR}/pkg-message
+
+OPTIONS_DEFINE=		DEBUG DOCS EXAMPLES OTR
+
+OPTIONS_SINGLE=		EVENTS SSL
+OPTIONS_SINGLE_EVENTS=	GLIB LIBEVENT
+OPTIONS_SINGLE_SSL=	OPENSSL GNUTLS NSS
+
+OPTIONS_MULTI=		PROTO
+OPTIONS_MULTI_PROTO=	JABBER LIBPURPLE MSN OSCAR TWITTER YAHOO
+
+OTR_DESC=		Off-the-Record Messaging support
+LIBPURPLE_DESC=		Use libpurple for protocol support
+MSN_DESC=		Microsoft Messenger support
+OSCAR_DESC=		OSCAR (ICQ, AIM) support
+TWITTER_DESC=		Twitter support
+YAHOO_DESC=		Yahoo! Messenger support
+GLIB_DESC=		Use glib as event handler
+LIBEVENT_DESC=		Use libevent as event handler
+
+OPTIONS_DEFAULT=	GLIB GNUTLS JABBER OSCAR TWITTER YAHOO
+
+CONFIGURE_ARGS=	--config=/var/db/bitlbee --strip=0
+
+USERS=		bitlbee
+GROUPS=		bitlbee
+
+.include <bsd.port.options.mk>
+
+.if ${PORT_OPTIONS:MDEBUG}
+CONFIGURE_ARGS+=--debug=1
+.else
+CONFIGURE_ARGS+=--debug=0
+.endif
+
+.if ${PORT_OPTIONS:MOPENSSL}
+CONFIGURE_ARGS+=--ssl=openssl
+.elif ${PORT_OPTIONS:MNSS}
+CONFIGURE_ARGS+=--ssl=nss
+LIB_DEPENDS+=	libnss3.so:${PORTSDIR}/security/nss
+.elif ${PORT_OPTIONS:MGNUTLS}
+CONFIGURE_ARGS+=--ssl=gnutls
+LIB_DEPENDS+=	libgnutls.so:${PORTSDIR}/security/gnutls \
+		libgcrypt.so:${PORTSDIR}/security/libgcrypt
+.endif
+
+.if ${PORT_OPTIONS:MGLIB}
+CONFIGURE_ARGS+=--events=glib
+USE_GNOME=	glib20
+.elif ${PORT_OPTIONS:MLIBEVENT}
+CONFIGURE_ARGS+=--events=libevent
+LIB_DEPENDS+=	libevent.so:${PORTSDIR}/devel/libevent2
+.endif
+
+.if ${PORT_OPTIONS:MOTR}
+CONFIGURE_ARGS+=--otr=1
+LIB_DEPENDS+=	libotr.so:${PORTSDIR}/security/libotr
+.else
+CONFIGURE_ARGS+=--otr=0
+.endif
+
+.if ${PORT_OPTIONS:MMSN}
+CONFIGURE_ARGS+=--msn=1
+.else
+CONFIGURE_ARGS+=--msn=0
+.endif
+
+.if ${PORT_OPTIONS:MJABBER}
+CONFIGURE_ARGS+=--jabber=1
+.else
+CONFIGURE_ARGS+=--jabber=0
+.endif
+
+.if ${PORT_OPTIONS:MOSCAR}
+CONFIGURE_ARGS+=--oscar=1
+.else
+CONFIGURE_ARGS+=--oscar=0
+.endif
+
+.if ${PORT_OPTIONS:MYAHOO}
+CONFIGURE_ARGS+=--yahoo=1
+.else
+CONFIGURE_ARGS+=--yahoo=0
+.endif
+
+.if ${PORT_OPTIONS:MTWITTER}
+CONFIGURE_ARGS+=--twitter=1
+.else
+CONFIGURE_ARGS+=--twitter=0
+.endif
+
+.if ${PORT_OPTIONS:MLIBPURPLE}
+CONFIGURE_ARGS+=--purple=1
+LIB_DEPENDS+=	libpurple.so:${PORTSDIR}/net-im/libpurple
+.else
+CONFIGURE_ARGS+=--purple=0
+.endif
+
+post-patch:
+	@${REINPLACE_CMD} \
+		-e "s|^\(EFLAGS=.*\)|\1 ${LDFLAGS}|" \
+		${WRKSRC}/configure
+
+	@${REINPLACE_CMD} \
+		-e "s:/etc/bitlbee/motd.txt:${PREFIX}/etc/bitlbee/motd.txt:" \
+		-e "s:/var/lib/bitlbee:/var/db/bitlbee:" \
+		${WRKSRC}/bitlbee.conf
+	@${REINPLACE_CMD} \
+		-e "s:/var/lib/bitlbee:/var/db/bitlbee:" \
+		${WRKSRC}/doc/bitlbee.8
+
+post-install:
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/sbin/bitlbee
+	${MKDIR} ${STAGEDIR}/${PREFIX}/etc/bitlbee
+.if ${PORT_OPTIONS:MDOCS}
+	${MKDIR} ${STAGEDIR}/${DOCSDIR}
+	${INSTALL_DATA} ${PORTDOCS:S@^@${WRKSRC}/doc/@} ${STAGEDIR}/${DOCSDIR}
+.endif
+.if ${PORT_OPTIONS:MEXAMPLES}
+	${MKDIR} ${STAGEDIR}/${EXAMPLESDIR}
+	${INSTALL_DATA} ${PORTEXAMPLES:S@^@${WRKSRC}/@} ${STAGEDIR}/${EXAMPLESDIR}
+.endif
+
+.include <bsd.port.mk>
