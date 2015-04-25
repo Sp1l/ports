@@ -1,0 +1,45 @@
+Index: net/miniupnpd/Makefile
+===================================================================
+--- net/miniupnpd/Makefile	(revision 384728)
++++ net/miniupnpd/Makefile	(working copy)
+@@ -24,6 +24,9 @@
+ USE_OPENSSL=	yes
+ USE_RC_SUBR=	miniupnpd
+ 
++CFLAGS+=	-I${OPENSSLINC}
++LDFLAGS+=	-L${OPENSSLLIB}
++
+ OPTIONS_DEFINE=	PF_ENABLE_FILTER_RULES CHECK_PORTINUSE IPV6 UPNP_IGDV2 UPNP_STRICT LEASEFILE
+ PF_ENABLE_FILTER_RULES_DESC=	Enable pf generation of filter rules
+ CHECK_PORTINUSE_DESC=	Check if ports are in use
+Index: net/miniupnpd/files/patch-Makefile
+===================================================================
+--- net/miniupnpd/files/patch-Makefile	(revision 0)
++++ net/miniupnpd/files/patch-Makefile	(working copy)
+@@ -0,0 +1,11 @@
++--- Makefile.orig	2014-06-30 12:03:05 UTC
+++++ Makefile
++@@ -204,7 +204,7 @@ depend:	config.h
++ 	testgetroute.c testportinuse.c testasyncsendto.c
++ 
++ miniupnpd: config.h $(ALLOBJS)
++-	$(CC) $(CFLAGS) -o $@ $(ALLOBJS) $(LIBS)
+++	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(ALLOBJS) $(LIBS)
++ 
++ # BSDmake :
++ #	$(CC) $(CFLAGS) -o $@ $> $(LIBS)
+
+Property changes on: net/miniupnpd/files/patch-Makefile
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
