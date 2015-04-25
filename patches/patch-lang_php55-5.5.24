@@ -22,3 +22,51 @@ Index: lang/php55/distinfo
 -SIZE (php-5.5.x-mail-header.patch) = 3379
 +SHA256 (php-5.5.24.tar.bz2) = 801b5cf2e0c01b07314d4ac3c8a7c28d524bdd8263ebdd0e33a99008251316a2
 +SIZE (php-5.5.24.tar.bz2) = 13337043
+Index: databases/php55-pdo_sqlite/Makefile
+===================================================================
+--- databases/php55-pdo_sqlite/Makefile	(revision 384745)
++++ databases/php55-pdo_sqlite/Makefile	(working copy)
+@@ -1,7 +1,6 @@
+ # Created by: Alex Dupre <ale@FreeBSD.org>
+ # $FreeBSD$
+ 
+-PORTREVISION=	1
+ CATEGORIES=	databases
+ 
+ MASTERDIR=	${.CURDIR}/../../lang/php55
+Index: databases/php55-sqlite3/Makefile
+===================================================================
+--- databases/php55-sqlite3/Makefile	(revision 384745)
++++ databases/php55-sqlite3/Makefile	(working copy)
+@@ -1,7 +1,6 @@
+ # Created by: Alex Dupre <ale@FreeBSD.org>
+ # $FreeBSD$
+ 
+-PORTREVISION=	1
+ CATEGORIES=	databases
+ 
+ MASTERDIR=	${.CURDIR}/../../lang/php55
+Index: security/php55-mcrypt/Makefile
+===================================================================
+--- security/php55-mcrypt/Makefile	(revision 384745)
++++ security/php55-mcrypt/Makefile	(working copy)
+@@ -1,7 +1,6 @@
+ # Created by: Alex Dupre <ale@FreeBSD.org>
+ # $FreeBSD$
+ 
+-PORTREVISION=	1
+ CATEGORIES=	security
+ 
+ MASTERDIR=	${.CURDIR}/../../lang/php55
+Index: textproc/php55-pspell/Makefile
+===================================================================
+--- textproc/php55-pspell/Makefile	(revision 384745)
++++ textproc/php55-pspell/Makefile	(working copy)
+@@ -1,7 +1,6 @@
+ # Created by: Alex Dupre <ale@FreeBSD.org>
+ # $FreeBSD$
+ 
+-PORTREVISION=	1
+ CATEGORIES=	textproc
+ 
+ MASTERDIR=	${.CURDIR}/../../lang/php55
