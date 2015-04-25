@@ -1,0 +1,14 @@
+Index: sysutils/ipmitool/Makefile
+===================================================================
+--- sysutils/ipmitool/Makefile	(revision 384728)
++++ sysutils/ipmitool/Makefile	(working copy)
+@@ -29,6 +29,9 @@
+ OPTIONS_DEFINE=	FREEIPMI DOCS
+ FREEIPMI_DESC=	Enable support for freeipmi
+ 
++CFLAGS+=	-I${OPENSSLINC}
++LDFLAGS+=	-L${OPENSSLLIB}
++
+ .if defined(WITH_DEBUG)
+ CFLAGS+=	-ggdb -Wall
+ .endif
