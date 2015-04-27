@@ -1,6 +1,6 @@
---- default.c.orig	2013-08-25 23:08:07 UTC
+--- default.c.orig	2014-11-05 19:25:50 UTC
 +++ default.c
-@@ -809,7 +809,7 @@ void init_home(void)
+@@ -824,7 +824,7 @@ void init_home(void)
  	get_compiler_name();
  	links_home = get_home(&first_use);
  	if (!links_home) {

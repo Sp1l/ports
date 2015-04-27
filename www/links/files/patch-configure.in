@@ -1,6 +1,6 @@
---- configure.in.orig	2013-09-17 00:11:46 UTC
+--- configure.in.orig	2014-12-19 20:04:22 UTC
 +++ configure.in
-@@ -843,6 +843,8 @@ fi
+@@ -755,6 +755,8 @@ fi
  #endif
  cf_have_ssl=$cf_result
  

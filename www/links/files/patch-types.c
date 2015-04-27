@@ -1,4 +1,4 @@
---- types.c.orig	2013-01-23 04:42:08 UTC
+--- types.c.orig	2014-08-27 18:33:52 UTC
 +++ types.c
 @@ -857,7 +857,8 @@ unsigned char *get_content_type_by_exten
  			ext = NULL;

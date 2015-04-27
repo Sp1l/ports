@@ -1,0 +1,197 @@
+Index: www/links/files/patch-config.h.in
+===================================================================
+--- www/links/files/patch-config.h.in	(revision 0)
++++ www/links/files/patch-config.h.in	(working copy)
+@@ -0,0 +1,12 @@
++--- config.h.in.orig	2015-03-21 12:27:07 UTC
+++++ config.h.in
++@@ -248,6 +248,9 @@
++ /* Define if you have the pthread_sigmask function.  */
++ #undef HAVE_PTHREAD_SIGMASK
++ 
+++/* Define if libcrypto has RAND_egd */
+++#undef HAVE_RAND_EGD
+++
++ /* Define if you have the raise function.  */
++ #undef HAVE_RAISE
++ 
+
+Property changes on: www/links/files/patch-config.h.in
+___________________________________________________________________
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Index: www/links/files/patch-configure
+===================================================================
+--- www/links/files/patch-configure	(revision 384728)
++++ www/links/files/patch-configure	(working copy)
+@@ -1,8 +1,8 @@
+---- configure.orig	2011-04-19 11:36:37.000000000 -0400
+-+++ configure	2011-10-18 13:48:27.000000000 -0400
+-@@ -1762,6 +1762,8 @@
++--- configure.orig	2015-04-27 05:19:33 UTC
+++++ configure
++@@ -5320,6 +5320,8 @@ else
+    cat > conftest.$ac_ext <<EOF
+- #line 1764 "configure"
++ #line 5318 "configure"
+  #include "confdefs.h"
+ +#include <sys/types.h>
+ +#include <netinet/in.h>
+@@ -9,3 +9,52 @@
+  #include <$ac_hdr>
+  EOF
+  ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
++@@ -6182,6 +6184,48 @@ fi
++ #endif
++ cf_have_ssl=$cf_result
++ 
+++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for RAND_egd in -lcrypto" >&5
+++$as_echo_n "checking for RAND_egd in -lcrypto... " >&6; }
+++if ${ac_cv_lib_crypto_RAND_egd+:} false; then :
+++  $as_echo_n "(cached) " >&6
+++else
+++  ac_check_lib_save_LIBS=$LIBS
+++LIBS="-lcrypto  $LIBS"
+++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+++/* end confdefs.h.  */
+++
+++/* Override any GCC internal prototype to avoid an error.
+++   Use char because int might match the return type of a GCC
+++   builtin and then its argument prototype would still apply.  */
+++#ifdef __cplusplus
+++extern "C"
+++#endif
+++char RAND_egd ();
+++int
+++main ()
+++{
+++return RAND_egd ();
+++  ;
+++  return 0;
+++}
+++_ACEOF
+++if ac_fn_c_try_link "$LINENO"; then :
+++  ac_cv_lib_crypto_RAND_egd=yes
+++else
+++  ac_cv_lib_crypto_RAND_egd=no
+++fi
+++rm -f core conftest.err conftest.$ac_objext \
+++    conftest$ac_exeext conftest.$ac_ext
+++LIBS=$ac_check_lib_save_LIBS
+++fi
+++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_RAND_egd" >&5
+++$as_echo "$ac_cv_lib_crypto_RAND_egd" >&6; }
+++if test "x$ac_cv_lib_crypto_RAND_egd" = xyes; then :
+++
+++$as_echo "#define HAVE_RAND_EGD 1" >>confdefs.h
+++
+++fi
+++
++ # Check whether --with-zlib or --without-zlib was given.
++ if test "${with_zlib+set}" = set; then
++   withval="$with_zlib"
+Index: www/links/files/patch-configure.in
+===================================================================
+--- www/links/files/patch-configure.in	(revision 0)
++++ www/links/files/patch-configure.in	(working copy)
+@@ -0,0 +1,11 @@
++--- configure.in.orig	2014-12-19 20:04:22 UTC
+++++ configure.in
++@@ -755,6 +755,8 @@ fi
++ #endif
++ cf_have_ssl=$cf_result
++ 
+++AC_CHECK_LIB(crypto, RAND_egd, AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd]))
+++
++ AC_ARG_WITH(zlib, [  --without-zlib          compile without zlib compression],[if test "$withval" = no; then disable_zlib=yes; else disable_zlib=no; fi])
++ AC_ARG_WITH(bzip2, [  --without-bzip2         compile without bzip2 compression],[if test "$withval" = no; then disable_bzip2=yes; else disable_bzip2=no; fi])
++ AC_ARG_WITH(lzma, [  --without-lzma          compile without lzma compression],[if test "$withval" = no; then disable_lzma=yes; else disable_lzma=no; fi])
+
+Property changes on: www/links/files/patch-configure.in
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: www/links/files/patch-default.c
+===================================================================
+--- www/links/files/patch-default.c	(revision 384728)
++++ www/links/files/patch-default.c	(working copy)
+@@ -1,7 +1,7 @@
+---- default.c.orig	2008-03-06 22:43:25.117856165 -0500
+-+++ default.c	2008-03-06 22:44:12.412560939 -0500
+-@@ -400,7 +400,7 @@
+- 	get_system_name();
++--- default.c.orig	2014-11-05 19:25:50 UTC
+++++ default.c
++@@ -824,7 +824,7 @@ void init_home(void)
++ 	get_compiler_name();
+  	links_home = get_home(&first_use);
+  	if (!links_home) {
+ -		fprintf(stderr, "Unable to find or create links config directory. Please check, that you have $HOME variable set correctly and that you have write permission to your home directory.\n\007");
+Index: www/links/files/patch-https.c
+===================================================================
+--- www/links/files/patch-https.c	(revision 0)
++++ www/links/files/patch-https.c	(working copy)
+@@ -0,0 +1,14 @@
++--- https.c.orig	2013-09-20 21:17:00 UTC
+++++ https.c
++@@ -36,7 +36,10 @@ SSL *getSSL(void)
++ 		unsigned os_pool_size;
++ 
++ 		const unsigned char *f = (const unsigned char *)RAND_file_name(cast_char f_randfile, sizeof(f_randfile));
++-		if (f && RAND_egd(cast_const_char f) < 0) {
+++#ifdef HAVE_RAND_EGD
+++		if (f && RAND_egd(cast_const_char f) < 0) 
+++#endif
+++		{
++ 			/* Not an EGD, so read and write to it */
++ 			if (RAND_load_file(cast_const_char f_randfile, -1))
++ 				RAND_write_file(cast_const_char f_randfile);
+
+Property changes on: www/links/files/patch-https.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: www/links/files/patch-types.c
+===================================================================
+--- www/links/files/patch-types.c	(revision 384728)
++++ www/links/files/patch-types.c	(working copy)
+@@ -1,6 +1,6 @@
+---- types.c.orig	2012-06-06 15:49:37.000000000 -0400
+-+++ types.c	2012-06-27 02:28:56.000000000 -0400
+-@@ -841,7 +841,8 @@
++--- types.c.orig	2014-08-27 18:33:52 UTC
+++++ types.c
++@@ -857,7 +857,8 @@ unsigned char *get_content_type_by_exten
+  			ext = NULL;
+  		}
+  	if (ext) while (ext[extl] && ext[extl] != '.' && !dir_sep(ext[extl]) && !end_of_dir(url, ext[extl])) extl++;
