@@ -1,8 +1,7 @@
 # $FreeBSD: head/mail/rainloop/Makefile 385562 2015-05-06 20:34:12Z rodrigo $
 
 PORTNAME=	rainloop
-PORTVERSION=	1.8.2
-PORTREVISION=	1
+PORTVERSION=	1.9.0
 CATEGORIES?=	mail www
 MASTER_SITES=	http://repository.rainloop.net/v2/webmail/${PORTVERSION}/
 DISTNAME=	${PORTNAME}-${PORTVERSION}.${RBUILD}-${RHASH}
@@ -16,14 +15,14 @@ LICENSE_TEXT=	License can be found at: https://github.com/RainLoop/rainloop-webm
 LICENSE_PERMS=	dist-mirror pkg-mirror auto-accept
 
 # Refresh using info from http://repository.rainloop.net/v2/core.stable.json
-RHASH=		3cd56183a7425a8750c19bc688aedd81
-RBUILD=		291
+RHASH=		0e55c0364faafb6f550fd4b186acfe6e
+RBUILD=		325
 
 USES=		zip
 NO_BUILD=	yes
 NO_WRKSUBDIR=	yes
 WANT_PHP_WEB=	yes
-USE_PHP=	curl iconv json xml dom openssl pcre spl zlib
+USE_PHP=	curl dom iconv json openssl pcre spl xml zlib
 RVER=		${PORTVERSION}.${RBUILD}
 PLIST_SUB=	VER="${RVER}" WWWOWN="${WWWOWN}" WWWGRP="${WWWGRP}"
 
