@@ -1,7 +1,8 @@
-# $FreeBSD: head/mail/rainloop/Makefile 382795 2015-03-31 06:24:15Z antoine $
+# $FreeBSD: head/mail/rainloop/Makefile 385562 2015-05-06 20:34:12Z rodrigo $
 
 PORTNAME=	rainloop
 PORTVERSION=	1.8.2
+PORTREVISION=	1
 CATEGORIES?=	mail www
 MASTER_SITES=	http://repository.rainloop.net/v2/webmail/${PORTVERSION}/
 DISTNAME=	${PORTNAME}-${PORTVERSION}.${RBUILD}-${RHASH}
@@ -26,9 +27,9 @@ USE_PHP=	curl iconv json xml dom openssl pcre spl zlib
 RVER=		${PORTVERSION}.${RBUILD}
 PLIST_SUB=	VER="${RVER}" WWWOWN="${WWWOWN}" WWWGRP="${WWWGRP}"
 
-OPTIONS_SINGLE=	DB
-OPTIONS_SINGLE_DB=	MYSQL PGSQL SQLITE
-OPTIONS_DEFAULT=	MYSQL
+OPTIONS_RADIO=		DB
+OPTIONS_RADIO_DB=	MYSQL PGSQL SQLITE
+OPTIONS_DEFAULT=	SQLITE
 
 .include <bsd.port.options.mk>
 
