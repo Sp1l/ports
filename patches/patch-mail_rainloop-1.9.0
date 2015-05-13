@@ -1,38 +1,49 @@
 Index: mail/rainloop/Makefile
 ===================================================================
---- mail/rainloop/Makefile	(revision 385934)
+--- mail/rainloop/Makefile	(revision 386204)
 +++ mail/rainloop/Makefile	(working copy)
-@@ -1,8 +1,7 @@
+@@ -1,24 +1,32 @@
  # $FreeBSD$
  
  PORTNAME=	rainloop
 -PORTVERSION=	1.8.2
+-DISTVERSIONSUFFIX=	.${RBUILD}-${RHASH}
 -PORTREVISION=	1
 +PORTVERSION=	1.9.0
  CATEGORIES?=	mail www
  MASTER_SITES=	http://repository.rainloop.net/v2/webmail/${PORTVERSION}/
- DISTNAME=	${PORTNAME}-${PORTVERSION}.${RBUILD}-${RHASH}
-@@ -16,14 +15,14 @@
- LICENSE_PERMS=	dist-mirror pkg-mirror auto-accept
++DISTNAME=	${PORTNAME}${EDITION}-${PORTVERSION}.${RBUILD}-${RHASH}
++RBUILD=		325
  
+ MAINTAINER=	loic.blot@unix-experience.fr
+ COMMENT=	Modern and interactive webmail
+ 
++.if !defined(EDITION)
+ LICENSE=	CCbyNCSA3
+ LICENSE_NAME=	Attribution-NonCommercial-ShareAlike 3.0 Unported
+ LICENSE_TEXT=	License can be found at: https://github.com/RainLoop/rainloop-webmail/blob/master/LICENSE
+ LICENSE_PERMS=	dist-mirror pkg-mirror auto-accept
+-
  # Refresh using info from http://repository.rainloop.net/v2/core.stable.json
 -RHASH=		3cd56183a7425a8750c19bc688aedd81
 -RBUILD=		291
 +RHASH=		0e55c0364faafb6f550fd4b186acfe6e
-+RBUILD=		325
++.endif
  
++.if defined(EDITION)
++LICENSE=	AGPLv3
++EDITION=	-community
++# Refresh using info from http://repository.rainloop.net/v2/core.open.json
++RHASH=		9486e0b169cbb489dd5904d3414affce
++RBUILD=		325
++.endif
++
  USES=		zip
  NO_BUILD=	yes
  NO_WRKSUBDIR=	yes
- WANT_PHP_WEB=	yes
--USE_PHP=	curl iconv json xml dom openssl pcre spl zlib
-+USE_PHP=	curl dom iconv json openssl pcre spl xml zlib
- RVER=		${PORTVERSION}.${RBUILD}
- PLIST_SUB=	VER="${RVER}" WWWOWN="${WWWOWN}" WWWGRP="${WWWGRP}"
- 
 Index: mail/rainloop/distinfo
 ===================================================================
---- mail/rainloop/distinfo	(revision 385934)
+--- mail/rainloop/distinfo	(revision 386204)
 +++ mail/rainloop/distinfo	(working copy)
 @@ -1,2 +1,2 @@
 -SHA256 (rainloop-1.8.2.291-3cd56183a7425a8750c19bc688aedd81.zip) = ebba0a10191dd3aee100c1959e1bd42d208e1315862b1767b1c373ddfb8e21d2
@@ -41,7 +52,7 @@ Index: mail/rainloop/distinfo
 +SIZE (rainloop-1.9.0.325-0e55c0364faafb6f550fd4b186acfe6e.zip) = 5126503
 Index: mail/rainloop/pkg-plist
 ===================================================================
---- mail/rainloop/pkg-plist	(revision 385934)
+--- mail/rainloop/pkg-plist	(revision 386204)
 +++ mail/rainloop/pkg-plist	(working copy)
 @@ -359,13 +359,14 @@
  %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/RainLoop/KeyPathHelper.php
@@ -568,12 +579,13 @@ Index: mail/rainloop/pkg-plist
  %%WWWDIR%%/rainloop/v/%%VER%%/langs/bg.ini
  %%WWWDIR%%/rainloop/v/%%VER%%/langs/cs.ini
  %%WWWDIR%%/rainloop/v/%%VER%%/langs/de.ini
-@@ -1089,3 +1091,8 @@
- %%WWWDIR%%/rainloop/v/%%VER%%/themes/Xv/images/background.png
- %%WWWDIR%%/rainloop/v/%%VER%%/themes/Xv/images/preview.png
- %%WWWDIR%%/rainloop/v/%%VER%%/themes/Xv/styles.less
-+@dir %%WWWDIR%%/data
-+@group %%WWWGRP%%
-+@group wheel
-+@owner %%WWWOWN%%
-+@owner root
+--- mail/Makefile.orig	2015-05-13 11:08:24.139908000 +0200
++++ mail/Makefile	2015-05-13 11:08:45.475907315 +0200
+@@ -543,6 +543,7 @@
+     SUBDIR += queue-fix
+     SUBDIR += queue-repair
+     SUBDIR += rainloop
++    SUBDIR += rainloop-community
+     SUBDIR += raysfilter
+     SUBDIR += razor-agents
+     SUBDIR += rbl-milter
