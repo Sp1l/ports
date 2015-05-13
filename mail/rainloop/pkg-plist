@@ -681,6 +681,7 @@
 %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/tmhOAuth/cacert.pem
 %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/tmhOAuth/tmhOAuth.php
 %%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/tmhOAuth/tmhUtilities.php
+%%WWWDIR%%/rainloop/v/%%VER%%/app/resources/RainLoop.asc
 %%WWWDIR%%/rainloop/v/%%VER%%/app/resources/images/empty-contact.png
 %%WWWDIR%%/rainloop/v/%%VER%%/app/resources/images/services/amazon.com.png
 %%WWWDIR%%/rainloop/v/%%VER%%/app/resources/images/services/apple.com.png

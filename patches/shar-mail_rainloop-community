@@ -12,19 +12,18 @@
 #
 echo x - mail/rainloop-community/Makefile
 sed 's/^X//' >mail/rainloop-community/Makefile << 'b311b2d4044e036a3d5f6c634e042621'
-X# $FreeBSD: head/mail/rainloop/Makefile 385562 2015-05-06 20:34:12Z rodrigo $
+X# $FreeBSD$
 X
 XPORTNAME=	rainloop
 XPKGNAMESUFFIX=	-community
 X
 XCOMMENT=	Modern and interactive webmail - community edition
 X
-XMASTERDIR=	${.CURDIR}/../rainloop
+XLICENSE=	AGPLv3
 X
+XMASTERDIR=	${.CURDIR}/../rainloop
 XDISTINFO_FILE=	${.CURDIR}/distinfo
 XPLIST=		${.CURDIR}/pkg-plist
-X
-XEDITION=	community
 X
 XCONFLICTS_INSTALL=	rainloop-[0-9]*
 X
@@ -32,8 +31,8 @@ X.include "${MASTERDIR}/Makefile"
 b311b2d4044e036a3d5f6c634e042621
 echo x - mail/rainloop-community/distinfo
 sed 's/^X//' >mail/rainloop-community/distinfo << '8ba139b3059f3967192c770aa2553947'
-XSHA256 (rainloop-community-1.9.0.325-9486e0b169cbb489dd5904d3414affce.zip) = 7802fe4e7c4ae1e9144170eb5cee205d6ad5376cb6d816da31d68dbd4c7e228a
-XSIZE (rainloop-community-1.9.0.325-9486e0b169cbb489dd5904d3414affce.zip) = 5120320
+XSHA256 (rainloop-community-1.9.0.327-cb1e82e14d53511a3c11e8842de8cc9c.zip) = 4379500bc3542dbc96d604ac6c44c926555deb7844a4670fccefb9347d5abe73
+XSIZE (rainloop-community-1.9.0.327-cb1e82e14d53511a3c11e8842de8cc9c.zip) = 5122925
 8ba139b3059f3967192c770aa2553947
 echo x - mail/rainloop-community/pkg-descr
 sed 's/^X//' >mail/rainloop-community/pkg-descr << '8ffe7743026de2e761ff2bf72046238e'
@@ -733,6 +732,7 @@ X%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/tmhOAuth/README.md
 X%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/tmhOAuth/cacert.pem
 X%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/tmhOAuth/tmhOAuth.php
 X%%WWWDIR%%/rainloop/v/%%VER%%/app/libraries/tmhOAuth/tmhUtilities.php
+X%%WWWDIR%%/rainloop/v/%%VER%%/app/resources/RainLoop.asc
 X%%WWWDIR%%/rainloop/v/%%VER%%/app/resources/images/empty-contact.png
 X%%WWWDIR%%/rainloop/v/%%VER%%/app/resources/images/services/amazon.com.png
 X%%WWWDIR%%/rainloop/v/%%VER%%/app/resources/images/services/apple.com.png
