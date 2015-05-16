@@ -1,7 +1,7 @@
-# $FreeBSD$
+# $FreeBSD: head/databases/mariadb100-server/Makefile 380551 2015-03-05 21:15:50Z brd $
 
 PORTNAME?=	mariadb
-PORTVERSION=	10.0.19
+PORTVERSION=	10.0.17
 CATEGORIES=	databases ipv6
 MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
 		http://mirrors.supportex.net/${SITESDIR}/ \
@@ -107,11 +107,7 @@ INNODB_CMAKE_OFF=	-DWITHOUT_INNOBASE=1
 MAXKEY_EXTRA_PATCHES+=	${FILESDIR}/extra-patch-include_my_compare.h
 MROONGA_CMAKE_OFF=	-DWITHOUT_MROONGA=1
 OQGRAPH_CMAKE_OFF=	-DWITHOUT_OQGRAPH=1
-OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs \
-			libJudy.so:${PORTSDIR}/devel/judy
-
-CXXFLAGS+=		-I${LOCALBASE}/include
-LDFLAGS+=		-L${LOCALBASE}/lib
+OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs
 
 post-install:
 	# Remove programs to avoid conflict with mariadb100-client
@@ -134,10 +130,6 @@ CMAKE_ARGS+=	-DWITH_JEMALLOC="no"
 # Server segfaults on i386 when built with clang >= 3.4
 .if ${ARCH} == 'i386' && ${OSVERSION} >= 1001000
 USE_GCC=	yes
-.endif
-
-.if ${PORT_OPTIONS:MOQGRAPH}
-IGNORE=	MariaDB server fails to build with OQGraph currently
 .endif
 
 post-patch:
