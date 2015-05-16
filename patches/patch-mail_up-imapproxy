@@ -1,0 +1,115 @@
+Index: mail/up-imapproxy/Makefile
+===================================================================
+--- mail/up-imapproxy/Makefile	(revision 386508)
++++ mail/up-imapproxy/Makefile	(working copy)
+@@ -16,10 +16,11 @@
+ 
+ OPTIONS_DEFINE=	DOVECOT DOCS
+ DOVECOT_DESC=	Use with dovecot2
++OPTIONS_SUB=	yes
+ 
+-USES=		tar:bzip2 pathfix
++USES=		autoreconf tar:bzip2 pathfix
+ USE_OPENSSL=	yes
+-USE_AUTOTOOLS=	autoheader
++GNU_CONFIGURE=	yes
+ CONFIGURE_ARGS=	--with-openssl=${OPENSSLBASE}
+ 
+ USE_RC_SUBR=	imapproxyd
+@@ -31,12 +32,7 @@
+ 
+ .include <bsd.port.options.mk>
+ 
+-.if ${PORT_OPTIONS:MDOVECOT}
+-SUB_LIST+=	DOVECOT="dovecot"
+-RUN_DEPENDS+=	dovecot:${PORTSDIR}/mail/dovecot2
+-.else
+-SUB_LIST+=	DOVECOT=""
+-.endif
++DOVECOT_RUN_DEPENDS=	dovecot:${PORTSDIR}/mail/dovecot2
+ 
+ do-install:
+ .for i in ${SBIN}
+Index: mail/up-imapproxy/files/patch-configure.in
+===================================================================
+--- mail/up-imapproxy/files/patch-configure.in	(revision 386508)
++++ mail/up-imapproxy/files/patch-configure.in	(working copy)
+@@ -1,6 +1,8 @@
+---- configure.in.orig	2008-01-28 13:15:08.000000000 +0000
+-+++ configure.in	2010-06-14 10:07:34.000000000 +0000
+-@@ -16,8 +16,3 @@
++--- configure.in.orig	2010-07-25 08:19:30 UTC
+++++ configure.in
++@@ -14,12 +14,7 @@ AC_CANONICAL_SYSTEM()
++ 
++ 
+  dnl Check for BSD sockets
+ -AC_CHECK_FUNC(connect, ,
+ -	AC_CHECK_LIB(nsl, gethostbyname, ,)
+@@ -10,9 +12,25 @@
+ -)
+ +AC_CHECK_FUNC([socket], , [AC_CHECK_LIB(socket, socket, , exit)])
+  
+-@@ -131,3 +126,4 @@
+  
++ dnl Check for pthreads
++@@ -116,6 +111,9 @@ AC_CHECK_LIB(ssl, SSL_new, ,
++ 	AC_WARN([OpenSSL library not found!!!  STARTTLS will be disabled.]),
++ 	-lcrypto)
++ 
+++AC_CHECK_LIB(crypto, RAND_egd, 
+++	AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd])
+++)
++ 
++ dnl Check for curses
++ save_LIBS="$LIBS"
++@@ -129,7 +127,8 @@ fi
++ LIBS="$save_LIBS"
++ AC_SUBST(LIB_CURSES)
++ 
+ -
+ +eval expanded_sysconfdir="\"$sysconfdir\""
+ +AC_DEFINE_UNQUOTED(DEFAULT_CONFIG_FILE, "$expanded_sysconfdir/imapproxyd.conf", [default location of config file])
+  AC_CONFIG_HEADER(config.h)
++ 
++ 
+Index: mail/up-imapproxy/files/patch-ssl
+===================================================================
+--- mail/up-imapproxy/files/patch-ssl	(revision 386508)
++++ mail/up-imapproxy/files/patch-ssl	(working copy)
+@@ -1,35 +0,0 @@
+---- include/imapproxy.h	Tue Apr 20 23:55:23 2004
+-+++ include/imapproxy.h	Sun Dec 10 11:28:42 2006
+-@@ -107,6 +107,7 @@
+- 
+- #if HAVE_LIBSSL
+- #include <openssl/ssl.h>
+-+#include <openssl/md5.h>
+- #include <openssl/rand.h>
+- #include <limits.h>
+- #endif
+---- config.h.in	Tue Apr 20 10:26:46 2004
+-+++ config.h.in	Sun Dec 10 11:27:13 2006
+-@@ -27,7 +27,7 @@
+- #undef HAVE_LIBSOCKET
+- 
+- /* Define to 1 if you have the `ssl' library (-lssl). */
+--#undef HAVE_LIBSSL
+-+#define HAVE_LIBSSL 1
+- 
+- /* Define to 1 if you have the <memory.h> header file. */
+- #undef HAVE_MEMORY_H
+---- src/threads.c	2008-01-28 14:15:08.000000000 +0100
+-+++ src/threads.c	2008-02-25 13:50:40.000000000 +0100
+-@@ -51,7 +51,10 @@
+- 
+- #define OPENSSL_THREAD_DEFINES
+- #include <openssl/opensslconf.h>
+--#if defined(OPENSSL_THREADS)
+-+#if defined(THREADS)
+-+#define OPENSSL_THREADS
+-+#endif
+-+#if defined(OPENSSL_THREADS)
+-
+- 
+- #include <stdio.h>

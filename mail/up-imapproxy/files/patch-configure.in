@@ -1,6 +1,8 @@
---- configure.in.orig	2008-01-28 13:15:08.000000000 +0000
-+++ configure.in	2010-06-14 10:07:34.000000000 +0000
-@@ -16,8 +16,3 @@
+--- configure.in.orig	2010-07-25 08:19:30 UTC
++++ configure.in
+@@ -14,12 +14,7 @@ AC_CANONICAL_SYSTEM()
+ 
+ 
  dnl Check for BSD sockets
 -AC_CHECK_FUNC(connect, ,
 -	AC_CHECK_LIB(nsl, gethostbyname, ,)
@@ -10,9 +12,25 @@
 -)
 +AC_CHECK_FUNC([socket], , [AC_CHECK_LIB(socket, socket, , exit)])
  
-@@ -131,3 +126,4 @@
+ 
+ dnl Check for pthreads
+@@ -116,6 +111,9 @@ AC_CHECK_LIB(ssl, SSL_new, ,
+ 	AC_WARN([OpenSSL library not found!!!  STARTTLS will be disabled.]),
+ 	-lcrypto)
+ 
++AC_CHECK_LIB(crypto, RAND_egd, 
++	AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd])
++)
+ 
+ dnl Check for curses
+ save_LIBS="$LIBS"
+@@ -129,7 +127,8 @@ fi
+ LIBS="$save_LIBS"
+ AC_SUBST(LIB_CURSES)
  
 -
 +eval expanded_sysconfdir="\"$sysconfdir\""
 +AC_DEFINE_UNQUOTED(DEFAULT_CONFIG_FILE, "$expanded_sysconfdir/imapproxyd.conf", [default location of config file])
  AC_CONFIG_HEADER(config.h)
+ 
+ 

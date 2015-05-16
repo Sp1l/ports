@@ -16,10 +16,11 @@ LICENSE=	GPLv2 # (or later)
 
 OPTIONS_DEFINE=	DOVECOT DOCS
 DOVECOT_DESC=	Use with dovecot2
+OPTIONS_SUB=	yes
 
-USES=		tar:bzip2 pathfix
+USES=		autoreconf tar:bzip2 pathfix
 USE_OPENSSL=	yes
-USE_AUTOTOOLS=	autoheader
+GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--with-openssl=${OPENSSLBASE}
 
 USE_RC_SUBR=	imapproxyd
@@ -31,12 +32,7 @@ SBIN=		in.imapproxyd pimpstat
 
 .include <bsd.port.options.mk>
 
-.if ${PORT_OPTIONS:MDOVECOT}
-SUB_LIST+=	DOVECOT="dovecot"
-RUN_DEPENDS+=	dovecot:${PORTSDIR}/mail/dovecot2
-.else
-SUB_LIST+=	DOVECOT=""
-.endif
+DOVECOT_RUN_DEPENDS=	dovecot:${PORTSDIR}/mail/dovecot2
 
 do-install:
 .for i in ${SBIN}

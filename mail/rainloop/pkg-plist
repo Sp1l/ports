@@ -1092,3 +1092,8 @@
 %%WWWDIR%%/rainloop/v/%%VER%%/themes/Xv/images/background.png
 %%WWWDIR%%/rainloop/v/%%VER%%/themes/Xv/images/preview.png
 %%WWWDIR%%/rainloop/v/%%VER%%/themes/Xv/styles.less
+@dir %%WWWDIR%%/data
+@group %%WWWGRP%%
+@group wheel
+@owner %%WWWOWN%%
+@owner root
