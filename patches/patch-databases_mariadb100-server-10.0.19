@@ -1,83 +1,33 @@
 Index: databases/mariadb100-server/Makefile
 ===================================================================
---- databases/mariadb100-server/Makefile	(revision 380486)
+--- databases/mariadb100-server/Makefile	(revision 385938)
 +++ databases/mariadb100-server/Makefile	(working copy)
 @@ -1,7 +1,7 @@
  # $FreeBSD$
  
  PORTNAME?=	mariadb
--PORTVERSION=	10.0.16
+-PORTVERSION=	10.0.17
 +PORTVERSION=	10.0.19
  CATEGORIES=	databases ipv6
  MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
  		http://mirrors.supportex.net/${SITESDIR}/ \
-@@ -35,8 +35,8 @@
- NO_OPTIONS_SORT=	yes
- 
- BUNDLED_SSL_DESC=	SSL/TLS support via (bundled) CyaSSL
--FASTMTX_DESC=           Replace mutexes with spinlocks
--WITHOUT_SSL_DESC=       No SSL/TLS support
-+FASTMTX_DESC=		Replace mutexes with spinlocks
-+WITHOUT_SSL_DESC=	No SSL/TLS support
- 
- CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
- 		-DINSTALL_DOCREADMEDIR="share/doc/mysql" \
-@@ -72,13 +72,13 @@
- OPTIONS_DEFAULT+=	MAXKEY
- OPTIONS_SUB=		yes
- 
--INNODB_DESC=            Build InnoDB engine next to XtraDB
--MAXKEY_DESC=            Change max key length from 1000 to 4000
-+INNODB_DESC=		Build InnoDB engine next to XtraDB
-+MAXKEY_DESC=		Change max key length from 1000 to 4000
- MROONGA_DESC=		Mroonga Full Text Search engine (gcc)
- OQGRAPH_DESC=		Open Query Graph Computation engine (gcc)
- .endif
- 
--BUNDLED_SSL_CMAKE_ON=   -DWITH_SSL=bundled
-+BUNDLED_SSL_CMAKE_ON=	-DWITH_SSL=bundled
- FASTMTX_CMAKE_ON=	-DWITH_FAST_MUTEXES=1
- OPENSSL_CMAKE_ON=	-DWITH_SSL=yes
- OPENSSL_USE=	OPENSSL=yes
-@@ -104,13 +104,15 @@
- 		-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1
- 
- INNODB_CMAKE_OFF=	-DWITHOUT_INNOBASE=1
--MAXKEY_EXTRA_PATCHES+=  ${FILESDIR}/extra-patch-include_my_compare.h
-+MAXKEY_EXTRA_PATCHES+=	${FILESDIR}/extra-patch-include_my_compare.h
+@@ -107,7 +107,8 @@
+ MAXKEY_EXTRA_PATCHES+=	${FILESDIR}/extra-patch-include_my_compare.h
  MROONGA_CMAKE_OFF=	-DWITHOUT_MROONGA=1
--MROONGA_USE=	GCC?=yes
  OQGRAPH_CMAKE_OFF=	-DWITHOUT_OQGRAPH=1
--OQGRAPH_USE=	GCC?=yes
 -OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs
 +OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs \
 +			libJudy.so:${PORTSDIR}/devel/judy
  
-+CXXFLAGS+=		-I${LOCALBASE}/include
-+LDFLAGS+=		-L${LOCALBASE}/lib
-+
  post-install:
  	# Remove programs to avoid conflict with mariadb100-client
- 	# These are "client" components, so there should be a switch that
-@@ -124,16 +126,20 @@
- .include <bsd.port.pre.mk>
- 
- .if ${OPSYS} == FreeBSD && ${OSVERSION} >= 1000012
--CMAKE_ARGS+=   -DWITH_JEMALLOC="system"
-+CMAKE_ARGS+=	-DWITH_JEMALLOC="system"
- .else
--CMAKE_ARGS+=   -DWITH_JEMALLOC="no"
-+CMAKE_ARGS+=	-DWITH_JEMALLOC="no"
+@@ -132,6 +133,11 @@
+ USE_GCC=	yes
  .endif
  
- # Server segfaults on i386 when built with clang >= 3.4
- .if ${ARCH} == 'i386' && ${OSVERSION} >= 1001000
--USE_GCC=        yes
-+USE_GCC=	yes
- .endif
- 
-+.if ${PORT_OPTIONS:MOQGRAPH}
-+IGNORE=	MariaDB server fails to build with OQGraph currently
++.if ${PORT_OPTIONS:MOQGRPAH}
++IGNORE= MariaDB currently doesn't build correctly with OQGraph \
++        See https://mariadb.atlassian.net/browse/MDEV-8128
 +.endif
 +
  post-patch:
@@ -85,322 +35,290 @@ Index: databases/mariadb100-server/Makefile
  	@${REINPLACE_CMD} 's|%%PREFIX%%|${PREFIX}|g' ${WRKSRC}/mysys/my_default.c
 Index: databases/mariadb100-server/distinfo
 ===================================================================
---- databases/mariadb100-server/distinfo	(revision 380486)
+--- databases/mariadb100-server/distinfo	(revision 385938)
 +++ databases/mariadb100-server/distinfo	(working copy)
 @@ -1,2 +1,2 @@
--SHA256 (mariadb-10.0.16.tar.gz) = 44134a5f3e174e3e8443c1d07916af57f3ffadd4c8846338d41850fedfefcde4
--SIZE (mariadb-10.0.16.tar.gz) = 55656968
+-SHA256 (mariadb-10.0.17.tar.gz) = 9cd394e99942c3700b13f2bf126895fe587e668bfcaffcfd81f0cd878fc19311
+-SIZE (mariadb-10.0.17.tar.gz) = 55989700
 +SHA256 (mariadb-10.0.19.tar.gz) = 2fbf5e5d7d8094691601ece8ae60b941478d73c98a58a960aeebfa021091a132
 +SIZE (mariadb-10.0.19.tar.gz) = 56224123
-Index: databases/mariadb100-server/files/patch-CMakeLists.txt
+Index: databases/mariadb100-server/files/patch-mysys_my_default.c
 ===================================================================
---- databases/mariadb100-server/files/patch-CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- CMakeLists.txt.orig	2014-08-09 00:13:37.000000000 +0200
--+++ CMakeLists.txt	2014-09-05 18:22:34.646409575 +0200
--@@ -463,7 +463,6 @@
-+--- CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
-++++ CMakeLists.txt
-+@@ -438,7 +438,6 @@ IF(WIN32)
-    ADD_SUBDIRECTORY(win/upgrade_wizard)
-    ADD_SUBDIRECTORY(win/packaging)
-  ENDIF()
-@@ -7,8 +7,8 @@
- -ADD_SUBDIRECTORY(packaging/solaris)
-  
-  IF(NOT CMAKE_CROSSCOMPILING)
--   SET(EXPORTED comp_err comp_sql factorial gen_lex_hash)
--@@ -503,6 +502,7 @@
-+   SET(EXPORTED comp_err comp_sql factorial)
-+@@ -482,6 +481,7 @@ ADD_CUSTOM_TARGET(INFO_BIN ALL
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  )
-  
-@@ -15,8 +15,8 @@
- +IF(FALSE)
-  INSTALL_DOCUMENTATION(README CREDITS COPYING COPYING.LESSER EXCEPTIONS-CLIENT
-                        COMPONENT Readme)
-- INSTALL_DOCUMENTATION(${CMAKE_BINARY_DIR}/Docs/INFO_SRC
--@@ -511,6 +511,7 @@
-+ 
-+@@ -492,6 +492,7 @@ INSTALL_DOCUMENTATION(README CREDITS COP
-  IF(UNIX)
-    INSTALL_DOCUMENTATION(Docs/INSTALL-BINARY COMPONENT Readme)
-  ENDIF()
-Index: databases/mariadb100-server/files/patch-client_CMakeLists.txt
+--- databases/mariadb100-server/files/patch-mysys_my_default.c	(revision 385938)
++++ databases/mariadb100-server/files/patch-mysys_my_default.c	(working copy)
+@@ -1,61 +0,0 @@
+---- mysys/my_default.c.orig	2014-08-09 00:13:39.000000000 +0200
+-+++ mysys/my_default.c	2014-09-05 19:56:48.006019959 +0200
+-@@ -90,7 +90,7 @@
+- 
+- /* Which directories are searched for options (and in which order) */
+- 
+--#define MAX_DEFAULT_DIRS 6
+-+#define MAX_DEFAULT_DIRS 7
+- #define DEFAULT_DIRS_SIZE (MAX_DEFAULT_DIRS + 1)  /* Terminate with NULL */
+- static const char **default_directories = NULL;
+- 
+-@@ -785,7 +785,7 @@
+-   {
+-     MY_STAT stat_info;
+-     if (!my_stat(name,&stat_info,MYF(0)))
+--      return 1;
+-+      return 0;
+-     /*
+-       Ignore world-writable regular files.
+-       This is mainly done to protect us to not read a file created by
+-@@ -803,6 +803,14 @@
+-   if (!(fp= mysql_file_fopen(key_file_cnf, name, O_RDONLY, MYF(0))))
+-     return 1;					/* Ignore wrong files */
+- 
+-+  if (strstr(name, "/etc") == name)
+-+  {
+-+    fprintf(stderr,
+-+	      "error: Config file %s in invalid location, please move to or merge with /usr/local%s\n",
+-+	      name,name);
+-+      goto err;
+-+  }
+-+
+-   while (mysql_file_fgets(buff, sizeof(buff) - 1, fp))
+-   {
+-     line++;
+-@@ -1067,7 +1075,8 @@
+-           if (name[0] == FN_HOMELIB)	/* Add . to filenames in home */
+-             *end++= '.';
+-           strxmov(end, conf_file, *ext, " ", NullS);
+--          fputs(name, stdout);
+-+          if (strstr(name, "/etc") != name)
+-+            fputs(name, stdout);
+-         }
+-       }
+-     }
+-@@ -1223,13 +1232,10 @@
+- 
+- #else
+- 
+--#if defined(DEFAULT_SYSCONFDIR)
+--  if (DEFAULT_SYSCONFDIR[0])
+--    errors += add_directory(alloc, DEFAULT_SYSCONFDIR, dirs);
+--#else
+-   errors += add_directory(alloc, "/etc/", dirs);
+-   errors += add_directory(alloc, "/etc/mysql/", dirs);
+--#endif /* DEFAULT_SYSCONFDIR */
+-+  errors += add_directory(alloc, "/usr/local/etc/", dirs);
+-+  errors += add_directory(alloc, "/usr/local/etc/mysql/", dirs);
+- 
+- #endif
+- 
+Index: databases/mariadb100-server/files/patch-scripts_mysql_config.sh
 ===================================================================
---- databases/mariadb100-server/files/patch-client_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-client_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- client/CMakeLists.txt.orig	2014-08-09 00:13:48.000000000 +0200
--+++ client/CMakeLists.txt	2014-09-07 21:19:33.000000000 +0200
--@@ -30,6 +30,7 @@
-+--- client/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
-++++ client/CMakeLists.txt
-+@@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES(
-  COPY_OPENSSL_DLLS(copy_openssl_client)
-  
-  ADD_DEFINITIONS(${SSL_DEFINES})
-@@ -8,7 +8,7 @@
-  MYSQL_ADD_EXECUTABLE(mysql completion_hash.cc mysql.cc readline.cc
-                             ${CMAKE_SOURCE_DIR}/sql/sql_string.cc)
-  TARGET_LINK_LIBRARIES(mysql mysqlclient)
--@@ -37,6 +38,7 @@
-+@@ -37,6 +38,7 @@ IF(UNIX)
-    TARGET_LINK_LIBRARIES(mysql ${MY_READLINE_LIBRARY})
-    SET_TARGET_PROPERTIES(mysql PROPERTIES ENABLE_EXPORTS TRUE)
-  ENDIF(UNIX)
-@@ -16,7 +16,7 @@
-  
-  MYSQL_ADD_EXECUTABLE(mysqltest mysqltest.cc COMPONENT Test)
-  SET_SOURCE_FILES_PROPERTIES(mysqltest.cc PROPERTIES COMPILE_FLAGS "-DTHREADS")
--@@ -44,6 +46,7 @@
-+@@ -44,6 +46,7 @@ TARGET_LINK_LIBRARIES(mysqltest mysqlcli
-  SET_TARGET_PROPERTIES(mysqltest PROPERTIES ENABLE_EXPORTS TRUE)
-  
-  
-@@ -24,7 +24,7 @@
-  MYSQL_ADD_EXECUTABLE(mysqlcheck mysqlcheck.c)
-  TARGET_LINK_LIBRARIES(mysqlcheck mysqlclient)
-  
--@@ -52,17 +55,21 @@
-+@@ -52,17 +55,21 @@ TARGET_LINK_LIBRARIES(mysqldump mysqlcli
-  
-  MYSQL_ADD_EXECUTABLE(mysqlimport mysqlimport.c)
-  TARGET_LINK_LIBRARIES(mysqlimport mysqlclient)
-@@ -46,7 +46,7 @@
-  MYSQL_ADD_EXECUTABLE(mysqlbinlog mysqlbinlog.cc)
-  TARGET_LINK_LIBRARIES(mysqlbinlog mysqlclient)
-  
--@@ -72,17 +79,20 @@
-+@@ -72,17 +79,20 @@ TARGET_LINK_LIBRARIES(mysqladmin mysqlcl
-  MYSQL_ADD_EXECUTABLE(mysqlslap mysqlslap.c)
-  SET_SOURCE_FILES_PROPERTIES(mysqlslap.c PROPERTIES COMPILE_FLAGS "-DTHREADS")
-  TARGET_LINK_LIBRARIES(mysqlslap mysqlclient)
-Index: databases/mariadb100-server/files/patch-cmake__jemalloc.cmake
+--- databases/mariadb100-server/files/patch-scripts_mysql_config.sh	(revision 385938)
++++ databases/mariadb100-server/files/patch-scripts_mysql_config.sh	(working copy)
+@@ -1,14 +0,0 @@
+---- scripts/mysql_config.sh.orig	2014-04-15 14:02:39.000000000 +0300
+-+++ scripts/mysql_config.sh	2014-05-16 19:08:41.000000000 +0300
+-@@ -108,8 +108,11 @@
+- # We intentionally add a space to the beginning and end of lib strings, simplifies replace later
+- libs=" $ldflags -L$pkglibdir @RPATH_OPTION@ -lmysqlclient @ZLIB_DEPS@ @NON_THREADED_LIBS@"
+- libs="$libs @openssl_libs@ @STATIC_NSS_FLAGS@ "
+-+libs="$libs -L%%LOCALBASE%%/lib "
+- libs_r=" $ldflags -L$pkglibdir  @RPATH_OPTION@ -lmysqlclient_r @ZLIB_DEPS@ @CLIENT_LIBS@ @openssl_libs@ "
+-+libs_r="$libs_r -L%%LOCALBASE%%/lib "
+- embedded_libs=" $ldflags -L$pkglibdir @RPATH_OPTION@ -lmysqld @LIBDL@ @ZLIB_DEPS@ @LIBS@ @WRAPLIBS@ @openssl_libs@ "
+-+embedded_libs="$embedded_libs -L%%LOCALBASE%%/lib "
+- 
+- if [ -r "$pkglibdir/libmygcc.a" ]; then
+-   # When linking against the static library with a different version of GCC
+Index: databases/mariadb100-server/files/patch-scripts_mysqld_safe.sh
 ===================================================================
---- databases/mariadb100-server/files/patch-cmake__jemalloc.cmake	(revision 380486)
-+++ databases/mariadb100-server/files/patch-cmake__jemalloc.cmake	(working copy)
-@@ -1,6 +1,6 @@
----- cmake/jemalloc.cmake.orig	2014-09-25 00:29:47.000000000 +0200
--+++ cmake/jemalloc.cmake	2014-09-27 10:05:48.000000000 +0200
--@@ -24,12 +24,12 @@
-+--- cmake/jemalloc.cmake.orig	2015-05-08 14:37:45 UTC
-++++ cmake/jemalloc.cmake
-+@@ -24,12 +24,12 @@ MACRO (CHECK_JEMALLOC)
-        SET(what system)
-      ENDIF()
-  
-Index: databases/mariadb100-server/files/patch-extra_CMakeLists.txt
+--- databases/mariadb100-server/files/patch-scripts_mysqld_safe.sh	(revision 385938)
++++ databases/mariadb100-server/files/patch-scripts_mysqld_safe.sh	(working copy)
+@@ -1,24 +0,0 @@
+---- scripts/mysqld_safe.sh.orig	2007-10-08 10:39:23.000000000 +0200
+-+++ scripts/mysqld_safe.sh	2007-10-08 10:40:52.000000000 +0200
+-@@ -235,10 +235,10 @@
+- 
+- if test -z "$MYSQL_HOME"
+- then 
+--  if test -r "$MY_BASEDIR_VERSION/my.cnf" && test -r "$DATADIR/my.cnf"
+-+  if test -r "$MY_BASEDIR_VERSION/etc/my.cnf" && test -r "$DATADIR/my.cnf"
+-   then
+-     log_error "WARNING: Found two instances of my.cnf -
+--$MY_BASEDIR_VERSION/my.cnf and
+-+$MY_BASEDIR_VERSION/etc/my.cnf and
+- $DATADIR/my.cnf
+- IGNORING $DATADIR/my.cnf"
+- 
+-@@ -247,7 +247,7 @@
+-   then
+-     log_error "WARNING: Found $DATADIR/my.cnf
+- The data directory is a deprecated location for my.cnf, please move it to
+--$MY_BASEDIR_VERSION/my.cnf"
+-+$MY_BASEDIR_VERSION/etc/my.cnf"
+-     MYSQL_HOME=$DATADIR
+-   else
+-     MYSQL_HOME=$MY_BASEDIR_VERSION
+Index: databases/mariadb100-server/files/patch-sql_sql_trigger.cc
 ===================================================================
---- databases/mariadb100-server/files/patch-extra_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-extra_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- extra/CMakeLists.txt.orig	2014-08-09 00:13:40.000000000 +0200
--+++ extra/CMakeLists.txt	2014-09-05 18:32:20.555373233 +0200
--@@ -80,6 +80,8 @@
-+--- extra/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
-++++ extra/CMakeLists.txt
-+@@ -78,9 +78,11 @@ IF(UNIX)
-    MYSQL_ADD_EXECUTABLE(resolve_stack_dump resolve_stack_dump.c)
-    TARGET_LINK_LIBRARIES(resolve_stack_dump mysys)
-  
-@@ -9,3 +9,6 @@
-    TARGET_LINK_LIBRARIES(mysql_waitpid mysys)
-  ENDIF()
- +ENDIF()
-+ 
-+ 
-+   # Add path to the InnoDB headers
-Index: databases/mariadb100-server/files/patch-extra_yassl_taocrypt_src_integer.cpp
+--- databases/mariadb100-server/files/patch-sql_sql_trigger.cc	(revision 385938)
++++ databases/mariadb100-server/files/patch-sql_sql_trigger.cc	(working copy)
+@@ -1,50 +0,0 @@
+---- sql/sql_trigger.cc.orig	2013-05-21 22:09:51.000000000 +0000
+-+++ sql/sql_trigger.cc	2013-09-26 13:15:55.450195525 +0000
+-@@ -192,32 +192,32 @@
+- {
+-   {
+-     { C_STRING_WITH_LEN("triggers") },
+--    my_offsetof(class Table_triggers_list, definitions_list),
+-+    static_cast<int>(my_offsetof(class Table_triggers_list, definitions_list)),
+-     FILE_OPTIONS_STRLIST
+-   },
+-   {
+-     { C_STRING_WITH_LEN("sql_modes") },
+--    my_offsetof(class Table_triggers_list, definition_modes_list),
+-+    static_cast<int>(my_offsetof(class Table_triggers_list, definition_modes_list)),
+-     FILE_OPTIONS_ULLLIST
+-   },
+-   {
+-     { C_STRING_WITH_LEN("definers") },
+--    my_offsetof(class Table_triggers_list, definers_list),
+-+    static_cast<int>(my_offsetof(class Table_triggers_list, definers_list)),
+-     FILE_OPTIONS_STRLIST
+-   },
+-   {
+-     { C_STRING_WITH_LEN("client_cs_names") },
+--    my_offsetof(class Table_triggers_list, client_cs_names),
+-+    static_cast<int>(my_offsetof(class Table_triggers_list, client_cs_names)),
+-     FILE_OPTIONS_STRLIST
+-   },
+-   {
+-     { C_STRING_WITH_LEN("connection_cl_names") },
+--    my_offsetof(class Table_triggers_list, connection_cl_names),
+-+    static_cast<int>(my_offsetof(class Table_triggers_list, connection_cl_names)),
+-     FILE_OPTIONS_STRLIST
+-   },
+-   {
+-     { C_STRING_WITH_LEN("db_cl_names") },
+--    my_offsetof(class Table_triggers_list, db_cl_names),
+-+    static_cast<int>(my_offsetof(class Table_triggers_list, db_cl_names)),
+-     FILE_OPTIONS_STRLIST
+-   },
+-   { { 0, 0 }, 0, FILE_OPTIONS_STRING }
+-@@ -226,7 +226,7 @@
+- File_option sql_modes_parameters=
+- {
+-   { C_STRING_WITH_LEN("sql_modes") },
+--  my_offsetof(class Table_triggers_list, definition_modes_list),
+-+  static_cast<int>(my_offsetof(class Table_triggers_list, definition_modes_list)),
+-   FILE_OPTIONS_ULLLIST
+- };
+- 
+Index: databases/mariadb100-server/files/patch-sql_sql_view.cc
 ===================================================================
---- databases/mariadb100-server/files/patch-extra_yassl_taocrypt_src_integer.cpp	(revision 380486)
-+++ databases/mariadb100-server/files/patch-extra_yassl_taocrypt_src_integer.cpp	(working copy)
-@@ -1,6 +1,6 @@
----- extra/yassl/taocrypt/src/integer.cpp.orig	2014-04-15 14:02:39.000000000 +0300
--+++ extra/yassl/taocrypt/src/integer.cpp	2014-05-16 17:00:15.000000000 +0300
--@@ -75,7 +75,7 @@
-+--- extra/yassl/taocrypt/src/integer.cpp.orig	2015-05-08 14:37:45 UTC
-++++ extra/yassl/taocrypt/src/integer.cpp
-+@@ -74,7 +74,7 @@ template <class T>
-  CPP_TYPENAME AlignedAllocator<T>::pointer AlignedAllocator<T>::allocate(
-                                             size_type n, const void *)
-  {
-Index: databases/mariadb100-server/files/patch-include_CMakeLists.txt
+--- databases/mariadb100-server/files/patch-sql_sql_view.cc	(revision 385938)
++++ databases/mariadb100-server/files/patch-sql_sql_view.cc	(working copy)
+@@ -1,63 +0,0 @@
+---- sql/sql_view.cc.orig	2013-05-21 22:09:51.000000000 +0000
+-+++ sql/sql_view.cc	2013-09-26 13:16:16.065195172 +0000
+-@@ -742,46 +742,46 @@
+- */
+- static File_option view_parameters[]=
+- {{{ C_STRING_WITH_LEN("query")},
+--  my_offsetof(TABLE_LIST, select_stmt),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, select_stmt)),
+-   FILE_OPTIONS_ESTRING},
+-  {{ C_STRING_WITH_LEN("md5")},
+--  my_offsetof(TABLE_LIST, md5),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, md5)),
+-   FILE_OPTIONS_STRING},
+-  {{ C_STRING_WITH_LEN("updatable")},
+--  my_offsetof(TABLE_LIST, updatable_view),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, updatable_view)),
+-   FILE_OPTIONS_ULONGLONG},
+-  {{ C_STRING_WITH_LEN("algorithm")},
+--  my_offsetof(TABLE_LIST, algorithm),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, algorithm)),
+-   FILE_OPTIONS_VIEW_ALGO},
+-  {{ C_STRING_WITH_LEN("definer_user")},
+--  my_offsetof(TABLE_LIST, definer.user),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, definer.user)),
+-   FILE_OPTIONS_STRING},
+-  {{ C_STRING_WITH_LEN("definer_host")},
+--  my_offsetof(TABLE_LIST, definer.host),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, definer.host)),
+-   FILE_OPTIONS_STRING},
+-  {{ C_STRING_WITH_LEN("suid")},
+--  my_offsetof(TABLE_LIST, view_suid),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, view_suid)),
+-   FILE_OPTIONS_ULONGLONG},
+-  {{ C_STRING_WITH_LEN("with_check_option")},
+--  my_offsetof(TABLE_LIST, with_check),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, with_check)),
+-   FILE_OPTIONS_ULONGLONG},
+-  {{ C_STRING_WITH_LEN("timestamp")},
+--  my_offsetof(TABLE_LIST, timestamp),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, timestamp)),
+-   FILE_OPTIONS_TIMESTAMP},
+-  {{ C_STRING_WITH_LEN("create-version")},
+--  my_offsetof(TABLE_LIST, file_version),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, file_version)),
+-   FILE_OPTIONS_ULONGLONG},
+-  {{ C_STRING_WITH_LEN("source")},
+--  my_offsetof(TABLE_LIST, source),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, source)),
+-   FILE_OPTIONS_ESTRING},
+-  {{(char*) STRING_WITH_LEN("client_cs_name")},
+--  my_offsetof(TABLE_LIST, view_client_cs_name),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, view_client_cs_name)),
+-   FILE_OPTIONS_STRING},
+-  {{(char*) STRING_WITH_LEN("connection_cl_name")},
+--  my_offsetof(TABLE_LIST, view_connection_cl_name),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, view_connection_cl_name)),
+-   FILE_OPTIONS_STRING},
+-  {{(char*) STRING_WITH_LEN("view_body_utf8")},
+--  my_offsetof(TABLE_LIST, view_body_utf8),
+-+  static_cast<int>(my_offsetof(TABLE_LIST, view_body_utf8)),
+-   FILE_OPTIONS_ESTRING},
+-  {{NullS, 0},			0,
+-   FILE_OPTIONS_STRING}
+Index: databases/mariadb100-server/files/patch-sql_sys_vars.cc
 ===================================================================
---- databases/mariadb100-server/files/patch-include_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-include_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- include/CMakeLists.txt.orig	2014-08-09 00:13:38.000000000 +0200
--+++ include/CMakeLists.txt	2014-09-05 18:38:18.461346954 +0200
--@@ -62,17 +62,21 @@
-+--- include/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
-++++ include/CMakeLists.txt
-+@@ -62,17 +62,21 @@ SET(HEADERS 
-    handler_ername.h
-  )
-  
-Index: databases/mariadb100-server/files/patch-libmysql_CMakeLists.txt
-===================================================================
---- databases/mariadb100-server/files/patch-libmysql_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-libmysql_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- libmysql/CMakeLists.txt.orig	2014-08-09 00:13:37.000000000 +0200
--+++ libmysql/CMakeLists.txt	2014-09-05 18:46:34.420323119 +0200
--@@ -403,7 +403,7 @@
-+--- libmysql/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
-++++ libmysql/CMakeLists.txt
-+@@ -410,7 +410,7 @@ SET(LIBS clientlib dbug strings vio mysy
-  
-  # Merge several convenience libraries into one big mysqlclient
-  # and link them together into shared library.
-@@ -9,7 +9,7 @@
-  
-  # Visual Studio users need debug  static library for debug projects
-  IF(MSVC)
--@@ -411,6 +411,7 @@
-+@@ -418,6 +418,7 @@ IF(MSVC)
-   INSTALL_DEBUG_TARGET(clientlib DESTINATION ${INSTALL_LIBDIR}/debug)
-  ENDIF()
-  
-@@ -17,7 +17,7 @@
-  IF(UNIX)
-    MACRO(GET_VERSIONED_LIBNAME LIBNAME EXTENSION VERSION OUTNAME)
-      SET(DOT_VERSION ".${VERSION}")
--@@ -425,11 +426,13 @@
-+@@ -432,11 +433,13 @@ IF(UNIX)
-    ENDMACRO()
-    INSTALL_SYMLINK(${CMAKE_STATIC_LIBRARY_PREFIX}mysqlclient_r.a mysqlclient ${INSTALL_LIBDIR} Development)
-  ENDIF()
-@@ -32,7 +32,7 @@
-    IF(UNIX)
-      # libtool compatability
-      IF(CMAKE_SYSTEM_NAME MATCHES "FreeBSD" OR APPLE)
--@@ -477,3 +480,4 @@
-+@@ -484,3 +487,4 @@ IF(NOT DISABLE_SHARED)
-      ENDFOREACH()
-    ENDIF()
-  ENDIF()
-Index: databases/mariadb100-server/files/patch-libservices_CMakeLists.txt
-===================================================================
---- databases/mariadb100-server/files/patch-libservices_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-libservices_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- libservices/CMakeLists.txt.orig	2014-08-09 00:13:47.000000000 +0200
--+++ libservices/CMakeLists.txt	2014-09-05 18:48:40.074297131 +0200
--@@ -29,4 +29,6 @@
-+--- libservices/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
-++++ libservices/CMakeLists.txt
-+@@ -29,4 +29,6 @@ SET(MYSQLSERVICES_SOURCES
-    logger_service.c)
-  
-  ADD_CONVENIENCE_LIBRARY(mysqlservices ${MYSQLSERVICES_SOURCES})
-Index: databases/mariadb100-server/files/patch-man_CMakeLists.txt
-===================================================================
---- databases/mariadb100-server/files/patch-man_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-man_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- man/CMakeLists.txt.orig	2014-06-13 13:58:21.397251542 +0300
--+++ man/CMakeLists.txt	2014-06-13 14:00:24.132245109 +0300
--@@ -33,7 +33,8 @@
-+--- man/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
-++++ man/CMakeLists.txt
-+@@ -34,7 +34,8 @@ SET(MAN1_TEST mysql-stress-test.pl.1 mys
-  
-  INSTALL(FILES ${MAN1_SERVER} DESTINATION ${INSTALL_MANDIR}/man1 COMPONENT ManPagesServer)
-  INSTALL(FILES ${MAN8_SERVER} DESTINATION ${INSTALL_MANDIR}/man8 COMPONENT ManPagesServer)
-Index: databases/mariadb100-server/files/patch-pcre_CMakeLists.txt
-===================================================================
---- databases/mariadb100-server/files/patch-pcre_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-pcre_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- pcre/CMakeLists.txt.orig	2014-08-09 00:13:36.000000000 +0200
--+++ pcre/CMakeLists.txt	2014-09-05 20:08:49.090972949 +0200
--@@ -513,6 +513,8 @@
-+--- pcre/CMakeLists.txt.orig	2015-05-08 14:37:46 UTC
-++++ pcre/CMakeLists.txt
-+@@ -513,6 +513,8 @@ IF(PCRE_SHOW_REPORT)
-    MESSAGE(STATUS "")
-  ENDIF(PCRE_SHOW_REPORT)
-  
-Index: databases/mariadb100-server/files/patch-scripts_CMakeLists.txt
-===================================================================
---- databases/mariadb100-server/files/patch-scripts_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-scripts_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- scripts/CMakeLists.txt.orig	2014-08-09 00:13:37.000000000 +0200
--+++ scripts/CMakeLists.txt	2014-09-05 19:06:46.206250221 +0200
--@@ -281,6 +281,8 @@
-+--- scripts/CMakeLists.txt.orig	2015-05-08 14:37:46 UTC
-++++ scripts/CMakeLists.txt
-+@@ -275,6 +275,8 @@ MACRO(EXTRACT_LINK_LIBRARIES target var)
-              STRING(REGEX REPLACE "^lib" "" lib "${lib}")
-              SET(${var} "${${var}}-l${lib} " ) 
-            ENDIF()
-Index: databases/mariadb100-server/files/patch-sql_CMakeLists.txt
-===================================================================
---- databases/mariadb100-server/files/patch-sql_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-sql_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- sql/CMakeLists.txt.orig	2013-05-22 01:09:51.000000000 +0300
--+++ sql/CMakeLists.txt	2013-06-08 14:13:06.000000000 +0300
--@@ -278,6 +278,7 @@
-+--- sql/CMakeLists.txt.orig	2015-05-08 14:37:46 UTC
-++++ sql/CMakeLists.txt
-+@@ -312,6 +312,7 @@ ADD_CUSTOM_TARGET(distclean
-    VERBATIM
-    )
-  
-@@ -8,7 +8,7 @@
-  IF(INSTALL_LAYOUT STREQUAL "STANDALONE")
-  
-  # Copy db.opt into data/test/
--@@ -321,6 +322,7 @@
-+@@ -355,6 +356,7 @@ ELSE()
-    INSTALL(FILES ${DUMMY_FILE} DESTINATION data/mysql COMPONENT DataFiles)
-  ENDIF(WIN32 AND MYSQLD_EXECUTABLE)
-  ENDIF(INSTALL_LAYOUT STREQUAL "STANDALONE")
-@@ -16,7 +16,7 @@
-  
-  IF(WIN32)
-    SET(my_bootstrap_sql ${CMAKE_CURRENT_BINARY_DIR}/my_bootstrap.sql)
--@@ -363,8 +365,10 @@
-+@@ -397,8 +399,10 @@ IF(WIN32)
-    TARGET_LINK_LIBRARIES(mysql_upgrade_service mysys winservice)
-  ENDIF(WIN32)
-  
-Index: databases/mariadb100-server/files/patch-storage_tokudb_ft-index_cmake__modules_TokuFeatureDetection.cmake
-===================================================================
---- databases/mariadb100-server/files/patch-storage_tokudb_ft-index_cmake__modules_TokuFeatureDetection.cmake	(revision 380486)
-+++ databases/mariadb100-server/files/patch-storage_tokudb_ft-index_cmake__modules_TokuFeatureDetection.cmake	(working copy)
-@@ -1,4 +1,4 @@
----- storage/tokudb/ft-index/cmake_modules/TokuFeatureDetection.cmake.orig	2014-09-24 22:29:47 UTC
-+--- storage/tokudb/ft-index/cmake_modules/TokuFeatureDetection.cmake.orig	2015-05-08 14:37:46 UTC
- +++ storage/tokudb/ft-index/cmake_modules/TokuFeatureDetection.cmake
- @@ -87,13 +87,7 @@ if (NOT HAVE_DLSYM_WITHOUT_DL)
-  endif ()
-Index: databases/mariadb100-server/files/patch-storage_tokudb_ft-index_portability_memory.cc
-===================================================================
---- databases/mariadb100-server/files/patch-storage_tokudb_ft-index_portability_memory.cc	(revision 380486)
-+++ databases/mariadb100-server/files/patch-storage_tokudb_ft-index_portability_memory.cc	(working copy)
-@@ -1,4 +1,4 @@
----- storage/tokudb/ft-index/portability/memory.cc.orig	2014-09-24 22:29:47 UTC
-+--- storage/tokudb/ft-index/portability/memory.cc.orig	2015-05-08 14:37:47 UTC
- +++ storage/tokudb/ft-index/portability/memory.cc
- @@ -94,11 +94,6 @@ PATENT RIGHTS GRANT:
-  #include <string.h>
-Index: databases/mariadb100-server/files/patch-support-files_CMakeLists.txt
-===================================================================
---- databases/mariadb100-server/files/patch-support-files_CMakeLists.txt	(revision 380486)
-+++ databases/mariadb100-server/files/patch-support-files_CMakeLists.txt	(working copy)
-@@ -1,6 +1,6 @@
----- support-files/CMakeLists.txt.orig	2012-11-28 17:49:47.000000000 +0200
--+++ support-files/CMakeLists.txt	2012-12-23 05:40:39.000000000 +0200
--@@ -66,10 +66,11 @@
-+--- support-files/CMakeLists.txt.orig	2015-05-08 14:37:48 UTC
-++++ support-files/CMakeLists.txt
-+@@ -67,10 +67,11 @@ IF(UNIX)
-    ENDFOREACH()
-    IF(INSTALL_SUPPORTFILESDIR)
-      INSTALL(FILES magic DESTINATION ${inst_location} COMPONENT SupportFiles)
+--- databases/mariadb100-server/files/patch-sql_sys_vars.cc	(revision 385938)
++++ databases/mariadb100-server/files/patch-sql_sys_vars.cc	(working copy)
+@@ -1,38 +0,0 @@
+---- sql/sys_vars.cc.orig	2014-08-09 00:13:37.000000000 +0200
+-+++ sql/sys_vars.cc	2014-09-05 19:30:55.609134039 +0200
+-@@ -1012,7 +1012,7 @@
+-        "connection before closing it",
+-        SESSION_VAR(net_interactive_timeout),
+-        CMD_LINE(REQUIRED_ARG),
+--       VALID_RANGE(1, LONG_TIMEOUT), DEFAULT(NET_WAIT_TIMEOUT), BLOCK_SIZE(1));
+-+       VALID_RANGE(1, INT_MAX32/1000), DEFAULT(NET_WAIT_TIMEOUT), BLOCK_SIZE(1));
+- 
+- static Sys_var_ulonglong Sys_join_buffer_size(
+-        "join_buffer_size",
+-@@ -2044,7 +2044,7 @@
+-        "Number of seconds to wait for more data from a connection before "
+-        "aborting the read",
+-        SESSION_VAR(net_read_timeout), CMD_LINE(REQUIRED_ARG),
+--       VALID_RANGE(1, LONG_TIMEOUT), DEFAULT(NET_READ_TIMEOUT), BLOCK_SIZE(1),
+-+       VALID_RANGE(1, INT_MAX32/1000), DEFAULT(NET_READ_TIMEOUT), BLOCK_SIZE(1),
+-        NO_MUTEX_GUARD, NOT_IN_BINLOG, ON_CHECK(0),
+-        ON_UPDATE(fix_net_read_timeout));
+- 
+-@@ -2059,7 +2059,7 @@
+-        "Number of seconds to wait for a block to be written to a connection "
+-        "before aborting the write",
+-        SESSION_VAR(net_write_timeout), CMD_LINE(REQUIRED_ARG),
+--       VALID_RANGE(1, LONG_TIMEOUT), DEFAULT(NET_WRITE_TIMEOUT), BLOCK_SIZE(1),
+-+       VALID_RANGE(1, INT_MAX32/1000), DEFAULT(NET_WRITE_TIMEOUT), BLOCK_SIZE(1),
+-        NO_MUTEX_GUARD, NOT_IN_BINLOG, ON_CHECK(0),
+-        ON_UPDATE(fix_net_write_timeout));
+- 
+-@@ -3288,7 +3288,7 @@
+-        "The number of seconds the server waits for activity on a "
+-        "connection before closing it",
+-        SESSION_VAR(net_wait_timeout), CMD_LINE(REQUIRED_ARG),
+--       VALID_RANGE(1, IF_WIN(INT_MAX32/1000, LONG_TIMEOUT)),
+-+       VALID_RANGE(1, INT_MAX32/1000),
+-        DEFAULT(NET_WAIT_TIMEOUT), BLOCK_SIZE(1));
+- 
+- static Sys_var_plugin Sys_default_storage_engine(
