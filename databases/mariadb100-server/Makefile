@@ -59,8 +59,6 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 		-DEXECINFO_ROOT=${LOCALBASE} \
 		-DCOMPILATION_COMMENT="FreeBSD Ports"
 
-MAKE_JOBS_UNSAFE=yes
-
 .ifdef USE_MYSQL
 .error You have USE_MYSQL variable defined either in environment or in make(1) arguments. Please undefine and try again.
 .endif
@@ -139,7 +137,7 @@ USE_GCC=	yes
 .endif
 
 .if ${PORT_OPTIONS:MOQGRAPH}
-#IGNORE=	MariaDB server fails to build with OQGraph currently
+IGNORE=	MariaDB server fails to build with OQGraph currently
 .endif
 
 post-patch:
