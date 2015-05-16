@@ -1,0 +1,34 @@
+Index: files/patch-plugins_qca-ossl_qca-ossl.cpp
+===================================================================
+--- files/patch-plugins_qca-ossl_qca-ossl.cpp	(revision 0)
++++ files/patch-plugins_qca-ossl_qca-ossl.cpp	(working copy)
+@@ -0,0 +1,14 @@
++--- qca-ossl.cpp.orig	2014-11-06 09:15:45.000000000 +0100
+++++ qca-ossl.cpp	2015-02-23 10:25:54.952326743 +0100
++@@ -5801,7 +5801,11 @@
++ 	{
++ 		SessionInfo sessInfo;
++ 
+++#ifndef OPENSSL_NO_COMP
++ 		sessInfo.isCompressed = (0 != ssl->session->compress_meth);
+++#else
+++		sessInfo.isCompressed = 0;
+++#endif
++ 
++ 		if (ssl->version == TLS1_VERSION)
++ 			sessInfo.version = TLS::TLS_v1;
+
+Property changes on: files/patch-plugins_qca-ossl_qca-ossl.cpp
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property

@@ -1,0 +1,114 @@
+Index: irc/znc/Makefile
+===================================================================
+--- irc/znc/Makefile	(revision 380073)
++++ irc/znc/Makefile	(working copy)
+@@ -2,7 +2,7 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	znc
+-PORTVERSION=	1.4
++PORTVERSION=	1.6.0
+ CATEGORIES=	irc ipv6
+ MASTER_SITES=	http://znc.in/releases/
+ 
+Index: irc/znc/distinfo
+===================================================================
+--- irc/znc/distinfo	(revision 380073)
++++ irc/znc/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (znc-1.4.tar.gz) = 86e98fd0ed182d39828c926809f8075d836ee3b70a6dd43dfbb434822f2a7b52
+-SIZE (znc-1.4.tar.gz) = 1239648
++SHA256 (znc-1.6.0.tar.gz) = df622aeae34d26193c738dff6499e56ad669ec654484e19623738d84cc80aba7
++SIZE (znc-1.6.0.tar.gz) = 1367962
+Index: irc/znc/files/patch-src_Csocket.cpp
+===================================================================
+--- irc/znc/files/patch-src_Csocket.cpp	(revision 0)
++++ irc/znc/files/patch-src_Csocket.cpp	(working copy)
+@@ -0,0 +1,10 @@
++--- src/Csocket.cpp.orig	2015-02-12 20:51:46 UTC
+++++ src/Csocket.cpp
++@@ -47,6 +47,7 @@
++ #include <stdio.h>
++ #include <openssl/conf.h>
++ #include <openssl/engine.h>
+++#include <openssl/comp.h>
++ #endif /* HAVE_LIBSSL */
++ 
++ #ifdef HAVE_ICU
+
+Property changes on: irc/znc/files/patch-src_Csocket.cpp
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: irc/znc/pkg-plist
+===================================================================
+--- irc/znc/pkg-plist	(revision 380073)
++++ irc/znc/pkg-plist	(working copy)
+@@ -14,9 +14,11 @@
+ include/znc/MD5.h
+ include/znc/Modules.h
+ include/znc/Nick.h
++include/znc/Query.h
+ include/znc/SHA256.h
+ include/znc/Server.h
+ include/znc/Socket.h
++include/znc/SSLVerifyHost.h
+ include/znc/Template.h
+ include/znc/Threads.h
+ include/znc/User.h
+@@ -30,6 +32,7 @@
+ include/znc/znc.h
+ include/znc/zncconfig.h
+ lib/znc/adminlog.so
++lib/znc/alias.so
+ lib/znc/autoattach.so
+ lib/znc/autocycle.so
+ lib/znc/autoop.so
+@@ -41,7 +44,6 @@
+ lib/znc/bouncedcc.so
+ lib/znc/buffextras.so
+ lib/znc/chansaver.so
+-lib/znc/charset.so
+ lib/znc/clearbufferonmsg.so
+ lib/znc/clientnotify.so
+ lib/znc/controlpanel.so
+@@ -106,10 +108,12 @@
+ %%DATADIR%%/modules/notes/files/trash.gif
+ %%DATADIR%%/modules/notes/tmpl/index.tmpl
+ %%DATADIR%%/modules/perform/tmpl/index.tmpl
++%%DATADIR%%/modules/q/tmpl/index.tmpl
+ %%DATADIR%%/modules/send_raw/files/select.js
+ %%DATADIR%%/modules/send_raw/tmpl/index.tmpl
+ %%DATADIR%%/modules/stickychan/tmpl/index.tmpl
+ %%DATADIR%%/modules/stickychan/tmpl/stickychan_WebadminChan.tmpl
++%%DATADIR%%/modules/webadmin/files/webadmin.css
+ %%DATADIR%%/modules/webadmin/files/webadmin.js
+ %%DATADIR%%/modules/webadmin/tmpl/add_edit_chan.tmpl
+ %%DATADIR%%/modules/webadmin/tmpl/add_edit_network.tmpl
+@@ -116,13 +120,16 @@
+ %%DATADIR%%/modules/webadmin/tmpl/add_edit_user.tmpl
+ %%DATADIR%%/modules/webadmin/tmpl/del_network.tmpl
+ %%DATADIR%%/modules/webadmin/tmpl/del_user.tmpl
++%%DATADIR%%/modules/webadmin/tmpl/encoding_settings.tmpl
+ %%DATADIR%%/modules/webadmin/tmpl/index.tmpl
+ %%DATADIR%%/modules/webadmin/tmpl/listusers.tmpl
+ %%DATADIR%%/modules/webadmin/tmpl/settings.tmpl
+ %%DATADIR%%/modules/webadmin/tmpl/traffic.tmpl
++%%DATADIR%%/webskins/_default_/pub/External.png
+ %%DATADIR%%/webskins/_default_/pub/_default_.css
+ %%DATADIR%%/webskins/_default_/pub/favicon.ico
+ %%DATADIR%%/webskins/_default_/pub/global.css
++%%DATADIR%%/webskins/_default_/pub/jquery-1.11.2.min.js
+ %%DATADIR%%/webskins/_default_/pub/robots.txt
+ %%DATADIR%%/webskins/_default_/tmpl/Banner.tmpl
+ %%DATADIR%%/webskins/_default_/tmpl/BaseHeader.tmpl

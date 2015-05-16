@@ -1,0 +1,92 @@
+Index: sysutils/condor/files/patch-src__condor_includes__condor_crypt_3des.h
+===================================================================
+--- sysutils/condor/files/patch-src__condor_includes__condor_crypt_3des.h	(revision 0)
++++ sysutils/condor/files/patch-src__condor_includes__condor_crypt_3des.h	(working copy)
+@@ -0,0 +1,11 @@
++--- src/condor_includes/condor_crypt_3des.h.orig	2014-12-09 23:15:18.000000000 +0100
+++++ src/condor_includes/condor_crypt_3des.h	2015-02-28 19:35:54.722059602 +0100
++@@ -61,7 +61,7 @@
++     //------------------------------------------
++     // Private constructor
++     //------------------------------------------
++-    des_key_schedule  keySchedule1_, keySchedule2_, keySchedule3_;
+++    DES_key_schedule  keySchedule1_, keySchedule2_, keySchedule3_;
++     unsigned char     ivec_[8];
++     int               num_;
++ };
+
+Property changes on: sysutils/condor/files/patch-src__condor_includes__condor_crypt_3des.h
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: sysutils/condor/files/patch-src__condor_io__condor_crypt_3des.cpp
+===================================================================
+--- sysutils/condor/files/patch-src__condor_io__condor_crypt_3des.cpp	(revision 0)
++++ sysutils/condor/files/patch-src__condor_io__condor_crypt_3des.cpp	(working copy)
+@@ -0,0 +1,41 @@
++--- src/condor_io/condor_crypt_3des.cpp.orig	2014-12-09 23:15:18.000000000 +0100
+++++ src/condor_io/condor_crypt_3des.cpp	2015-02-28 19:38:25.216863132 +0100
++@@ -35,9 +35,9 @@
++ 	unsigned char * keyData = k.getPaddedKeyData(24);
++ 	ASSERT(keyData);
++ 
++-    des_set_key((des_cblock *)  keyData    , keySchedule1_);
++-    des_set_key((des_cblock *) (keyData+8) , keySchedule2_);
++-    des_set_key((des_cblock *) (keyData+16), keySchedule3_);
+++    DES_set_key((DES_cblock *)  keyData    , &keySchedule1_);
+++    DES_set_key((DES_cblock *) (keyData+8) , &keySchedule2_);
+++    DES_set_key((DES_cblock *) (keyData+16), &keySchedule3_);
++ 
++     // initialize ivsec
++     resetState();
++@@ -71,9 +71,9 @@
++     output = (unsigned char *) malloc(input_len);
++ 
++     if (output) {
++-        des_ede3_cfb64_encrypt(input, output, output_len,
++-                               keySchedule1_, keySchedule2_, keySchedule3_,
++-                               (des_cblock *)ivec_, &num_, DES_ENCRYPT);
+++        DES_ede3_cfb64_encrypt(input, output, output_len,
+++                               &keySchedule1_, &keySchedule2_, &keySchedule3_,
+++                               (DES_cblock *)ivec_, &num_, DES_ENCRYPT);
++         return true;   
++     }
++     else {
++@@ -95,9 +95,9 @@
++     if (output) {
++         output_len = input_len;
++ 
++-        des_ede3_cfb64_encrypt(input, output, output_len,
++-                               keySchedule1_, keySchedule2_, keySchedule3_,
++-                               (des_cblock *)ivec_, &num_, DES_DECRYPT);
+++        DES_ede3_cfb64_encrypt(input, output, output_len,
+++                               &keySchedule1_, &keySchedule2_, &keySchedule3_,
+++                               (DES_cblock *)ivec_, &num_, DES_DECRYPT);
++         
++         return true;           // Should be changed
++     }
+
+Property changes on: sysutils/condor/files/patch-src__condor_io__condor_crypt_3des.cpp
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property

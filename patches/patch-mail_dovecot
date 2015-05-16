@@ -1,0 +1,30 @@
+Index: mail/dovecot/files/patch-src_login-common_ssl-proxy-openssl.c
+===================================================================
+--- mail/dovecot/files/patch-src_login-common_ssl-proxy-openssl.c	(revision 0)
++++ mail/dovecot/files/patch-src_login-common_ssl-proxy-openssl.c	(working copy)
+@@ -0,0 +1,10 @@
++--- src/login-common/ssl-proxy-openssl.c.orig	2015-03-07 13:25:36.487131678 +0100
+++++ src/login-common/ssl-proxy-openssl.c	2015-03-07 13:24:28.303136938 +0100
++@@ -21,6 +21,7 @@
++ #include <openssl/ssl.h>
++ #include <openssl/err.h>
++ #include <openssl/rand.h>
+++#include <openssl/comp.h>
++ 
++ #define DOVECOT_SSL_DEFAULT_CIPHER_LIST "ALL:!LOW:!SSLv2"
++ /* Check every 30 minutes if parameters file has been updated */
+
+Property changes on: mail/dovecot/files/patch-src_login-common_ssl-proxy-openssl.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property

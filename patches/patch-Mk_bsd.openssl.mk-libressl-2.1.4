@@ -1,0 +1,13 @@
+Index: Mk/bsd.openssl.mk
+===================================================================
+--- Mk/bsd.openssl.mk	(revision 380420)
++++ Mk/bsd.openssl.mk	(working copy)
+@@ -108,7 +108,7 @@
+ 
+ # try to guess SHLIBVER for libressl
+ .if defined(OPENSSL_PORT) && ${OPENSSL_PORT} == security/libressl
+-OPENSSL_SHLIBVER?=	30
++OPENSSL_SHLIBVER?=	32
+ .endif
+ 
+ # default

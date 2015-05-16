@@ -1,0 +1,30 @@
+Index: irc/znc/files/patch-src_Csocket.cpp
+===================================================================
+--- irc/znc/files/patch-src_Csocket.cpp	(revision 0)
++++ irc/znc/files/patch-src_Csocket.cpp	(working copy)
+@@ -0,0 +1,10 @@
++--- src/Csocket.cpp.orig	2014-05-08 20:21:25 UTC
+++++ src/Csocket.cpp
++@@ -47,6 +47,7 @@
++ #include <stdio.h>
++ #include <openssl/conf.h>
++ #include <openssl/engine.h>
+++#include <openssl/comp.h>
++ #endif /* HAVE_LIBSSL */
++ 
++ 
+
+Property changes on: irc/znc/files/patch-src_Csocket.cpp
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property

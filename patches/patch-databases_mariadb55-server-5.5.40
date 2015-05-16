@@ -1,0 +1,213 @@
+diff -ruN mariadb55-server.orig/Makefile mariadb55-server/Makefile
+--- mariadb55-server.orig/Makefile	2014-09-04 18:14:25.000000000 +0200
++++ mariadb55-server/Makefile	2014-11-16 21:09:15.180564604 +0100
+@@ -1,7 +1,7 @@
+ # $FreeBSD: head/databases/mariadb55-server/Makefile 367285 2014-09-04 16:14:25Z robak $
+ 
+ PORTNAME?=	mariadb
+-PORTVERSION=	5.5.39
++PORTVERSION=	5.5.40
+ CATEGORIES=	databases ipv6
+ MASTER_SITES=	http://ftp.osuosl.org/pub/mariadb/${PORTNAME}-${PORTVERSION}/source/ \
+ 		http://mirrors.supportex.net/mariadb/${PORTNAME}-${PORTVERSION}/source/ \
+@@ -110,7 +110,10 @@
+ USE_MYSQL=	yes
+ WANT_MYSQL_VER=	55m
+ 
+-CONFLICTS_INSTALL=	mysql[0-9][0-9]-server-* mariadb[0-46-9][0-9]-server-* mariadb5.[0-46-9]-server-* percona[0-9][0-9]-server-*
++CONFLICTS_INSTALL=	mysql*-server-* \
++			mariadb1[0-9][0-9]-server-* \
++			mariadb5[0-46-9]-server-* \
++			percona*-server-*
+ 
+ USE_RC_SUBR=	mysql-server
+ 
+diff -ruN mariadb55-server.orig/distinfo mariadb55-server/distinfo
+--- mariadb55-server.orig/distinfo	2014-09-04 18:14:25.000000000 +0200
++++ mariadb55-server/distinfo	2014-11-16 20:16:03.519180056 +0100
+@@ -1,2 +1,2 @@
+-SHA256 (mariadb-5.5.39.tar.gz) = cb850865ab55ce5f01c99a612cc75b76ead5d75adfa75a606f453d32f9089d14
+-SIZE (mariadb-5.5.39.tar.gz) = 45084762
++SHA256 (mariadb-5.5.40.tar.gz) = cbde17f4a31483143490def6fcce33310ebae49eafe92dc4ada0e7227202415a
++SIZE (mariadb-5.5.40.tar.gz) = 44745240
+diff -ruN mariadb55-server.orig/files/patch-cmake__jemalloc.cmake mariadb55-server/files/patch-cmake__jemalloc.cmake
+--- mariadb55-server.orig/files/patch-cmake__jemalloc.cmake	2013-10-01 00:32:28.000000000 +0200
++++ mariadb55-server/files/patch-cmake__jemalloc.cmake	2014-11-16 20:28:22.652151006 +0100
+@@ -1,14 +1,16 @@
+---- cmake/jemalloc.cmake.orig	2013-09-20 00:34:22.000000000 +0200
+-+++ cmake/jemalloc.cmake	2013-09-27 22:46:05.791110010 +0200
+-@@ -37,9 +37,9 @@
+-     SET(WITH_JEMALLOC "no")
+-   ENDIF()
+-   IF(WITH_JEMALLOC STREQUAL "system" OR WITH_JEMALLOC STREQUAL "yes")
+--    CHECK_LIBRARY_EXISTS(jemalloc malloc_stats_print "" HAVE_JEMALLOC)
++--- cmake/jemalloc.cmake.orig	2014-10-08 15:19:51.000000000 +0200
+++++ cmake/jemalloc.cmake	2014-11-16 20:27:50.032638191 +0100
++@@ -22,11 +22,11 @@
++       SET(libname jemalloc)
++     ENDIF()
++ 
++-    CHECK_LIBRARY_EXISTS(${libname} malloc_stats_print "" HAVE_JEMALLOC)
+ +    CHECK_LIBRARY_EXISTS(c malloc_stats_print "" HAVE_JEMALLOC)
++     SET(CMAKE_REQUIRED_LIBRARIES)
++ 
+      IF (HAVE_JEMALLOC)
+--      SET(LIBJEMALLOC jemalloc)
++-      SET(LIBJEMALLOC ${libname})
+ +      SET(LIBJEMALLOC c)
+-     ELSEIF (WITH_JEMALLOC STREQUAL "system")
+-       MESSAGE(FATAL_ERROR "system jemalloc is not found")
+-     ELSEIF (WITH_JEMALLOC STREQUAL "yes")
++     ELSEIF (NOT WITH_JEMALLOC STREQUAL "auto")
++       MESSAGE(FATAL_ERROR "${libname} is not found")
++     ENDIF()
+diff -ruN mariadb55-server.orig/pkg-plist mariadb55-server/pkg-plist
+--- mariadb55-server.orig/pkg-plist	2014-10-20 12:41:12.000000000 +0200
++++ mariadb55-server/pkg-plist	2014-11-16 20:53:37.905021273 +0100
+@@ -157,146 +157,4 @@
+ %%DATADIR%%/slovak/errmsg.sys
+ %%DATADIR%%/spanish/errmsg.sys
+ %%DATADIR%%/swedish/errmsg.sys
+-%%DATADIR%%/tests/plugin/example/README
+-%%DATADIR%%/tests/plugin/example/mtr/suite.pm
+-%%DATADIR%%/tests/plugin/example/mtr/t/combs.combinations
+-%%DATADIR%%/tests/plugin/example/mtr/t/inc.inc
+-%%DATADIR%%/tests/plugin/example/mtr/t/newcomb.combinations
+-%%DATADIR%%/tests/plugin/example/mtr/t/over.result
+-%%DATADIR%%/tests/plugin/example/mtr/t/over.test
+-%%DATADIR%%/tests/plugin/example/mtr/t/self.result
+-%%DATADIR%%/tests/plugin/example/mtr/t/self.test
+-%%DATADIR%%/tests/plugin/example/mtr/t/source.result
+-%%DATADIR%%/tests/plugin/example/mtr/t/test2,c2.result
+-%%DATADIR%%/tests/plugin/example/mtr/t/test2.opt
+-%%DATADIR%%/tests/plugin/example/mtr/t/test2.rdiff
+-%%DATADIR%%/tests/plugin/example/mtr/t/testsh-master.sh
+-%%DATADIR%%/tests/plugin/heap/mtr2/README
+-%%DATADIR%%/tests/plugin/heap/mtr2/my.cnf
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/alter_tablespace.opt
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/autoinc_secondary.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/cache_index.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/checksum_table_live.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/define_engine.inc
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/disabled.def
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/fulltext_search.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/index_enable_disable.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/index_type_hash.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/insert_delayed.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/lock_concurrent.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/optimize_table.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/repair_table.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/suite.opt
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/tbl_opt_data_index_dir.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/tbl_opt_insert_method.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/tbl_opt_key_block_size.opt
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/tbl_opt_row_format.opt
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/tbl_opt_row_format.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/tbl_opt_union.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/type_char_indexes.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/type_float_indexes.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/type_spatial_indexes.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/vcol.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/parts/checksum_table.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/parts/create_table.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/parts/optimize_table.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/parts/repair_table.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/parts/suite.opt
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/trx/cons_snapshot_serializable.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/trx/level_read_committed.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/trx/level_read_uncommitted.rdiff
+-%%DATADIR%%/tests/plugin/innobase/storage_engine/trx/suite.opt
+-%%DATADIR%%/tests/plugin/myisam/mtr2/README
+-%%DATADIR%%/tests/plugin/myisam/mtr2/overlay.inc
+-%%DATADIR%%/tests/plugin/myisam/mtr2/single.rdiff
+-%%DATADIR%%/tests/plugin/myisam/mtr2/suite.opt
+-%%DATADIR%%/tests/plugin/myisam/mtr2/suite.pm
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/alter_tablespace.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/check_table.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/define_engine.inc
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/foreign_keys.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/index_type_hash.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/show_engine.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/tbl_opt_insert_method.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/tbl_opt_union.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/cons_snapshot_repeatable_read.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/cons_snapshot_serializable.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/delete.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/insert.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/level_read_committed.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/level_read_uncommitted.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/level_repeatable_read.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/level_serializable.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/select_for_update.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/select_lock_in_share_mode.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/update.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/xa.rdiff
+-%%DATADIR%%/tests/plugin/myisam/storage_engine/trx/xa_recovery.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/alter_table.inc
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/alter_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/alter_tablespace.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/analyze_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/autoincrement.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/cache_index.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/checksum_table_live.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/cleanup_engine.inc
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/create_table.inc
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/create_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/define_engine.inc
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/disabled.def
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/foreign_keys.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/fulltext_search.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/handler.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/index.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/index_enable_disable.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/index_type_btree.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/index_type_hash.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/insert_delayed.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/lock.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/optimize_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/repair_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/show_engine.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_ai.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_avg_row_length.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_checksum.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_connection.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_data_index_dir.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_delay_key_write.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_insert_method.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_key_block_size.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_max_rows.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_min_rows.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_pack_keys.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_password.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_row_format.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_opt_union.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_standard_opts.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/tbl_temporary.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/truncate_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/type_char_indexes.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/type_float_indexes.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/type_spatial.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/type_spatial_indexes.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/vcol.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/alter_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/analyze_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/check_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/checksum_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/create_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/optimize_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/repair_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/parts/truncate_table.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/cons_snapshot_repeatable_read.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/cons_snapshot_serializable.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/delete.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/insert.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/level_read_committed.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/level_read_uncommitted.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/level_repeatable_read.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/level_serializable.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/select_for_update.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/select_lock_in_share_mode.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/update.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/xa.rdiff
+-%%DATADIR%%/tests/plugin/myisammrg/storage_engine/trx/xa_recovery.rdiff
+ %%DATADIR%%/ukrainian/errmsg.sys
