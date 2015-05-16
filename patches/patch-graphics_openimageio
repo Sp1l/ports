@@ -1,0 +1,13 @@
+Index: graphics/openimageio/Makefile
+===================================================================
+--- graphics/openimageio/Makefile	(revision 380549)
++++ graphics/openimageio/Makefile	(working copy)
+@@ -43,6 +43,8 @@
+ TEST_CMAKE_ON=		-DOIIO_BUILD_TESTS:BOOL=ON
+ TEST_CMAKE_OFF=		-DOIIO_BUILD_TESTS:BOOL=OFF
+ 
++USE_OPENSSL=		yes
++
+ .include <bsd.port.options.mk>
+ 
+ .if ${SLAVE_PORT} == no

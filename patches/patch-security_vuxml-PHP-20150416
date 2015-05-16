@@ -56,7 +56,7 @@ Index: security/vuxml/vuln.xml
 +    </references>
 +    <dates>
 +      <discovery>2015-04-16</discovery>
-+      <entry>2015-04-16</entry>
++      <entry>2015-04-25</entry>
 +    </dates>
 +  </vuln>
 +

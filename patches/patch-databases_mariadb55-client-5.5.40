@@ -1,0 +1,259 @@
+diff -ruN mariadb55-client.orig/Makefile mariadb55-client/Makefile
+--- mariadb55-client.orig/Makefile	2014-06-15 10:26:47.000000000 +0200
++++ mariadb55-client/Makefile	2014-11-16 21:10:27.379155486 +0100
+@@ -11,7 +11,10 @@
+ PATCHDIR=	${.CURDIR}/files
+ PLIST=		${.CURDIR}/pkg-plist
+ 
+-CONFLICTS_INSTALL=	mysql[0-9][0-9]-client-* mariadb[0-46-9][0-9]-client-* mariadb5.[0-46-9]-client-* percona[0-9][0-9]-client-*
++CONFLICTS_INSTALL=	mysql*-client-* \
++			mariadb1[0-9][0-9]-client-* \
++			mariadb5[0-46-9]-client-* \
++			percona*-client-*
+ 
+ CMAKE_ARGS+=	-DWITHOUT_SERVER=1
+ 
+diff -ruN mariadb55-client.orig/files/patch-CMakeLists.txt mariadb55-client/files/patch-CMakeLists.txt
+--- mariadb55-client.orig/files/patch-CMakeLists.txt	2014-09-04 18:16:00.000000000 +0200
++++ mariadb55-client/files/patch-CMakeLists.txt	2014-11-16 20:39:03.569199961 +0100
+@@ -1,5 +1,5 @@
+---- CMakeLists.txt.orig	2014-08-08 03:08:33.378366450 +0300
+-+++ CMakeLists.txt	2014-08-08 03:10:04.225360039 +0300
++--- CMakeLists.txt.orig	2014-10-08 15:19:53.000000000 +0200
+++++ CMakeLists.txt	2014-10-17 21:36:43.000000000 +0200
+ @@ -411,28 +411,8 @@
+  ADD_SUBDIRECTORY(extra)
+  ADD_SUBDIRECTORY(libservices)
+@@ -44,8 +44,8 @@
+ +IF(FALSE)
+  INSTALL_DOCUMENTATION(README COPYING COPYING.LESSER EXCEPTIONS-CLIENT
+                        COMPONENT Readme)
+- INSTALL_DOCUMENTATION(${CMAKE_BINARY_DIR}/Docs/INFO_SRC
+-@@ -484,6 +464,7 @@
++ 
++@@ -487,6 +467,7 @@
+  IF(UNIX)
+    INSTALL_DOCUMENTATION(Docs/INSTALL-BINARY COMPONENT Readme)
+  ENDIF()
+diff -ruN mariadb55-client.orig/files/patch-cmake__jemalloc.cmake mariadb55-client/files/patch-cmake__jemalloc.cmake
+--- mariadb55-client.orig/files/patch-cmake__jemalloc.cmake	2013-10-01 00:32:28.000000000 +0200
++++ mariadb55-client/files/patch-cmake__jemalloc.cmake	2014-11-16 20:28:22.652151000 +0100
+@@ -1,14 +1,16 @@
+---- cmake/jemalloc.cmake.orig	2013-09-20 00:34:22.000000000 +0200
+-+++ cmake/jemalloc.cmake	2013-09-27 22:46:05.791110010 +0200
+-@@ -37,9 +37,9 @@
+-     SET(WITH_JEMALLOC "no")
+-   ENDIF()
+-   IF(WITH_JEMALLOC STREQUAL "system" OR WITH_JEMALLOC STREQUAL "yes")
+--    CHECK_LIBRARY_EXISTS(jemalloc malloc_stats_print "" HAVE_JEMALLOC)
++--- cmake/jemalloc.cmake.orig	2014-10-08 15:19:51.000000000 +0200
+++++ cmake/jemalloc.cmake	2014-11-16 20:27:50.032638191 +0100
++@@ -22,11 +22,11 @@
++       SET(libname jemalloc)
++     ENDIF()
++ 
++-    CHECK_LIBRARY_EXISTS(${libname} malloc_stats_print "" HAVE_JEMALLOC)
+ +    CHECK_LIBRARY_EXISTS(c malloc_stats_print "" HAVE_JEMALLOC)
++     SET(CMAKE_REQUIRED_LIBRARIES)
++ 
+      IF (HAVE_JEMALLOC)
+--      SET(LIBJEMALLOC jemalloc)
++-      SET(LIBJEMALLOC ${libname})
+ +      SET(LIBJEMALLOC c)
+-     ELSEIF (WITH_JEMALLOC STREQUAL "system")
+-       MESSAGE(FATAL_ERROR "system jemalloc is not found")
+-     ELSEIF (WITH_JEMALLOC STREQUAL "yes")
++     ELSEIF (NOT WITH_JEMALLOC STREQUAL "auto")
++       MESSAGE(FATAL_ERROR "${libname} is not found")
++     ENDIF()
+diff -ruN mariadb55-client.orig/files/patch-libservices_CMakeLists.txt mariadb55-client/files/patch-libservices_CMakeLists.txt
+--- mariadb55-client.orig/files/patch-libservices_CMakeLists.txt	2013-01-05 12:30:51.000000000 +0100
++++ mariadb55-client/files/patch-libservices_CMakeLists.txt	2014-11-16 20:39:03.569199961 +0100
+@@ -1,7 +1,7 @@
+---- libservices/CMakeLists.txt.orig	2012-11-28 17:49:47.000000000 +0200
+-+++ libservices/CMakeLists.txt	2012-12-23 17:32:35.000000000 +0200
+-@@ -24,4 +24,6 @@
+-   debug_sync_service.c)
++--- libservices/CMakeLists.txt.orig	2014-10-08 15:19:52.000000000 +0200
+++++ libservices/CMakeLists.txt	2014-10-17 21:47:48.000000000 +0200
++@@ -26,4 +26,6 @@
++   logger_service.c)
+  
+  ADD_CONVENIENCE_LIBRARY(mysqlservices ${MYSQLSERVICES_SOURCES})
+ +IF(FALSE)
+diff -ruN mariadb55-client.orig/files/patch-scripts_CMakeLists.txt.rej mariadb55-client/files/patch-scripts_CMakeLists.txt.rej
+--- mariadb55-client.orig/files/patch-scripts_CMakeLists.txt.rej	1970-01-01 01:00:00.000000000 +0100
++++ mariadb55-client/files/patch-scripts_CMakeLists.txt.rej	2014-11-16 20:39:03.569199961 +0100
+@@ -0,0 +1,117 @@
++@@ -1,49 +1,74 @@
++---- support-files/CMakeLists.txt.orig	2014-06-13 13:36:52.080474738 +0300
++-+++ support-files/CMakeLists.txt	2014-06-13 13:50:59.537282325 +0300
++-@@ -41,15 +41,18 @@
++-   SET(inst_location ${INSTALL_SUPPORTFILESDIR})
+++--- scripts/CMakeLists.txt.orig	2014-10-08 15:19:53.000000000 +0200
++++++ scripts/CMakeLists.txt	2014-10-17 22:44:55.000000000 +0200
+++@@ -72,6 +72,7 @@
+++ )
++  ENDIF()
++  
++ +IF(FALSE)
++- FOREACH(inifile my-huge my-innodb-heavy-4G my-large my-medium my-small)
++-   CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${inifile}.cnf.sh 
++-                  ${CMAKE_CURRENT_BINARY_DIR}/${inifile}.${ini_file_extension} @ONLY)
++-   INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${inifile}.${ini_file_extension}
++-           DESTINATION ${inst_location} COMPONENT IniFiles)
++- ENDFOREACH()
+++ INSTALL(FILES 
+++   ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_tables.sql 
+++   ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_tables_data.sql
+++@@ -81,6 +82,7 @@
+++   ${FIX_PRIVILEGES_SQL}
+++   DESTINATION ${INSTALL_MYSQLSHAREDIR} COMPONENT Server
+++ )
++ +ENDIF()
++  
+++ # TCMalloc hacks
+++ IF(MALLOC_LIB)
+++@@ -140,6 +142,7 @@
+++ SET(HOSTNAME "hostname")
+++ SET(MYSQLD_USER "mysql")
+++ 
++++IF(FALSE)
+++ # Required for mysqlbug until autotools are deprecated, once done remove these
+++ # and expand default cmake variables
+++ SET(CC ${CMAKE_C_COMPILER})
+++@@ -180,6 +183,7 @@
+++   DESTINATION ${INSTALL_BINDIR}
+++   COMPONENT Server
+++   )
++++ENDIF()
+++ 
+++ ENDIF(UNIX)
+++ 
+++@@ -204,6 +208,7 @@
+++   SET(localstatedir ${MYSQL_DATADIR})
+++ ENDIF()
+++ 
++++IF()
++  IF(UNIX)
++-   SET(prefix ${CMAKE_INSTALL_PREFIX})
++-+  IF(FALSE)
++-   FOREACH(script  mysqld_multi.server mysql-log-rotate binary-configure)
++-     CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${script}.sh 
++-                    ${CMAKE_CURRENT_BINARY_DIR}/${script} @ONLY )
++-@@ -67,8 +70,10 @@
++-     INSTALL(FILES magic DESTINATION ${inst_location} COMPONENT SupportFiles)
++-     INSTALL(DIRECTORY RHEL4-SElinux/ DESTINATION ${inst_location}/SELinux/RHEL4 COMPONENT SupportFiles)
++-   ENDIF()
++-+  ENDIF()
+++ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mysql_install_db.sh
+++   ${CMAKE_CURRENT_BINARY_DIR}/mysql_install_db ESCAPE_QUOTES @ONLY)
+++@@ -219,6 +224,7 @@
+++   COMPONENT Server
+++   )
+++ ENDIF()
++++ENDIF()
++  
++-   INSTALL(FILES mysql.m4 DESTINATION ${INSTALL_SHAREDIR}/aclocal COMPONENT Development)
++-+  IF(FALSE)
++-   CONFIGURE_FILE(MySQL-shared-compat.spec.sh ${CMAKE_CURRENT_BINARY_DIR}/MySQL-shared-compat.spec @ONLY)
++-   CONFIGURE_FILE(mysql.spec.sh ${CMAKE_CURRENT_BINARY_DIR}/mysql.spec @ONLY)
++-   
++-@@ -92,6 +97,7 @@
++-     DESTINATION ${inst_location} COMPONENT SupportFiles
++-     PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ 
++-     GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
++-+  
++- 
++-   IF (INSTALL_SYSCONFDIR)
++-     INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mysql-log-rotate DESTINATION ${INSTALL_SYSCONFDIR}/logrotate.d
++-@@ -101,6 +107,7 @@
++-             RENAME mysql COMPONENT SupportFiles
++-             PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ 
++-             GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
++-+ ENDIF()
++- 
++-     INSTALL(FILES rpm/my.cnf DESTINATION ${INSTALL_SYSCONFDIR}
++-             COMPONENT Common)
++-
+++ SET(prefix "${CMAKE_INSTALL_PREFIX}")
+++ SET(sysconfdir ${prefix})
+++@@ -335,18 +341,8 @@
+++   SET(BIN_SCRIPTS
+++     msql2mysql
+++     mysql_config
+++-    mysql_fix_extensions
+++-    mysql_setpermission
+++-    mysql_secure_installation
+++-    mysql_zap
+++     mysqlaccess
+++-    mysql_convert_table_format
+++     mysql_find_rows
+++-    mytop
+++-    mysqlhotcopy
+++-    mysqldumpslow
+++-    mysqld_multi
+++-    mysqld_safe
+++   )
+++   FOREACH(file ${BIN_SCRIPTS})
+++     IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${file}.sh)
+++@@ -386,4 +382,3 @@
+++     COMPONENT Development)
+++   ENDIF()
+++ ENDIF()
+++-
+diff -ruN mariadb55-client.orig/files/patch-scripts_mysql_config.sh mariadb55-client/files/patch-scripts_mysql_config.sh
+--- mariadb55-client.orig/files/patch-scripts_mysql_config.sh	2014-06-02 14:28:58.000000000 +0200
++++ mariadb55-client/files/patch-scripts_mysql_config.sh	2014-11-16 20:39:03.569199961 +0100
+@@ -1,6 +1,6 @@
+---- scripts/mysql_config.sh.orig	2014-04-15 14:02:39.000000000 +0300
+-+++ scripts/mysql_config.sh	2014-05-16 19:08:41.000000000 +0300
+-@@ -108,8 +108,11 @@
++--- scripts/mysql_config.sh.orig	2014-10-17 21:44:16.000000000 +0200
+++++ scripts/mysql_config.sh	2014-10-17 21:54:16.000000000 +0200
++@@ -109,8 +109,11 @@
+  # We intentionally add a space to the beginning and end of lib strings, simplifies replace later
+  libs=" $ldflags -L$pkglibdir @RPATH_OPTION@ -lmysqlclient @ZLIB_DEPS@ @NON_THREADED_LIBS@"
+  libs="$libs @openssl_libs@ @STATIC_NSS_FLAGS@ "
+diff -ruN mariadb55-client.orig/files/patch-support-files_CMakeLists.txt mariadb55-client/files/patch-support-files_CMakeLists.txt
+--- mariadb55-client.orig/files/patch-support-files_CMakeLists.txt	2014-06-15 10:26:47.000000000 +0200
++++ mariadb55-client/files/patch-support-files_CMakeLists.txt	2014-11-16 20:39:03.569199961 +0100
+@@ -1,5 +1,5 @@
+---- support-files/CMakeLists.txt.orig	2014-06-13 13:36:52.080474738 +0300
+-+++ support-files/CMakeLists.txt	2014-06-13 13:50:59.537282325 +0300
++--- support-files/CMakeLists.txt.orig	2014-10-08 15:19:53.000000000 +0200
+++++ support-files/CMakeLists.txt	2014-10-17 22:34:28.000000000 +0200
+ @@ -41,15 +41,18 @@
+    SET(inst_location ${INSTALL_SUPPORTFILESDIR})
+  ENDIF()
+@@ -19,7 +19,7 @@
+    FOREACH(script  mysqld_multi.server mysql-log-rotate binary-configure)
+      CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/${script}.sh 
+                     ${CMAKE_CURRENT_BINARY_DIR}/${script} @ONLY )
+-@@ -67,8 +70,10 @@
++@@ -69,8 +72,10 @@
+      INSTALL(FILES magic DESTINATION ${inst_location} COMPONENT SupportFiles)
+      INSTALL(DIRECTORY RHEL4-SElinux/ DESTINATION ${inst_location}/SELinux/RHEL4 COMPONENT SupportFiles)
+    ENDIF()
+@@ -30,19 +30,11 @@
+    CONFIGURE_FILE(MySQL-shared-compat.spec.sh ${CMAKE_CURRENT_BINARY_DIR}/MySQL-shared-compat.spec @ONLY)
+    CONFIGURE_FILE(mysql.spec.sh ${CMAKE_CURRENT_BINARY_DIR}/mysql.spec @ONLY)
+    
+-@@ -92,6 +97,7 @@
++@@ -94,6 +99,7 @@
+      DESTINATION ${inst_location} COMPONENT SupportFiles
+      PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ 
+      GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+-+  
+++  ENDIF()
+  
+    IF (INSTALL_SYSCONFDIR)
+      INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/mysql-log-rotate DESTINATION ${INSTALL_SYSCONFDIR}/logrotate.d
+-@@ -101,6 +107,7 @@
+-             RENAME mysql COMPONENT SupportFiles
+-             PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ 
+-             GROUP_EXECUTE WORLD_READ WORLD_EXECUTE)
+-+ ENDIF()
+- 
+-     INSTALL(FILES rpm/my.cnf DESTINATION ${INSTALL_SYSCONFDIR}
+-             COMPONENT Common)
