@@ -23,6 +23,7 @@ PKGMESSAGE=	${WRKDIR}/pkg-message
 
 SLAVEDIRS=	databases/mariadb100-client
 USES=		bison:build cmake execinfo gmake shebangfix cpe
+USE_LDCONFIG=	yes
 SHEBANG_FILES=	scripts/*.sh
 SITESDIR=	mariadb/mariadb-${PORTVERSION}/source
 
@@ -104,7 +105,7 @@ CMAKE_ARGS+=	-DWITH_EMBEDDED_SERVER="ON" \
 		-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1
 
 INNODB_CMAKE_OFF=	-DWITHOUT_INNOBASE=1
-MAXKEY_EXTRA_PATCHES+=	${FILESDIR}/extra-patch-include_my_compare.h
+MAXKEY_EXTRA_PATCHES+=	${FILESDIR}/extra-patch-include_my__compare.h
 MROONGA_CMAKE_OFF=	-DWITHOUT_MROONGA=1
 OQGRAPH_CMAKE_OFF=	-DWITHOUT_OQGRAPH=1
 OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs \
@@ -134,8 +135,8 @@ USE_GCC=	yes
 .endif
 
 .if ${PORT_OPTIONS:MOQGRPAH}
-IGNORE= MariaDB currently doesn't build correctly with OQGraph \
-        See https://mariadb.atlassian.net/browse/MDEV-8128
+IGNORE=	currently MariaDB doesn't build correctly with OQGraph \
+	See https://mariadb.atlassian.net/browse/MDEV-8128.
 .endif
 
 post-patch:
