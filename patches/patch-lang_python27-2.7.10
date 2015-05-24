@@ -1,0 +1,85 @@
+Index: lang/python27/Makefile
+===================================================================
+--- lang/python27/Makefile	(revision 387260)
++++ lang/python27/Makefile	(working copy)
+@@ -1,10 +1,10 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	python27
+-PORTVERSION=	2.7.9
+-PORTREVISION=	1
++PORTVERSION=	2.7.10
+ CATEGORIES=	lang python ipv6
+-MASTER_SITES=	PYTHON/ftp/python/${PORTVERSION}
++MASTER_SITES=	PYTHON
++MASTER_SITE_SUBDIR=	ftp/python/${PORTVERSION}
+ DISTNAME=	Python-${PORTVERSION}
+ DIST_SUBDIR=	python
+ 
+@@ -104,6 +104,10 @@
+ PLIST_SUB+=	NO_NIS=""
+ .endif
+ 
++.if defined(WITH_OPENSSL_PORT)
++CONFIGURE_ARGS+=	CPPFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib
++.endif
++
+ post-patch:
+ 	@${REINPLACE_CMD} -e \
+ 		's,/usr/doc/python-docs-,${PREFIX}/share/doc/python,g' \
+Index: lang/python27/distinfo
+===================================================================
+--- lang/python27/distinfo	(revision 387260)
++++ lang/python27/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (python/Python-2.7.9.tar.xz) = 90d27e14ea7e03570026850e2e50ba71ad20b7eb31035aada1cf3def8f8d4916
+-SIZE (python/Python-2.7.9.tar.xz) = 12164712
++SHA256 (python/Python-2.7.10.tar.xz) = 1cd3730781b91caf0fa1c4d472dc29274186480161a150294c42ce9b5c5effc0
++SIZE (python/Python-2.7.10.tar.xz) = 12250696
+Index: lang/python27/pkg-plist
+===================================================================
+--- lang/python27/pkg-plist	(revision 387260)
++++ lang/python27/pkg-plist	(working copy)
+@@ -1436,8 +1436,8 @@
+ lib/python2.7/ensurepip/__main__.py
+ lib/python2.7/ensurepip/__main__.pyc
+ lib/python2.7/ensurepip/__main__.pyo
+-lib/python2.7/ensurepip/_bundled/pip-1.5.6-py2.py3-none-any.whl
+-lib/python2.7/ensurepip/_bundled/setuptools-7.0-py2.py3-none-any.whl
++lib/python2.7/ensurepip/_bundled/pip-6.1.1-py2.py3-none-any.whl
++lib/python2.7/ensurepip/_bundled/setuptools-15.2-py2.py3-none-any.whl
+ lib/python2.7/ensurepip/_uninstall.py
+ lib/python2.7/ensurepip/_uninstall.pyc
+ lib/python2.7/ensurepip/_uninstall.pyo
+@@ -1782,9 +1782,9 @@
+ lib/python2.7/idlelib/tabbedpages.py
+ lib/python2.7/idlelib/tabbedpages.pyo
+ lib/python2.7/idlelib/tabbedpages.pyc
+-lib/python2.7/idlelib/testcode.py
+-lib/python2.7/idlelib/testcode.pyo
+-lib/python2.7/idlelib/testcode.pyc
++lib/python2.7/idlelib/idle_test/test_io.py
++lib/python2.7/idlelib/idle_test/test_io.pyo
++lib/python2.7/idlelib/idle_test/test_io.pyc
+ lib/python2.7/idlelib/textView.py
+ lib/python2.7/idlelib/textView.pyo
+ lib/python2.7/idlelib/textView.pyc
+@@ -2907,7 +2907,7 @@
+ lib/python2.7/test/decimaltestdata/tointegral.decTest
+ lib/python2.7/test/decimaltestdata/tointegralx.decTest
+ lib/python2.7/test/decimaltestdata/xor.decTest
+-lib/python2.7/test/dh512.pem
++lib/python2.7/test/dh1024.pem
+ lib/python2.7/test/doctest_aliases.py
+ lib/python2.7/test/doctest_aliases.pyo
+ lib/python2.7/test/doctest_aliases.pyc
+@@ -4090,6 +4090,9 @@
+ lib/python2.7/test/test_time.py
+ lib/python2.7/test/test_time.pyo
+ lib/python2.7/test/test_time.pyc
++lib/python2.7/test/test_timeit.py
++lib/python2.7/test/test_timeit.pyo
++lib/python2.7/test/test_timeit.pyc
+ lib/python2.7/test/test_timeout.py
+ lib/python2.7/test/test_timeout.pyo
+ lib/python2.7/test/test_timeout.pyc
