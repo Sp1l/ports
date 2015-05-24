@@ -2,7 +2,7 @@ Index: lang/python27/Makefile
 ===================================================================
 --- lang/python27/Makefile	(revision 387260)
 +++ lang/python27/Makefile	(working copy)
-@@ -1,10 +1,10 @@
+@@ -1,8 +1,7 @@
  # $FreeBSD$
  
  PORTNAME=	python27
@@ -10,13 +10,9 @@ Index: lang/python27/Makefile
 -PORTREVISION=	1
 +PORTVERSION=	2.7.10
  CATEGORIES=	lang python ipv6
--MASTER_SITES=	PYTHON/ftp/python/${PORTVERSION}
-+MASTER_SITES=	PYTHON
-+MASTER_SITE_SUBDIR=	ftp/python/${PORTVERSION}
+ MASTER_SITES=	PYTHON/ftp/python/${PORTVERSION}
  DISTNAME=	Python-${PORTVERSION}
- DIST_SUBDIR=	python
- 
-@@ -104,6 +104,10 @@
+@@ -104,6 +103,10 @@
  PLIST_SUB+=	NO_NIS=""
  .endif
  
