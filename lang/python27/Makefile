@@ -104,7 +104,7 @@ PLIST_SUB+=	NO_NIS=""
 .endif
 
 .if defined(WITH_OPENSSL_PORT)
-CONFIGURE_ARGS+=	CPPFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib
+CONFIGURE_ARGS+=	CPPFLAGS=-I${LOCALBASE}/include LDFLAGS=-L${LOCALBASE}/lib
 .endif
 
 post-patch:
