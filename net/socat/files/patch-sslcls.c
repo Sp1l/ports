@@ -4,7 +4,7 @@
     return;
  }
  
-+#ifdef HAVE_RAND_EGD
++#ifndef OPENSSL_NO_EGD
  int sycRAND_egd(const char *path) {
     int result;
     Debug1("RAND_egd(\"%s\")", path);

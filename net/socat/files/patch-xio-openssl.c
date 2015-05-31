@@ -22,7 +22,7 @@
     }
  
     if (opt_egd) {
-+#ifdef HAVE_RAND_EGD
++#ifndef OPENSSL_NO_EGD
        sycRAND_egd(opt_egd);
 +#endif
     }
