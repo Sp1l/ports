@@ -5,7 +5,7 @@
  
  		const unsigned char *f = (const unsigned char *)RAND_file_name(cast_char f_randfile, sizeof(f_randfile));
 -		if (f && RAND_egd(cast_const_char f) < 0) {
-+#ifdef HAVE_RAND_EGD
++#ifndef OPENSSL_NO_EGD
 +		if (f && RAND_egd(cast_const_char f) < 0) 
 +#endif
 +		{
