@@ -3,7 +3,7 @@
 # installation.
 # Submitted by: mva
 
---- Lib/distutils/command/build_scripts.py.orig	2014-12-10 15:59:34 UTC
+--- Lib/distutils/command/build_scripts.py.orig	2015-05-23 16:09:01 UTC
 +++ Lib/distutils/command/build_scripts.py
 @@ -126,6 +126,9 @@ class build_scripts (Command):
                                   file, oldmode, newmode)

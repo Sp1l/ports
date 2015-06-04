@@ -5,7 +5,7 @@
 
 # Description: ossaudiodev detection fix backport
 
---- setup.py.orig	2014-12-10 16:00:01 UTC
+--- setup.py.orig	2015-05-23 16:09:25 UTC
 +++ setup.py
 @@ -15,6 +15,7 @@ from distutils.core import Extension, se
  from distutils.command.build_ext import build_ext

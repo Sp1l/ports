@@ -1,10 +1,9 @@
-# $FreeBSD: head/lang/python27/Makefile 377581 2015-01-21 09:40:18Z koobs $
+# $FreeBSD: head/lang/python27/Makefile 383449 2015-04-06 16:58:36Z bdrewery $
 
 PORTNAME=	python27
-PORTVERSION=	2.7.9
+PORTVERSION=	2.7.10
 CATEGORIES=	lang python ipv6
-MASTER_SITES=	PYTHON
-MASTER_SITE_SUBDIR=	ftp/python/${PORTVERSION}
+MASTER_SITES=	PYTHON/ftp/python/${PORTVERSION}
 DISTNAME=	Python-${PORTVERSION}
 DIST_SUBDIR=	python
 
@@ -64,8 +63,7 @@ SEM_CONFIGURE_ENV=	ac_cv_posix_semaphores_enabled=yes
 SEM_CONFIGURE_ENV_OFF=	ac_cv_posix_semaphores_enabled=no
 
 THREADS_CONFIGURE_WITH=	threads
-THREADS_CFLAGS=		${PTHREAD_CFLAGS}
-THREADS_LDFLAGS=	${PTHREAD_LIBS}
+THREADS_LDFLAGS=	-lpthread
 
 UCS2_CONFIGURE_ON=	--enable-unicode=ucs2
 UCS4_CONFIGURE_ON=	--enable-unicode=ucs4
@@ -106,7 +104,7 @@ PLIST_SUB+=	NO_NIS=""
 .endif
 
 .if defined(WITH_OPENSSL_PORT)
-CONFIGURE_ARGS+=	CPPFLAGS=-I/usr/local/include LDFLAGS=-L/usr/local/lib
+CONFIGURE_ARGS+=	CPPFLAGS=-I${LOCALBASE}/include LDFLAGS=-L${LOCALBASE}/lib
 .endif
 
 post-patch:

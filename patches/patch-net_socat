@@ -1,116 +1,38 @@
-Index: net/socat/files/patch-configure
+Index: net/socat/Makefile
 ===================================================================
---- net/socat/files/patch-configure	(revision 0)
-+++ net/socat/files/patch-configure	(working copy)
-@@ -0,0 +1,52 @@
-+--- configure.orig	2015-01-24 16:30:38 UTC
-++++ configure
-+@@ -5367,6 +5367,49 @@ fi
-+ $as_echo "$sc_cv_have_libcrypto" >&6; }
-+ fi
-+ 
-++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for RAND_egd in -lcrypto" >&5
-++$as_echo_n "checking for RAND_egd in -lcrypto... " >&6; }
-++if ${ac_cv_lib_crypto_RAND_egd+:} false; then :
-++  $as_echo_n "(cached) " >&6
-++else
-++  ac_check_lib_save_LIBS=$LIBS
-++LIBS="-lcrypto  $LIBS"
-++cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-++/* end confdefs.h.  */
-++
-++/* Override any GCC internal prototype to avoid an error.
-++   Use char because int might match the return type of a GCC
-++   builtin and then its argument prototype would still apply.  */
-++#ifdef __cplusplus
-++extern "C"
-++#endif
-++char RAND_egd ();
-++int
-++main ()
-++{
-++return RAND_egd ();
-++  ;
-++  return 0;
-++}
-++_ACEOF
-++if ac_fn_c_try_link "$LINENO"; then :
-++  ac_cv_lib_crypto_RAND_egd=yes
-++else
-++  ac_cv_lib_crypto_RAND_egd=no
-++fi
-++rm -f core conftest.err conftest.$ac_objext \
-++    conftest$ac_exeext conftest.$ac_ext
-++LIBS=$ac_check_lib_save_LIBS
-++fi
-++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_crypto_RAND_egd" >&5
-++$as_echo "$ac_cv_lib_crypto_RAND_egd" >&6; }
-++if test "x$ac_cv_lib_crypto_RAND_egd" = xyes; then :
-++
-++$as_echo "#define HAVE_RAND_EGD 1" >>confdefs.h
-++
-++fi
-++
-++
-+ if test -n "$WITH_FIPS"; then
-+   if test "$sc_cv_have_openssl_fips_h" = 'yes' -a "$sc_cv_have_libcrypto" = 'yes'; then
-+     $as_echo "#define WITH_FIPS 1" >>confdefs.h
-
-Property changes on: net/socat/files/patch-configure
-___________________________________________________________________
-Added: fbsd:nokeywords
-## -0,0 +1 ##
-+yes
-\ No newline at end of property
-Added: svn:eol-style
-## -0,0 +1 ##
-+native
-\ No newline at end of property
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
-\ No newline at end of property
-Index: net/socat/files/patch-configure.in
+--- net/socat/Makefile	(revision 388093)
++++ net/socat/Makefile	(working copy)
+@@ -18,6 +18,8 @@
+ USE_RC_SUBR=	socat
+ USE_OPENSSL=	yes
+ 
++CPE_VENDOR=	dest-unreach
++
+ PORTSCOUT=	skipv:2.0.0-b2
+ 
+ PLIST_FILES=	bin/filan bin/procan bin/socat man/man1/socat.1.gz
+Index: net/socat/distinfo
 ===================================================================
---- net/socat/files/patch-configure.in	(revision 0)
-+++ net/socat/files/patch-configure.in	(working copy)
-@@ -0,0 +1,11 @@
-+--- configure.in.orig	2015-01-24 10:15:22 UTC
-++++ configure.in
-+@@ -647,6 +647,8 @@ if test -n "$WITH_FIPS" -a "$sc_cv_have_
-+   AC_MSG_RESULT($sc_cv_have_libcrypto)
-+ fi
-+ 
-++AC_CHECK_LIB(crypto, RAND_egd, AC_DEFINE(HAVE_RAND_EGD, 1, [Define if the libcrypto has RAND_egd]))
-++
-+ if test -n "$WITH_FIPS"; then
-+   if test "$sc_cv_have_openssl_fips_h" = 'yes' -a "$sc_cv_have_libcrypto" = 'yes'; then
-+     AC_DEFINE(WITH_FIPS)
+--- net/socat/distinfo	(revision 388093)
++++ net/socat/distinfo	(working copy)
 
-Property changes on: net/socat/files/patch-configure.in
+Property changes on: net/socat/distinfo
 ___________________________________________________________________
-Added: svn:mime-type
+Added: svn:keywords
 ## -0,0 +1 ##
-+text/plain
-\ No newline at end of property
-Added: fbsd:nokeywords
-## -0,0 +1 ##
-+yes
-\ No newline at end of property
-Added: svn:eol-style
-## -0,0 +1 ##
-+native
++FreeBSD=%H
 \ No newline at end of property
 Index: net/socat/files/patch-error.h
 ===================================================================
---- net/socat/files/patch-error.h	(revision 384518)
+--- net/socat/files/patch-error.h	(revision 388093)
 +++ net/socat/files/patch-error.h	(working copy)
-@@ -1,4 +1,4 @@
----- error.h.orig	2015-01-26 09:59:47 UTC
-+--- error.h.orig	2015-01-24 10:15:22 UTC
- +++ error.h
- @@ -229,8 +229,8 @@ struct diag_dgram {
-  } ;
+
+Property changes on: net/socat/files/patch-error.h
+___________________________________________________________________
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
 Index: net/socat/files/patch-sslcls.c
 ===================================================================
 --- net/socat/files/patch-sslcls.c	(revision 0)
@@ -122,7 +44,7 @@ Index: net/socat/files/patch-sslcls.c
 +    return;
 + }
 + 
-++#ifdef HAVE_RAND_EGD
+++#ifndef OPENSSL_NO_EGD
 + int sycRAND_egd(const char *path) {
 +    int result;
 +    Debug1("RAND_egd(\"%s\")", path);
@@ -158,6 +80,10 @@ Added: svn:mime-type
 ## -0,0 +1 ##
 +text/plain
 \ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
 Index: net/socat/files/patch-sslcls.h
 ===================================================================
 --- net/socat/files/patch-sslcls.h	(revision 0)
@@ -177,6 +103,14 @@ Index: net/socat/files/patch-sslcls.h
 
 Property changes on: net/socat/files/patch-sslcls.h
 ___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
@@ -184,10 +118,6 @@ Added: fbsd:nokeywords
 Added: svn:eol-style
 ## -0,0 +1 ##
 +native
-\ No newline at end of property
-Added: svn:mime-type
-## -0,0 +1 ##
-+text/plain
 \ No newline at end of property
 Index: net/socat/files/patch-xio-openssl.c
 ===================================================================
@@ -218,7 +148,7 @@ Index: net/socat/files/patch-xio-openssl.c
 +    }
 + 
 +    if (opt_egd) {
-++#ifdef HAVE_RAND_EGD
+++#ifndef OPENSSL_NO_EGD
 +       sycRAND_egd(opt_egd);
 ++#endif
 +    }
@@ -227,96 +157,29 @@ Index: net/socat/files/patch-xio-openssl.c
 
 Property changes on: net/socat/files/patch-xio-openssl.c
 ___________________________________________________________________
-Added: svn:eol-style
-## -0,0 +1 ##
-+native
-\ No newline at end of property
 Added: svn:mime-type
 ## -0,0 +1 ##
 +text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
 \ No newline at end of property
 Added: fbsd:nokeywords
 ## -0,0 +1 ##
 +yes
 \ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
 Index: net/socat/files/patch-xioopts.c
 ===================================================================
---- net/socat/files/patch-xioopts.c	(revision 384518)
+--- net/socat/files/patch-xioopts.c	(revision 388093)
 +++ net/socat/files/patch-xioopts.c	(working copy)
-@@ -1,73 +1,20 @@
+@@ -1,5 +1,23 @@
  --- xioopts.c.orig	2015-01-24 10:15:22 UTC
  +++ xioopts.c
--@@ -2971,6 +2971,25 @@ int retropt_bind(struct opt *opts,
--    OFUNC_TERMIOS_FLAG, OFUNC_TERMIOS_PATTERN, and some OFUNC_SPEC */
-- int applyopts(int fd, struct opt *opts, enum e_phase phase) {
--    struct opt *opt;
--+#ifdef HAVE_TERMIOS_ISPEED
--+   int ispeed_major = -1, ospeed_major = -1;
--+   unsigned int ispeed_value, ospeed_value;
--+   bool speed_done = false;
--+
--+   opt = opts; while (opt && opt->desc != ODESC_END) {
--+      if (opt->desc == ODESC_DONE ||
--+          (phase != PH_ALL && opt->desc->phase != phase)) {
--+         ++opt; continue; }
--+         if (opt->desc->optcode == OPT_ISPEED) {
--+           ispeed_major = opt->desc->major;
--+           ispeed_value = opt->value.u_uint; }
--+         if (opt->desc->optcode == OPT_OSPEED) {
--+           ospeed_major = opt->desc->major;
--+           ospeed_value = opt->value.u_uint; }
--+      ++opt;
--+      continue;
--+   }
--+#endif /* HAVE_TERMIOS_ISPEED */
-- 
--    opt = opts; while (opt && opt->desc != ODESC_END) {
--       if (opt->desc == ODESC_DONE ||
--@@ -3605,21 +3624,29 @@ int applyopts(int fd, struct opt *opts, 
-- 
-- #ifdef HAVE_TERMIOS_ISPEED
--       } else if (opt->desc->func == OFUNC_TERMIOS_SPEED) {
---	 union {
---	    struct termios termarg;
---	    speed_t speeds[sizeof(struct termios)/sizeof(speed_t)];
---	 } tdata;
---	 if (Tcgetattr(fd, &tdata.termarg) < 0) {
---	    Error3("tcgetattr(%d, %p): %s",
---		   fd, &tdata.termarg, strerror(errno));
---	    opt->desc = ODESC_ERROR; ++opt; continue;
---	 }
---	 tdata.speeds[opt->desc->major] = opt->value.u_uint;
---	 if (Tcsetattr(fd, TCSADRAIN, &tdata.termarg) < 0) {
---	    Error3("tcsetattr(%d, TCSADRAIN, %p): %s",
---		   fd, &tdata.termarg, strerror(errno));
---	    opt->desc = ODESC_ERROR; ++opt; continue;
---	 }
--+         if (speed_done == false) {
--+           union {
--+              struct termios termarg;
--+              speed_t speeds[sizeof(struct termios)/sizeof(speed_t)];
--+           } tdata;
--+           if (Tcgetattr(fd, &tdata.termarg) < 0) {
--+              Error3("tcgetattr(%d, %p): %s",
--+                     fd, &tdata.termarg, strerror(errno));
--+              opt->desc = ODESC_ERROR; ++opt; continue;
--+           }
--+           if (ispeed_major < 0 || ospeed_major < 0)
--+             tdata.speeds[opt->desc->major] = opt->value.u_uint;
--+           else{ 
--+             tdata.speeds[ispeed_major] = ispeed_value;
--+             tdata.speeds[ospeed_major] = ospeed_value;
--+             speed_done = true;
--+           }
--+           if (Tcsetattr(fd, TCSADRAIN, &tdata.termarg) < 0) {
--+             Error3("tcsetattr(%d, TCSADRAIN, %p): %s",
--+                     fd, &tdata.termarg, strerror(errno));
--+              opt->desc = ODESC_ERROR; ++opt; continue;
--+           }
--+         }
-- #endif /* HAVE_TERMIOS_ISPEED */
-- 
--       } else if (opt->desc->func == OFUNC_TERMIOS_SPEC) {
 +@@ -296,7 +296,7 @@ const struct optname optionnames[] = {
 + #if WITH_EXT2 && defined(EXT2_COMPR_FL)
 + 	IF_ANY    ("compr",	&opt_ext2_compr)
@@ -335,3 +198,13 @@ Index: net/socat/files/patch-xioopts.c
 + 	IF_OPENSSL("openssl-compress",	&opt_openssl_compress)
 + #endif
 + 	IF_OPENSSL("openssl-dhparam",	&opt_openssl_dhparam)
+ @@ -2971,6 +2971,25 @@ int retropt_bind(struct opt *opts,
+     OFUNC_TERMIOS_FLAG, OFUNC_TERMIOS_PATTERN, and some OFUNC_SPEC */
+  int applyopts(int fd, struct opt *opts, enum e_phase phase) {
+
+Property changes on: net/socat/files/patch-xioopts.c
+___________________________________________________________________
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
