@@ -23,7 +23,7 @@ PKGMESSAGE=	${WRKDIR}/pkg-message
 
 SLAVEDIRS=	databases/mariadb100-client
 USES=		bison:build cmake execinfo gmake shebangfix cpe
-USE_LDCONFIG=	yes
+USE_LDCONFIG=	${PREFIX}/lib/mysql
 SHEBANG_FILES=	scripts/*.sh
 SITESDIR=	mariadb/mariadb-${PORTVERSION}/source
 
