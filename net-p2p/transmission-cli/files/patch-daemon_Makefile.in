@@ -1,11 +1,12 @@
---- daemon/Makefile.in.orig	2015-04-15 08:35:09 UTC
-+++ daemon/Makefile.in
-@@ -141,7 +141,7 @@ am__v_CC_1 = 
+--- daemon/Makefile.in.orig     2015-07-03 21:13:09.276872000 +0200
++++ daemon/Makefile.in  2015-07-03 21:14:07.096869297 +0200
+@@ -141,7 +141,7 @@ am__v_CC_1 =
  CCLD = $(CC)
  LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
  	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
--	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-+	$(LDFLAGS) $(AM_LDFLAGS) -o $@
+-       $(AM_LDFLAGS) $(LDFLAGS) -o $@
++       $(LDFLAGS) $(AM_LDFLAGS) -o $@
  AM_V_CCLD = $(am__v_CCLD_@AM_V@)
  am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
  am__v_CCLD_0 = @echo "  CCLD    " $@;
+
