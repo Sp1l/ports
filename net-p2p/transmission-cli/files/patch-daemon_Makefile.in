@@ -4,8 +4,8 @@
  CCLD = $(CC)
  LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
  	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
--       $(AM_LDFLAGS) $(LDFLAGS) -o $@
-+       $(LDFLAGS) $(AM_LDFLAGS) -o $@
+-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
++	$(LDFLAGS) $(AM_LDFLAGS) -o $@
  AM_V_CCLD = $(am__v_CCLD_@AM_V@)
  am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
  am__v_CCLD_0 = @echo "  CCLD    " $@;
