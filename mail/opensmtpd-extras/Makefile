@@ -10,6 +10,7 @@ MAINTAINER=	brnrd@freebsd.org
 COMMENT=	Official add-ons for OpenSMTPd
 
 RUN_DEPENDS=	opensmtpd>=5.7:${PORTSDIR}/mail/opensmtpd
+LIB_DEPENDS=	libevent.so:${PORTSDIR}/devel/libevent2
 
 USES=		autoreconf libtool
 CPE_VENDOR=	openbsd
@@ -68,7 +69,7 @@ FILTER_CLAMAV_RUN_DEPENDS=	clamav>=0:${PORTSDIR}/security/clamav
 FILTER_DKIMSIGN_CONFIGURE_WITH=	filter-dkim-signer
 
 FILTER_DNSBL_CONFIGURE_WITH=	filter-dnsbl
-FILTER_DNSBL_BUILD_DEPENDS=	libasr.so:${PORTSDIR}/dns/libasr
+FILTER_DNSBL_LIB_DEPENDS=	libasr.so:${PORTSDIR}/dns/libasr
 
 FILTER_LUA_CONFIGURE_WITH=	filter-lua lua=${LOCALBASE}
 FILTER_LUA_USES=	lua
