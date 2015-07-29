@@ -1,0 +1,8 @@
+--- extras/wip/filters/filter-trace/Makefile.am.orig	2015-06-11 20:14:46 UTC
++++ extras/wip/filters/filter-trace/Makefile.am
+@@ -5,3 +5,5 @@ pkglibexec_PROGRAMS	 = filter-trace
+ 
+ filter_trace_SOURCES	 = $(SRCS)
+ filter_trace_SOURCES	+= $(filters_srcdir)/filter-trace/filter_trace.c
++
++man_MANS		 = filter-trace.8

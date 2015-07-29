@@ -1,0 +1,8 @@
+--- extras/wip/filters/filter-stub/Makefile.am.orig	2015-06-11 20:14:46 UTC
++++ extras/wip/filters/filter-stub/Makefile.am
+@@ -5,3 +5,5 @@ pkglibexec_PROGRAMS	 = filter-stub
+ 
+ filter_stub_SOURCES	 = $(SRCS)
+ filter_stub_SOURCES	+= $(filters_srcdir)/filter-stub/filter_stub.c
++
++man_MANS		 = filter-stub.8

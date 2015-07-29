@@ -1,0 +1,8 @@
+--- extras/wip/tables/table-passwd/Makefile.am.orig	2015-06-11 20:14:46 UTC
++++ extras/wip/tables/table-passwd/Makefile.am
+@@ -5,3 +5,5 @@ pkglibexec_PROGRAMS	 = table-passwd
+ 
+ table_passwd_SOURCES	 = $(SRCS)
+ table_passwd_SOURCES	+= $(tables_srcdir)/table-passwd/table_passwd.c
++
++man_MANS		 = table_passwd.5
