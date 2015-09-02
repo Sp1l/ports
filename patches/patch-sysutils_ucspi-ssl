@@ -1,0 +1,12 @@
+Index: sysutils/ucspi-ssl/Makefile
+===================================================================
+--- sysutils/ucspi-ssl/Makefile	(revision 383805)
++++ sysutils/ucspi-ssl/Makefile	(working copy)
+@@ -20,6 +20,7 @@
+ CONFLICTS?=	ucspi-ssl-tls-[0-9]*
+ 
+ USES=		perl5
++USE_OPENSSL=	yes
+ 
+ PORTDOCS=	CHANGES TODO UCSPI-SSL
+ 
