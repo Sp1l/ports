@@ -67,7 +67,7 @@ ALL_MODULES_CATEGORIES=	\
 	SESSION_ENABLED SESSION_DISABLED \
 	META EXAMPLE
 
-ADDITIONAL_OPT=	LUAJIT IPV4_MAPPED
+ADDITIONAL_OPT=	LUAJIT IPV4_MAPPED MOD_H2
 
 # ===================================================================================
 #NO_OPTIONS_SORT=	yes
