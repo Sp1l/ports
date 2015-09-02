@@ -1,4 +1,4 @@
-# $FreeBSD: head/www/apache24/Makefile.modules 368986 2014-09-22 18:50:18Z ohauer $
+# $FreeBSD: head/www/apache24/Makefile.modules 394508 2015-08-17 14:20:40Z mat $
 #
 # Note by Clement Laforet: (to generate PLIST_SUB entries for modules)
 #	gsed 's/^\(.*\)mod\(.*\)\.so/%%\MOD\U\2%%\L\1mod\2\.so/' pkg-plist > tmp
@@ -9,7 +9,7 @@
 # Maintainer note for OPTION handling:
 # To set additional option use
 #    PORT_OPTIONS+=
-# To unset an OPTION, even the OPTION is set in OPTIONSFILE use
+# To unset an OPTION, even the OPTION is set in OPTIONS_FILE use
 #    WITHOUT_MODULES+=
 #  Using OPTIONS_EXCLUDE and OPTIONS_OVERRIDE do not work as expected
 #  if the OPTION is enabled by the user, therefore we calculate
@@ -43,9 +43,11 @@ IGNORE=	SESSION_CRYPTO requires APR-util to have crypto openssl support build in
 # XXX in case we use OPTIONS for MPM
 # we do not have a WITH_MPM variable
 .if ${PORT_OPTIONS:MMPM_SHARED}
+SUB_LIST+=		MPM_FALLBACK_CHECK=""
 PLIST_SUB+=		MPM_SHARED=""
 CONFIGURE_ARGS+=	--enable-mpms-shared=all
 .else
+SUB_LIST+=		MPM_FALLBACK_CHECK="\#"
 PLIST_SUB+=		MPM_SHARED="@comment "
 .endif
 
