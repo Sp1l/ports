@@ -60,8 +60,6 @@ LUAJIT_LIB_DEPENDS=		libluajit-5.1.so:${PORTSDIR}/lang/luajit
 LUA_CONFIGURE_WITH=		lua
 LUA_USES=			lua
 
-MOD_H2_EXTRA_PATCHES=		${FILESDIR}/extra-patch-mod_h2
-
 SOCACHE_DC_CONFIGURE_ON=	--with-distcache=${LOCALBASE}
 SOCACHE_DC_LIB_DEPENDS=		libdistcache.so:${PORTSDIR}/security/distcache
 
@@ -101,8 +99,7 @@ CONFIGURE_ARGS+=--prefix=${PREFIX_RELDEST} \
 		--enable-http \
 		--with-pcre=${LOCALBASE} \
 		--with-apr=${APR_CONFIG} \
-		--with-apr-util=${APU_CONFIG} \
-		--enable-silent-rules
+		--with-apr-util=${APU_CONFIG}
 
 CONFIGURE_ENV=	LOCALBASE="${LOCALBASE}"
 

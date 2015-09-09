@@ -20,7 +20,6 @@ MPM_EVENT_DESC=			MPM worker variant with the goal of consuming threads only for
 # additional (no modules)
 IPV4_MAPPED_DESC=		Allow IPv6 sockets to handle IPv4 connections
 LUAJIT_DESC=			LuaJit Support
-MOD_H2_DESC=			Patch apache for mod_h2 (EXPERIMENTAL HTTP/2 support)
 
 # =====================================
 # static support (tbd)
