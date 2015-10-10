@@ -1,0 +1,196 @@
+Index: comms/kermit/files/patch-ck__ssl.c
+===================================================================
+--- comms/kermit/files/patch-ck__ssl.c	(revision 0)
++++ comms/kermit/files/patch-ck__ssl.c	(working copy)
+@@ -0,0 +1,80 @@
++--- ck_ssl.c.orig	2011-07-06 15:03:32.000000000 +0200
+++++ ck_ssl.c	2015-10-03 14:42:36.360598285 +0200
++@@ -1054,11 +1054,15 @@ ssl_display_comp(SSL * ssl)
++     if (ssl == NULL)
++         return;
++ 
+++#ifndef OPENSSL_NO_COMP
++     if (ssl->expand == NULL || ssl->expand->meth == NULL)
+++#endif
++         printf("Compression: None\r\n");
+++#ifndef OPENSSL_NO_COMP
++     else {
++         printf("Compression: %s\r\n",ssl->expand->meth->name);
++     }
+++#endif
++ }
++ 
++ int
++@@ -1483,9 +1487,13 @@ the build.\r\n\r\n");
++         }
++         debug(F110,"ssl_rnd_file",ssl_rnd_file,0);
++ 
+++#ifndef OPENSSL_NO_EGD
++         rc1 = RAND_egd(ssl_rnd_file);
++         debug(F111,"ssl_once_init","RAND_egd()",rc1);
++-        if ( rc1 <= 0 ) {
+++        if ( rc1 <= 0 ) 
+++#endif
+++	{
+++
++             rc2 = RAND_load_file(ssl_rnd_file, -1);
++             debug(F111,"ssl_once_init","RAND_load_file()",rc1);
++         }
++@@ -1579,10 +1587,12 @@ ssl_tn_init(mode) int mode;
++             /* This can fail because we do not have RSA available */
++             if ( !ssl_ctx ) {
++                 debug(F110,"ssl_tn_init","SSLv23_client_method failed",0);
+++#ifndef OPENSSL_NO_SSL3
++                 ssl_ctx=(SSL_CTX *)SSL_CTX_new(SSLv3_client_method());
++             }
++             if ( !ssl_ctx ) {
++                 debug(F110,"ssl_tn_init","SSLv3_client_method failed",0);
+++#endif
++                 last_ssl_mode = -1;
++                 return(0);
++             }
++@@ -1593,8 +1603,10 @@ ssl_tn_init(mode) int mode;
++             /* This can fail because we do not have RSA available */
++             if ( !tls_ctx ) {
++                 debug(F110,"ssl_tn_init","SSLv23_client_method failed",0);
+++#ifndef OPENSSL_NO_SSL3
++                 tls_ctx=(SSL_CTX *)SSL_CTX_new(SSLv3_client_method());
++             }
+++#endif /* OPENSSL_NO_SSL3 */
++ #endif /* COMMENT */
++             if ( !tls_ctx ) {
++                 debug(F110,"ssl_tn_init","TLSv1_client_method failed",0);
++@@ -1611,10 +1623,12 @@ ssl_tn_init(mode) int mode;
++             /* This can fail because we do not have RSA available */
++             if ( !ssl_ctx ) {
++                 debug(F110,"ssl_tn_init","SSLv23_server_method failed",0);
+++#ifndef OPENSSL_NO_SSL3
++                 ssl_ctx=(SSL_CTX *)SSL_CTX_new(SSLv3_server_method());
++             }
++             if ( !ssl_ctx ) {
++                 debug(F110,"ssl_tn_init","SSLv3_server_method failed",0);
+++#endif
++                 last_ssl_mode = -1;
++                 return(0);
++             }
++@@ -2161,7 +2175,9 @@ ssl_http_init(hostname) char * hostname;
++         /* This can fail because we do not have RSA available */
++         if ( !tls_http_ctx ) {
++             debug(F110,"ssl_http_init","SSLv23_client_method failed",0);
+++#ifndef OPENSSL_NO_SSL3
++             tls_http_ctx=(SSL_CTX *)SSL_CTX_new(SSLv3_client_method());
+++#endif
++         }
++ #endif /* COMMENT */
++         if ( !tls_http_ctx ) {
+
+Property changes on: comms/kermit/files/patch-ck__ssl.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: comms/kermit/files/patch-ckcftp.c
+===================================================================
+--- comms/kermit/files/patch-ckcftp.c	(revision 0)
++++ comms/kermit/files/patch-ckcftp.c	(working copy)
+@@ -0,0 +1,24 @@
++--- ckcftp.c.orig	2011-07-14 18:17:30.000000000 +0200
+++++ ckcftp.c	2015-10-03 14:48:01.112575165 +0200
++@@ -10196,15 +10196,21 @@ ssl_auth() {
++ #define SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS 0L
++ #endif
++     if (auth_type && !strcmp(auth_type,"TLS")) {
+++#ifndef OPENSSL_NO_SSL3
++         ssl_ftp_ctx=SSL_CTX_new(SSLv3_client_method());
+++#endif
++         if (!ssl_ftp_ctx)
++           return(0);
++         SSL_CTX_set_options(ssl_ftp_ctx,
++                             SSL_OP_SINGLE_DH_USE|SSL_OP_EPHEMERAL_RSA
++                             );
++     } else {
+++#ifndef OPENSSL_NO_SSL3
++         ssl_ftp_ctx = SSL_CTX_new(ftp_bug_use_ssl_v2 ? SSLv23_client_method() : 
++                                   SSLv3_client_method());
+++#else
+++        ssl_ftp_ctx = SSL_CTX_new(SSLv23_client_method());
+++#endif
++         if (!ssl_ftp_ctx)
++           return(0);
++         SSL_CTX_set_options(ssl_ftp_ctx,
+
+Property changes on: comms/kermit/files/patch-ckcftp.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: comms/kermit/files/patch-ckcssl.h
+===================================================================
+--- comms/kermit/files/patch-ckcssl.h	(revision 0)
++++ comms/kermit/files/patch-ckcssl.h	(working copy)
+@@ -0,0 +1,20 @@
++--- ckcssl.h.orig	1999-09-21 04:08:20.000000000 +0200
+++++ ckcssl.h	2015-10-03 14:35:05.123628000 +0200
++@@ -71,13 +71,15 @@ _PROTOTYP(int ssl_client_verify_callback
++ #define SSL_CTX_free                     ck_SSL_CTX_free
++ #define SSL_CTX_set_default_passwd_cb    ck_SSL_CTX_set_default_passwd_cb
++ #define SSLv23_method                    ck_SSLv23_method
+++#ifndef OPENSSL_NO_SSL3
++ #define SSLv3_method                     ck_SSLv3_method
+++#define SSLv3_client_method              ck_SSLv3_client_method
+++#define SSLv3_server_method              ck_SSLv3_server_method
+++#endif
++ #define TLSv1_method                     ck_TLSv1_method
++ #define SSLv23_client_method             ck_SSLv23_client_method
++-#define SSLv3_client_method              ck_SSLv3_client_method
++ #define TLSv1_client_method              ck_TLSv1_client_method
++ #define SSLv23_server_method             ck_SSLv23_server_method
++-#define SSLv3_server_method              ck_SSLv3_server_method
++ #define TLSv1_server_method              ck_TLSv1_server_method
++ #define SSL_library_init                 ck_SSL_library_init
++ #define SSL_state_string                 ck_SSL_state_string
+
+Property changes on: comms/kermit/files/patch-ckcssl.h
+___________________________________________________________________
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
