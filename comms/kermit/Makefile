@@ -25,10 +25,6 @@ PORTEXAMPLES=	*
 
 OPTIONS_DEFINE=	DOCS EXAMPLES
 
-.if (${OPENSSL_PORT:tl} == 'security/libressl')
-MAKE_ARGS+=	-DNO_COMP -DNO_EGD
-.endif
-
 post-patch:
 	@${REINPLACE_CMD} -e 's,-O2 -pipe,${CFLAGS},' ${WRKSRC}/${MAKEFILE}
 
