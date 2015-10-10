@@ -1,0 +1,87 @@
+Index: benchmarks/httperf/Makefile
+===================================================================
+--- benchmarks/httperf/Makefile	(revision 398989)
++++ benchmarks/httperf/Makefile	(working copy)
+@@ -13,10 +13,13 @@
+ 
+ USE_OPENSSL=	yes
+ GNU_CONFIGURE=	yes
+-USES=		gmake
++USES=		gmake libtool
+ MAKE_ARGS=	LIBUTIL_OBJS=ssl_writev.o \
+ 		exec_prefix=${PREFIX}
+ 
++CFLAGS+=	-I${OPENSSLINC}
++LDFLAGS+=	-L${OPENSSLLIB}
++
+ PLIST_FILES=	bin/httperf \
+ 		man/man1/httperf.1.gz
+ 
+Index: benchmarks/httperf/files/patch-httperf.c
+===================================================================
+--- benchmarks/httperf/files/patch-httperf.c	(revision 398989)
++++ benchmarks/httperf/files/patch-httperf.c	(working copy)
+@@ -1,13 +0,0 @@
+---- src/httperf.c.orig	2007-12-11 10:48:02.000000000 +0000
+-+++ src/httperf.c	2007-12-11 10:48:48.000000000 +0000
+-@@ -78,6 +78,10 @@
+- #include <conn.h>
+- #include <timer.h>
+- 
+-+#ifdef __FreeBSD__
+-+#include <machine/floatingpoint.h>
+-+#endif
+-+
+- #ifdef HAVE_SSL
+- #  include <openssl/rand.h>
+- #endif
+Index: benchmarks/httperf/files/patch-src_httperf.c
+===================================================================
+--- benchmarks/httperf/files/patch-src_httperf.c	(revision 0)
++++ benchmarks/httperf/files/patch-src_httperf.c	(working copy)
+@@ -0,0 +1,26 @@
++--- src/httperf.c.orig	2007-04-07 07:01:56 UTC
+++++ src/httperf.c
++@@ -78,6 +78,10 @@
++ #include <conn.h>
++ #include <timer.h>
++ 
+++#ifdef __FreeBSD__
+++#include <machine/floatingpoint.h>
+++#endif
+++
++ #ifdef HAVE_SSL
++ #  include <openssl/rand.h>
++ #endif
++@@ -808,7 +812,12 @@ main (int argc, char **argv)
++       SSLeay_add_ssl_algorithms ();
++ 
++       /* for some strange reason, SSLv23_client_method () doesn't work here */
+++#ifndef OPENSSL_NO_SSL3
++       ssl_ctx = SSL_CTX_new (SSLv3_client_method ());
+++#else
+++      ssl_ctx = SSL_CTX_new (SSLv23_client_method ());
+++      SSL_CTX_set_options (ssl_ctx, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3 );
+++#endif
++       if (!ssl_ctx)
++ 	{
++ 	  ERR_print_errors_fp (stderr);
+
+Property changes on: benchmarks/httperf/files/patch-src_httperf.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
