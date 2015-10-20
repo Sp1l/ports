@@ -33,6 +33,11 @@ bin/perror
 bin/replace
 bin/resolve_stack_dump
 bin/resolveip
+bin/wsrep_sst_common
+bin/wsrep_sst_mysqldump
+bin/wsrep_sst_rsync
+bin/wsrep_sst_xtrabackup
+bin/wsrep_sst_xtrabackup-v2
 include/mysql/private/embedded_priv.h
 lib/mysql/libmysqld.a
 lib/mysql/libmysqld.so
@@ -43,9 +48,11 @@ lib/mysql/plugin/auth_pam.so
 lib/mysql/plugin/auth_socket.so
 lib/mysql/plugin/auth_test_plugin.so
 lib/mysql/plugin/daemon_example.ini
+lib/mysql/plugin/debug_key_management.so
 lib/mysql/plugin/dialog.so
 lib/mysql/plugin/dialog_examples.so
-lib/mysql/plugin/feedback.so
+lib/mysql/plugin/example_key_management.so
+lib/mysql/plugin/file_key_management.so
 lib/mysql/plugin/ha_archive.so
 lib/mysql/plugin/ha_blackhole.so
 lib/mysql/plugin/ha_connect.so
@@ -54,7 +61,6 @@ lib/mysql/plugin/ha_federatedx.so
 %%INNODB%%lib/mysql/plugin/ha_innodb.so
 %%MROONGA%%lib/mysql/plugin/ha_mroonga.so
 %%OQGRAPH%%lib/mysql/plugin/ha_oqgraph.so
-lib/mysql/plugin/ha_sequence.so
 lib/mysql/plugin/ha_sphinx.so
 lib/mysql/plugin/ha_spider.so
 lib/mysql/plugin/ha_test_sql_discovery.so
@@ -72,7 +78,9 @@ lib/mysql/plugin/query_response_time.so
 lib/mysql/plugin/semisync_master.so
 lib/mysql/plugin/semisync_slave.so
 lib/mysql/plugin/server_audit.so
+lib/mysql/plugin/simple_password_check.so
 lib/mysql/plugin/sql_errlog.so
+lib/mysql/plugin/wsrep_info.so
 libexec/mysqld
 man/man1/aria_chk.1.gz
 man/man1/aria_dump_log.1.gz
@@ -173,3 +181,5 @@ man/man8/mysqld.8.gz
 %%DATADIR%%/spanish/errmsg.sys
 %%DATADIR%%/swedish/errmsg.sys
 %%DATADIR%%/ukrainian/errmsg.sys
+%%DATADIR%%/wsrep.cnf
+%%DATADIR%%/wsrep_notify

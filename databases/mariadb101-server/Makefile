@@ -86,7 +86,7 @@ WITHOUT_SSL_CMAKE_ON=	-DWITH_SSL=no
 
 .if defined(CLIENT_ONLY)
 # MySQL-Client part
-USES+=		readline
+uSES+=		readline
 .else
 # MySQL-Server part
 
@@ -119,6 +119,8 @@ post-install:
 		${STAGEDIR}${PREFIX}/bin/mysql_config \
 		${STAGEDIR}${PREFIX}/bin/mysql_find_rows \
 		${STAGEDIR}${PREFIX}/bin/mysqlaccess
+	${RM} -r ${STAGEDIR}/${PREFIX}/share/mysql/policy \
+		${STAGEDIR}/${PREFIX}/share/pkgconfig
 .endif
 
 .include <bsd.port.pre.mk>
