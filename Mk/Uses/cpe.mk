@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/cpe.mk 362972 2014-07-26 13:57:12Z des $
+# $FreeBSD: head/Mk/Uses/cpe.mk 383010 2015-04-02 15:02:44Z mat $
 #
 # Include CPE information in package manifest as a CPE 2.3 formatted
 # string.  See http://scap.nist.gov/specifications/cpe/ for details.
@@ -22,9 +22,9 @@
 _INCLUDE_USES_CPE_MK=    yes
 
 CPE_PART	?= a
-CPE_PRODUCT	?= ${PORTNAME}
+CPE_PRODUCT	?= ${PORTNAME:tl}
 CPE_VENDOR	?= ${CPE_PRODUCT}
-CPE_VERSION	?= ${PORTVERSION}
+CPE_VERSION	?= ${PORTVERSION:tl}
 CPE_UPDATE	?=
 CPE_EDITION	?=
 CPE_LANG	?=

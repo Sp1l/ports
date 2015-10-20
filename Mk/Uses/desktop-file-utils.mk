@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/desktop-file-utils.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/desktop-file-utils.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # handle dependency depends on desktop-file-utils and package regen
 #

@@ -1,8 +1,8 @@
-# $FreeBSD: head/Mk/Uses/lua.mk 378872 2015-02-12 12:55:24Z koobs $
+# $FreeBSD: head/Mk/Uses/lua.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Provide support for lua
-# 
-# MAINTAINER: lua@FreeBSD.org
+#
+# MAINTAINER: ports@FreeBSD.org
 # Usage:
 #
 # USES+=	lua:[version]

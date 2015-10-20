@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/bsd.apache.mk 369952 2014-10-04 10:53:21Z ohauer $
+# $FreeBSD: head/Mk/bsd.apache.mk 392104 2015-07-14 22:34:53Z pgollucci $
 #
 # bsd.apache.mk - Apache related macros.
 # Author: Clement Laforet <clement@FreeBSD.org>
@@ -217,7 +217,7 @@ APACHE_MODULES+=	${module}
 .if defined(WITH_STATIC_MODULES)
 .for module in ${APACHE_MODULES}
 .	if ${WITH_STATIC_MODULES:M${module}}
-_CONFIGURE_ARGS+=	--enable-${module:tl}
+_CONFIGURE_ARGS+=	--enable-${module:tl}=static
 .	else
 _CONFIGURE_ARGS+=	--enable-${module:tl}=shared
 .	endif

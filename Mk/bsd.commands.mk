@@ -2,7 +2,7 @@
 #
 # Created by: Gabor Kovesdan <gabor@FreeBSD.org>
 #
-# $FreeBSD: head/Mk/bsd.commands.mk 373028 2014-11-22 01:48:44Z bapt $
+# $FreeBSD: head/Mk/bsd.commands.mk 381977 2015-03-23 04:03:00Z bdrewery $
 #
 # DO NOT COMMIT CHANGES TO THIS FILE BY YOURSELF, EVEN IF YOU DID NOT GET
 # A RESPONSE FROM THE MAINTAINER(S) WITHIN A REASONABLE TIMEFRAME! ALL
@@ -18,6 +18,7 @@ _COMMANDSMKINCLUDED=	yes
 AWK?=			/usr/bin/awk
 BASENAME?=		/usr/bin/basename
 BRANDELF?=		/usr/bin/brandelf
+BSDMAKE?=		/usr/bin/make
 BZCAT?=			/usr/bin/bzcat
 BZIP2_CMD?=		/usr/bin/bzip2
 CAT?=			/bin/cat

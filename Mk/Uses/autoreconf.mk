@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/autoreconf.mk 379150 2015-02-17 10:30:55Z tijl $
+# $FreeBSD: head/Mk/Uses/autoreconf.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Run autoreconf in CONFIGURE_WRKSRC to update configure, Makefile.in and
 # other build scripts.
@@ -70,6 +70,7 @@ BUILD_DEPENDS+=	libtoolize:${PORTSDIR}/devel/libtool
 _INCLUDE_USES_AUTORECONF_POST_MK=	yes
 
 .if ! ${autoreconf_ARGS:Mbuild}
+_USES_configure+=	470:do-autoreconf
 do-autoreconf:
 .for f in AUTHORS ChangeLog INSTALL NEWS README
 # Don't modify time stamps if the files already exist

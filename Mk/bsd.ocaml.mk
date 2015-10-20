@@ -1,7 +1,7 @@
 # ex:ts=4
 #
 # $MBSDlabs: portmk/bsd.ocaml.mk,v 1.18 2006/08/06 18:47:23 stas Exp $
-# $FreeBSD: head/Mk/bsd.ocaml.mk 373656 2014-11-29 23:56:21Z antoine $
+# $FreeBSD: head/Mk/bsd.ocaml.mk 397941 2015-09-26 08:41:45Z bapt $
 #
 # bsd.ocaml.mk - Support for the Objective Caml language packages
 #
@@ -17,6 +17,10 @@
 # USE_OCAML_FINDLIB	-	Set if your port uses ocamlfind to install
 #				packages. Package direcories will be
 #				automatically deleted.
+# USE_OCAML_CAMLP4	-	Set if your port uses camlp4 to build.
+# USE_OCAML_TK		-	Set if you port needs ocaml-labltk.
+# NO_OCAMLTK_BUILDDEPENDS -	Don't add labltk to BUILD|EXTRACT|PATCH_DEPENDS.
+# NO_OCAMLTK_RUNDEPENDS	-	Don't add labltk to RUN_DEPENDS.
 # USE_OCAML_LDCONFIG	-	Set if your port installs shared libraries
 #				into ocaml site-lib dir. OCaml ld.conf file
 #				will be automatically processed.
@@ -44,6 +48,8 @@ OCAMLC?=		${LOCALBASE}/bin/ocamlc
 OCAMLC_OPT?=		${LOCALBASE}/bin/ocamlc.opt
 OCAMLCP?=		${LOCALBASE}/bin/ocamlcp
 OCAMLFIND?=		${LOCALBASE}/bin/ocamlfind
+CAMLP4?=		${LOCALBASE}/bin/camlp4
+OCAMLTK?=		${LOCALBASE}/bin/labltk
 
 #
 # OCaml library directory
@@ -66,6 +72,18 @@ OCAMLC_DEPEND?=		${OCAMLC}:${OCAMLC_PORT}
 #
 OCAMLFIND_PORT?=	${PORTSDIR}/devel/ocaml-findlib
 OCAMLFIND_DEPEND?=	${OCAMLFIND}:${OCAMLFIND_PORT}
+
+#
+# OCaml camlp4 port dependency
+#
+CAMLP4_PORT?=		${PORTSDIR}/devel/ocaml-camlp4
+CAMLP4_DEPEND?=		${CAMLP4}:${CAMLP4_PORT}
+
+#
+# OCaml TK bindings dependency
+#
+OCAMLTK_PORT?=		${PORTSDIR}/x11-toolkits/ocaml-labltk
+OCAMLTK_DEPENDS?=	${OCAMLTK}:${OCAMLTK_PORT}
 
 #
 # Common OCaml examples and documents location
@@ -136,6 +154,21 @@ ocaml-findlib:
 . endif
 .endif
 
+.if defined(USE_OCAML_CAMLP4)
+BUILD_DEPENDS+=		${CAMLP4_DEPEND}
+.endif
+
+.if defined(USE_OCAML_TK)
+. if !defined(NO_OCAMLTK_BUILDDEPENDS)
+EXTRACT_DEPENDS+=	${OCAMLTK_DEPENDS}
+PATCH_DEPENDS+=		${OCAMLTK_DEPENDS}
+BUILD_DEPENDS+=		${OCAMLTK_DEPENDS}
+. endif
+. if !defined(NO_OCAMLTK_RUNDEPENDS)
+RUN_DEPENDS+=		${OCAMLTK_DEPENDS}
+. endif
+.endif
+
 .if defined(USE_OCAML_LDCONFIG)
 #
 # Directories under PREFIX for appending to ld.conf
@@ -144,9 +177,9 @@ OCAML_LDLIBS?=	${OCAML_SITELIBDIR}/${PORTNAME}
 . if !target(ocaml-ldconfig)
 ocaml-ldconfig:
 .  for LIB in ${OCAML_LDLIBS}
-	@${ECHO_CMD} "@exec ${ECHO_CMD} "%D/${LIB}" >> %D/${OCAML_LDCONF}" \
+	@${ECHO_CMD} "@postexec ${ECHO_CMD} "%D/${LIB}" >> %D/${OCAML_LDCONF}" \
 		>> ${TMPPLIST}
-	@${ECHO_CMD} "@unexec ${SED} -i \"\" -e '/${LIB:S#/#\/#g}/d' %D/${OCAML_LDCONF}"  >> ${TMPPLIST}
+	@${ECHO_CMD} "@postunexec ${SED} -i \"\" -e '/${LIB:S#/#\/#g}/d' %D/${OCAML_LDCONF}"  >> ${TMPPLIST}
 .  endfor
 . endif
 .endif
@@ -155,7 +188,7 @@ ocaml-ldconfig:
 . if !target(ocaml-wash)
 ocaml-wash:
 #	If ld.conf is empty
-	@${ECHO_CMD} "@unexec if [ ! -s %D/${OCAML_LDCONF} ]; then ${RM} -f %D/${OCAML_LDCONF}; fi || true" >> ${TMPPLIST}
+	@${ECHO_CMD} "@postunexec if [ ! -s %D/${OCAML_LDCONF} ]; then ${RM} -f %D/${OCAML_LDCONF}; fi || true" >> ${TMPPLIST}
 . endif
 .endif
 

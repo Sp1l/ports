@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/gmake.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/gmake.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Provide support to use the GNU make
 #
@@ -24,6 +24,6 @@ _GMAKE_EXT=	-lite
 
 BUILD_DEPENDS+=		gmake${_GMAKE_EXT}:${PORTSDIR}/devel/gmake${_GMAKE_EXT}
 CONFIGURE_ENV+=		MAKE=gmake${_GMAKE_EXT}
-MAKE_CMD?=		gmake${_GMAKE_EXT}
+MAKE_CMD=		gmake${_GMAKE_EXT}
 
 .endif

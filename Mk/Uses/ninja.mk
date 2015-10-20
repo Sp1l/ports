@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/ninja.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/ninja.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Provide support to use Ninja
 #
@@ -27,6 +27,8 @@ CMAKE_ARGS+=	-GNinja
 MAKEFILE=
 MAKE_CMD=	ninja
 MAKE_FLAGS=
+# Set a minimal job of 1
+_MAKE_JOBS=	-j${MAKE_JOBS_NUMBER}
 _DESTDIR_VIA_ENV=	yes
 
 .endif

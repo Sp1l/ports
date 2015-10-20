@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/zope.mk 348308 2014-03-15 10:31:54Z gerald $
+# $FreeBSD: head/Mk/Uses/zope.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Provide support for Zope-related ports
 #
@@ -79,7 +79,8 @@ IGNORE+=	Zope requires Python ${_PYTHON_VER_REQUIRED}.\
 .if ${ZOPE_VERSION} == ${_ZOPE_PORTBRANCH}
 RUN_DEPENDS+=	zope213>0:${PORTSDIR}/www/zope213
 .else
-check-makevars::
+_USES_sanity+=	300:check-makevars-zope
+check-makevars-zope:
 	@${ECHO} "Makefile error: bad value for ZOPE_VERSION: ${ZOPE_VERSION}."
 	@${ECHO} "Legal values are: ${_ZOPE_PORTBRANCH} (default)"
 	@${FALSE}

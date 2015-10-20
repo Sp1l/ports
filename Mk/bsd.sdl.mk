@@ -29,7 +29,7 @@
 #
 
 #
-# $FreeBSD: head/Mk/bsd.sdl.mk 352816 2014-05-02 14:45:32Z tijl $
+# $FreeBSD: head/Mk/bsd.sdl.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 
 SDL_Include_MAINTAINER=		mva@FreeBSD.org

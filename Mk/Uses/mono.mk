@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/mono.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/mono.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # mono (c#) support
 #
@@ -18,7 +18,7 @@ IGNORE=	USES=mono takes no arguments
 # can always assume to be writable.
 MONO_SHARED_DIR=	${WRKDIR}
 CONFIGURE_ENV+=		MONO_SHARED_DIR="${MONO_SHARED_DIR}"
-MAKE_ENV+=		MONO_SHARED_DIR="${MONO_SHARED_DIR}"
+MAKE_ENV+=		MONO_SHARED_DIR="${MONO_SHARED_DIR}" TZ=UTC
 BUILD_DEPENDS+=		mono:${PORTSDIR}/lang/mono
 RUN_DEPENDS+=		mono:${PORTSDIR}/lang/mono
 

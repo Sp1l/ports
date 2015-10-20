@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/cran.mk 374462 2014-12-10 14:44:09Z feld $
+# $FreeBSD: head/Mk/Uses/cran.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Use the Comprehensive R Archive Network 
 #
@@ -41,14 +41,14 @@ WRKSRC?=	${WRKDIR}/${PORTNAME}
 NO_BUILD=	yes
 R_COMMAND=	${LOCALBASE}/bin/R
 
-.if !target(regression-test)
+.if !target(do-test)
 R_POSTCMD_CHECK_OPTIONS?=	--timings
 
 .if !exists(${LOCALBASE}/bin/pdflatex)
 R_POSTCMD_CHECK_OPTIONS+=	--no-manual --no-rebuild-vignettes
 .endif
 
-regression-test: build
+do-test:
 	@cd ${WRKDIR} ; ${SETENV} ${MAKE_ENV} _R_CHECK_FORCE_SUGGESTS_=FALSE \
 	${R_COMMAND} ${R_PRECMD_CHECK_OPTIONS} CMD check \
 	${R_POSTCMD_CHECK_OPTIONS} ${PORTNAME}
@@ -70,13 +70,10 @@ do-install:
 .endif
 
 .if ${cran_ARGS:Mauto-plist}
-.if !target(post-install-script)
-post-install-script:
+_USES_install+=	750:cran-auto-plist
+cran-auto-plist:
 	@${FIND} -ds ${STAGEDIR}${PREFIX}/${R_MOD_DIR} \( -type f -or -type l \) -print | \
 		${SED} -E -e 's,^${STAGEDIR}${PREFIX}/?,,' >> ${TMPPLIST}
-	@${FIND} -ds ${STAGEDIR}${PREFIX}/${R_MOD_DIR} -type d -print | ${SED} -E -e \
-		's,^${STAGEDIR}${PREFIX}/?,@dirrm ,' >> ${TMPPLIST}
-.endif
 .endif
 
 .endif #_INCLUDE_USES_CRAN_MK

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/pathfix.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/pathfix.mk 394503 2015-08-17 13:31:25Z mat $
 #
 # Lookup common paths in Makefile.in, configure and similar files, and replace
 # their values to respect FreeBSD hier(7) for file installation.
@@ -18,6 +18,7 @@ IGNORE=	USES=pathfix does not require args
 
 PATHFIX_MAKEFILEIN?=	Makefile.in
 
+_USES_patch+=	190:pathfix
 pathfix:
 	@${FIND} ${WRKSRC} -name "${PATHFIX_MAKEFILEIN}" -type f | ${XARGS} ${REINPLACE_CMD} -e \
 		's|[(]libdir[)]/locale|(prefix)/share/locale|g ; \

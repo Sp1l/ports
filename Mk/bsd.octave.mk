@@ -1,7 +1,7 @@
 #-*- tab-width: 4; -*-
 # ex:ts=4
 #
-# $FreeBSD: head/Mk/bsd.octave.mk 377711 2015-01-23 03:18:29Z stephen $
+# $FreeBSD: head/Mk/bsd.octave.mk 397940 2015-09-26 08:39:49Z bapt $
 #
 # bsd.octave.mk - Octave related macro
 # Common code to install octave-forge packages.
@@ -41,5 +41,5 @@ do-install:
 post-install:
 	@${ECHO_CMD} "share/octave/tarballs/${DISTNAME}.tar.gz" >> ${TMPPLIST}
 	@${ECHO_CMD} "share/octave/tarballs/${OCTAVE_PKGNAME}.tar.gz" >> ${TMPPLIST}
-	@${ECHO_CMD} "@unexec if [ -x ${LOAD_OCTAVE_PKG_CMD} ]; then ${LOAD_OCTAVE_PKG_CMD}; fi" >> ${TMPPLIST}
-	@${ECHO_CMD} "@exec if [ -x ${LOAD_OCTAVE_PKG_CMD} ]; then ${LOAD_OCTAVE_PKG_CMD}; fi" >> ${TMPPLIST}
+	@${ECHO_CMD} "@postunexec if [ -x ${LOAD_OCTAVE_PKG_CMD} ]; then ${LOAD_OCTAVE_PKG_CMD}; fi" >> ${TMPPLIST}
+	@${ECHO_CMD} "@postexec if [ -x ${LOAD_OCTAVE_PKG_CMD} ]; then ${LOAD_OCTAVE_PKG_CMD}; fi" >> ${TMPPLIST}

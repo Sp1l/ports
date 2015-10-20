@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/qmake.mk 372179 2014-11-05 09:39:21Z rakuco $
+# $FreeBSD: head/Mk/Uses/qmake.mk 397043 2015-09-16 08:55:04Z rakuco $
 #
 # Provide support for qmake-based projects
 #
@@ -71,6 +71,7 @@ QMAKE_ARGS+=	-spec ${QMAKESPEC} \
 		QMAKE_CFLAGS="${CFLAGS}" \
 		QMAKE_CXXFLAGS="${CXXFLAGS}" \
 		QMAKE_LFLAGS="${LDFLAGS}" \
+		QMAKE_LIBS="${LIBS}" \
 		QMAKE_CFLAGS_DEBUG="" \
 		QMAKE_CFLAGS_RELEASE="" \
 		QMAKE_CXXFLAGS_DEBUG="" \

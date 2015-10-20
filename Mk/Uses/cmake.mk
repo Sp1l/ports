@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/cmake.mk 374910 2014-12-18 16:47:19Z rakuco $
+# $FreeBSD: head/Mk/Uses/cmake.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Provide support for CMake based projects
 #
@@ -19,8 +19,6 @@
 # CMAKE_NINJA		- Use ninja instead of make(1)
 #
 # Variables for ports:
-# CMAKE_ENV		- Environment passed to cmake.
-#			Default: ${CONFIGURE_ENV}
 # CMAKE_ARGS		- Arguments passed to cmake
 #			Default: see below
 # CMAKE_BUILD_TYPE	- Type of build (cmake predefined build types).
@@ -68,7 +66,6 @@ PLIST_SUB+=		CMAKE_BUILD_TYPE="${CMAKE_BUILD_TYPE:tl}"
 INSTALL_TARGET?=	install/strip
 .endif
 
-CMAKE_ENV?=		${CONFIGURE_ENV}
 CMAKE_ARGS+=		-DCMAKE_C_COMPILER:STRING="${CC}" \
 			-DCMAKE_CXX_COMPILER:STRING="${CXX}" \
 			-DCMAKE_C_FLAGS:STRING="${CFLAGS}" \
@@ -117,7 +114,7 @@ INSTALL_WRKSRC=		${CONFIGURE_WRKSRC}
 do-configure:
 	@${ECHO_MSG} ${_CMAKE_MSG}
 	${MKDIR} ${CONFIGURE_WRKSRC}
-	@cd ${CONFIGURE_WRKSRC}; ${SETENV} ${CMAKE_ENV} ${CMAKE_BIN} ${CMAKE_ARGS} ${CMAKE_SOURCE_PATH}
+	@cd ${CONFIGURE_WRKSRC}; ${SETENV} ${CONFIGURE_ENV} ${CMAKE_BIN} ${CMAKE_ARGS} ${CMAKE_SOURCE_PATH}
 .endif
 
 .endif #!defined(_INCLUDE_USES_CMAKE_MK)

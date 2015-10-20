@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/fmake.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/fmake.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Provide support to use the legacy FreeBSD make
 #
@@ -18,6 +18,6 @@ IGNORE=	Incorrect 'USES+= fmake:${fmake_ARGS}' fmake takes no arguments
 FMAKE=			${LOCALBASE}/bin/fmake
 BUILD_DEPENDS+=		${FMAKE}:${PORTSDIR}/devel/fmake
 CONFIGURE_ENV+=		MAKE=${FMAKE}
-MAKE_CMD?=		${FMAKE}
+MAKE_CMD=		${FMAKE}
 .endif
 .endif

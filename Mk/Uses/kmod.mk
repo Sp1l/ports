@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/kmod.mk 375621 2014-12-26 12:43:44Z bapt $
+# $FreeBSD: head/Mk/Uses/kmod.mk 394503 2015-08-17 13:31:25Z mat $
 #
 # Handles common items for kernel module ports.
 #
@@ -39,7 +39,7 @@ STRIP_CMD+=	--strip-debug # do not strip kernel symbols
 .if defined(_POSTMKINCLUDED) && !defined(_INCLUDE_USES_KMOD_POST_MK)
 _INCLUDE_USES_KMOD_POST_MK=	yes
 
-pre-install: ${STAGEDIR}${KMODDIR}
+_USES_install+=	290:${STAGEDIR}${KMODDIR}
 ${STAGEDIR}${KMODDIR}:
 	@${MKDIR} ${.TARGET}
 

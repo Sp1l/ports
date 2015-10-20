@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/alias.mk 371239 2014-10-20 07:33:00Z marino $
+# $FreeBSD: head/Mk/Uses/alias.mk 391257 2015-07-03 16:54:08Z amdmi3 $
 #
 # Add __FreeSBD__ definition to CFLAGS
 # Used by DPorts when masquerading as FreeBSD allows port to build without
@@ -13,7 +13,7 @@
 .if !defined(_INCLUDE_USES_ALIAS_MK)
 _INCLUDE_USES_ALIAS_MK=    yes
 
-.if ${OPSYS} == DragonFly
+.if ${OPSYS} != FreeBSD
 
 .if empty(alias_ARGS)
 CFLAGS+=	-D__FreeBSD__=9
@@ -26,6 +26,6 @@ IGNORE=	invalid MAJOR RELEASE argument (${alias_ARGS}) for USES=alias
 .  endif
 .endif
 
-.endif # OPSYS == DragonFly
+.endif # OPSYS != FreeBSD
 
 .endif

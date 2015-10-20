@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/dos2unix.mk 348308 2014-03-15 10:31:54Z gerald $
+# $FreeBSD: head/Mk/Uses/dos2unix.mk 394503 2015-08-17 13:31:25Z mat $
 #
 # Provide support to convert files from dos2unix
 #
@@ -15,6 +15,7 @@ _INCLUDE_USES_DOS2UNIX_MK=	yes
 _DOS2UNIX_ALL=	yes
 .endif
 
+_USES_patch+=	200:dos2unix
 dos2unix:
 	@${ECHO_MSG} "===>   Converting DOS text files to UNIX text files"
 .if defined(_DOS2UNIX_ALL)

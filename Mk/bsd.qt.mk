@@ -1,7 +1,7 @@
 #-*- tab-width: 4; -*-
 # ex:ts=4
 #
-# $FreeBSD: head/Mk/bsd.qt.mk 379843 2015-02-24 21:39:19Z makc $
+# $FreeBSD: head/Mk/bsd.qt.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Port variables:
 # USE_QT*			- List of Qt modules to depend on, with optional '_build'
@@ -26,8 +26,8 @@ Qt_Pre_Include=	bsd.qt.mk
 
 # Qt versions currently supported by the framework.
 _QT_SUPPORTED?=	4 5
-QT4_VERSION?=	4.8.6
-QT5_VERSION?=	5.3.2
+QT4_VERSION?=	4.8.7
+QT5_VERSION?=	5.4.1
 
 QT_PREFIX?=		${LOCALBASE}
 
@@ -96,7 +96,7 @@ USES+=			tar:xz
 # devel/qt*/distinfo for every port.
 QT_DIST=		base declarative doc graphicaleffects imageformats \
 				multimedia quick1 quickcontrols script serialport svg tools \
-				translations webkit webkit-examples x11extras xmlpatterns
+				translations webchannel webkit webkit-examples websockets x11extras xmlpatterns
 .  endif
 
 .  if ${QT_DIST} == "base" && ${PORTNAME} != "qmake"
@@ -146,6 +146,9 @@ CONFIGURE_ARGS+=-nomake examples -nomake tests \
 				-qmldir ${PREFIX}/${QT_QMLDIR_REL} \
 				-examplesdir ${PREFIX}/${QT_EXAMPLEDIR_REL} \
 				-testsdir ${PREFIX}/${QT_TESTDIR_REL}
+.  if ${ARCH} == i386 && empty(MACHINE_CPU:Msse2)
+CONFIGURE_ARGS+=-no-sse2
+.  endif
 . endif
 
 . if defined(WANT_QT_DEBUG) || defined(WITH_DEBUG)
@@ -168,13 +171,13 @@ CONFIGURE_ARGS+=-verbose
 . endif
 
 . if ${QT_DIST} == "base" || ${_QT_VERSION:M4*}
+.  if ${_QT_VERSION:M4*}
+_EXTRA_PATCHES_QT4=	${.CURDIR:H:H}/devel/${_QT_RELNAME}/files/extrapatch-src-corelib-global-qglobal.h
+.  endif
 EXTRA_PATCHES?=	${.CURDIR:H:H}/devel/${_QT_RELNAME}/files/extrapatch-configure \
 		${.CURDIR:H:H}/devel/${_QT_RELNAME}/files/extrapatch-config.tests-unix-compile.test \
-		${.CURDIR:H:H}/devel/${_QT_RELNAME}/files/extrapatch-libtool
-.  if ${_QT_VERSION:M4*}
-EXTRA_PATCHES?=	${EXTRA_PATCHES} \
-				${.CURDIR:H:H}/devel/${_QT_RELNAME}/files/extrapatch-src-corelib-global-qglobal.h
-.  endif
+		${.CURDIR:H:H}/devel/${_QT_RELNAME}/files/extrapatch-libtool \
+		${_EXTRA_PATCHES_QT4}
 . endif
 
 # Override settings installed in qconfig.h and *.pri files. The flags will be
@@ -297,8 +300,9 @@ _USE_QT4_ONLY=	accessible assistant-adp assistantclient codecs-cn codecs-jp \
 				qtestlib qvfb rcc uic uic3 xmlpatterns-tool
 
 _USE_QT5_ONLY=	buildtools concurrent core graphicaleffects \
-				paths printsupport qdbus qdoc qev qml quick \
-				quickcontrols serialport uitools widgets x11extras
+				paths phonon4 printsupport qdbus qdoc qev qml quick \
+				quickcontrols serialport uitools webchannel websockets \
+				widgets x11extras
 
 accessible_PORT=	accessibility/${_QT_RELNAME}-accessible
 accessible_PATH=	${QT_PLUGINDIR}/accessible/libqtaccessiblewidgets.so
@@ -402,7 +406,7 @@ network_PATH=		${QT_LIBDIR}/libQt${_QT_LIBVER}Network.so
 opengl_PORT=		graphics/${_QT_RELNAME}-opengl
 opengl_PATH=		${QT_LIBDIR}/libQt${_QT_LIBVER}OpenGL.so
 
-paths_PORT=		sysutils/qt5-qtpaths
+paths_PORT=		sysutils/${_QT_RELNAME}-qtpaths
 paths_PATH=		${QT_BINDIR}/qtpaths
 
 pixeltool_PORT=		graphics/${_QT_RELNAME}-pixeltool
@@ -410,6 +414,9 @@ pixeltool_PATH=		${QT_BINDIR}/pixeltool
 
 phonon_PORT=		multimedia/phonon
 phonon_PATH=		${QT_LIBDIR}/libphonon.so
+
+phonon4_PORT=		multimedia/${_QT_RELNAME}-phonon4
+phonon4_PATH=		${QT_LIBDIR}/libphonon4${_QT_RELNAME}.so
 
 phonon-gst_PORT=	multimedia/phonon-gstreamer
 phonon-gst_PATH=	${QT_PLUGINDIR}/phonon_backend/libphonon_gstreamer.so
@@ -508,6 +515,12 @@ uic3_PATH=			${QT_BINDIR}/uic3
 
 uitools_PORT=		devel/${_QT_RELNAME}-uitools
 uitools_PATH=		${QT_LIBDIR}/libQt${_QT_LIBVER}UiTools.a
+
+webchannel_PORT=	www/${_QT_RELNAME}-webchannel
+webchannel_PATH=	${QT_LIBDIR}/libQt${_QT_LIBVER}WebChannel.so
+
+websockets_PORT=	www/${_QT_RELNAME}-websockets
+websockets_PATH=	${QT_LIBDIR}/libQt${_QT_LIBVER}WebSockets.so
 
 webkit_PORT=		www/webkit-${_QT_RELNAME}
 webkit_PATH=		${QT_LIBDIR}/libQt${_QT_LIBVER}WebKit.so
@@ -622,7 +635,7 @@ qt-post-install:
 	@${MKDIR} ${STAGEDIR}${QT_INCDIR}/QtCore/modules
 	@${ECHO_CMD} -n \
 		> ${STAGEDIR}${QT_INCDIR}/QtCore/modules/qconfig-${QT_MODNAME}.h
-.  for def in ${QT_DEFINES:N-*:O:u}
+.  for def in ${QT_DEFINES:N-*:O:u:C/=.*$//}
 	@${ECHO_CMD} "#if !defined(QT_${def}) && !defined(QT_NO_${def})" \
 		>> ${STAGEDIR}${QT_INCDIR}/QtCore/modules/qconfig-${QT_MODNAME}.h
 	${ECHO_CMD} "# define QT_${def}" \

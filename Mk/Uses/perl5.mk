@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/perl5.mk 379168 2015-02-17 15:58:12Z mat $
+# $FreeBSD: head/Mk/Uses/perl5.mk 399791 2015-10-19 20:53:15Z bdrewery $
 #
 # Provide support to use perl5
 #
@@ -42,19 +42,28 @@ IGNORE=	Incorrect 'USES+=perl5:${perl5_ARGS}' perl5 takes no arguments
 
 USE_PERL5?=	run build
 
-.if exists(${LOCALBASE}/bin/perl5)
+# remove when 5.20 goes away.
+.if !defined(_PORTS_ENV_CHECK)
 .sinclude "${LOCALBASE}/etc/perl5_version"
-.if !defined(PERL_VERSION)
-PERL_VERSION!=	perl -e 'printf "%vd\n", $$^V;'
 .endif
+.if defined(PERL_VERSION)
+PERL5_DEPEND=	${PERL5}
+THIS_IS_OLD_PERL=	yes
 .else
+# end of remove
 .include "${PORTSDIR}/Mk/bsd.default-versions.mk"
 .if ${PERL5_DEFAULT} == 5.16
-PERL_VERSION=	5.16.3
+.include "${PORTSDIR}/lang/perl5.16/version.mk"
 .elif ${PERL5_DEFAULT} == 5.18
-PERL_VERSION=	5.18.4
+.include "${PORTSDIR}/lang/perl5.18/version.mk"
 .elif ${PERL5_DEFAULT} == 5.20
-PERL_VERSION=	5.20.2
+.include "${PORTSDIR}/lang/perl5.20/version.mk"
+.elif ${PERL5_DEFAULT} == 5.22
+.include "${PORTSDIR}/lang/perl5.22/version.mk"
+.elif ${PERL5_DEFAULT} == devel
+.include "${PORTSDIR}/lang/perl5-devel/version.mk"
+# Force PERL_PORT here in case two identical PERL_VERSION.
+PERL_PORT?=	perl5-devel
 .else
 IGNORE=	Invalid perl5 version ${PERL5_DEFAULT}
 .endif
@@ -81,8 +90,11 @@ PERL_LEVEL=0
 PERL_ARCH?=	mach
 
 # there must always be a default to prevent dependency failures such
-# as "ports/lang: not found"
-.if   ${PERL_LEVEL} >= 502000
+# as "ports/lang: not found".  Also, perl5-devel is taken care in the
+# perl5_default file, or up there in the default versions selection.
+.if   ${PERL_LEVEL} >= 502200
+PERL_PORT?=	perl5.22
+.elif   ${PERL_LEVEL} >= 502000
 PERL_PORT?=	perl5.20
 .elif ${PERL_LEVEL} >= 501800
 PERL_PORT?=	perl5.18
@@ -96,6 +108,12 @@ SITE_ARCH_REL?=	${SITE_PERL_REL}/${PERL_ARCH}/${PERL_VER}
 SITE_ARCH?=	${LOCALBASE}/${SITE_ARCH_REL}
 SITE_MAN3_REL?=	${SITE_PERL_REL}/man/man3
 SITE_MAN3?=	${PREFIX}/${SITE_MAN3_REL}
+.if defined(THIS_IS_OLD_PERL)
+SITE_MAN1_REL?=	share/man/man1
+.else
+SITE_MAN1_REL?=	${SITE_PERL_REL}/man/man1
+.endif
+SITE_MAN1?=	${PREFIX}/${SITE_MAN1_REL}
 
 PERL5=		${LOCALBASE}/bin/perl${PERL_VERSION}
 PERL=		${LOCALBASE}/bin/perl
@@ -156,6 +174,7 @@ _INCLUDE_USES_PERL5_POST_MK=	yes
 
 PLIST_SUB+=	PERL_VERSION=${PERL_VERSION} \
 		PERL_VER=${PERL_VER} \
+		PERL5_MAN1=${SITE_MAN1_REL} \
 		PERL5_MAN3=${SITE_MAN3_REL} \
 		SITE_PERL=${SITE_PERL_REL} \
 		SITE_ARCH=${SITE_ARCH_REL}
@@ -209,19 +228,19 @@ CONFIGURE_ENV+=	PERL_MM_USE_DEFAULT="YES"
 .endif # configure
 
 .if ${_USE_PERL5:Mextract}
-EXTRACT_DEPENDS+=	${PERL5}:${PORTSDIR}/lang/${PERL_PORT}
+EXTRACT_DEPENDS+=	${PERL5_DEPEND}:${PORTSDIR}/lang/${PERL_PORT}
 .endif
 
 .if ${_USE_PERL5:Mpatch}
-PATCH_DEPENDS+=		${PERL5}:${PORTSDIR}/lang/${PERL_PORT}
+PATCH_DEPENDS+=		${PERL5_DEPEND}:${PORTSDIR}/lang/${PERL_PORT}
 .endif
 
 .if ${_USE_PERL5:Mbuild}
-BUILD_DEPENDS+=		${PERL5}:${PORTSDIR}/lang/${PERL_PORT}
+BUILD_DEPENDS+=		${PERL5_DEPEND}:${PORTSDIR}/lang/${PERL_PORT}
 .endif
 
 .if ${_USE_PERL5:Mrun}
-RUN_DEPENDS+=		${PERL5}:${PORTSDIR}/lang/${PERL_PORT}
+RUN_DEPENDS+=		${PERL5_DEPEND}:${PORTSDIR}/lang/${PERL_PORT}
 .endif
 
 .if ${_USE_PERL5:Mconfigure}
@@ -229,6 +248,9 @@ CONFIGURE_ARGS+=	CC="${CC}" CCFLAGS="${CFLAGS}" PREFIX="${PREFIX}" \
 			INSTALLPRIVLIB="${PREFIX}/lib" INSTALLARCHLIB="${PREFIX}/lib"
 CONFIGURE_SCRIPT?=	Makefile.PL
 MAN3PREFIX?=		${PREFIX}/${SITE_PERL_REL}
+.if !defined(THIS_IS_OLD_PERL)
+MAN1PREFIX?=		${PREFIX}/${SITE_PERL_REL}
+.endif
 .undef HAS_CONFIGURE
 
 .if !target(do-configure)
@@ -265,6 +287,7 @@ PACKLIST_DIR?=	${PREFIX}/${SITE_ARCH_REL}/auto
 
 # In all those, don't use - before the command so that the user does
 # not wonder what has been ignored by this message "*** Error code 1 (ignored)"
+_USES_install+=	560:fix-perl-things
 fix-perl-things:
 # Remove STAGEDIR from .packlist and add the file to the plist.
 	@(if [ -d ${STAGEDIR}${PACKLIST_DIR} ] ; then \
@@ -287,19 +310,14 @@ fix-perl-things:
 	@${RM} -f ${STAGEDIR}${PREFIX}/lib/perl5/${PERL_VER}/${PERL_ARCH}/perllocal.pod* || :
 	@${RMDIR} -p ${STAGEDIR}${PREFIX}/lib/perl5/${PERL_VER}/${PERL_ARCH} 2>/dev/null || :
 
-.if !target(regression-test)
-TEST_ARGS+=	${MAKE_ARGS}
-TEST_ENV+=	${MAKE_ENV}
+.if !target(do-test) && (!empty(USE_PERL5:Mmodbuild*) || !empty(USE_PERL5:Mconfigure))
 TEST_TARGET?=	test
 TEST_WRKSRC?=	${BUILD_WRKSRC}
-.if !target(test)
-test: regression-test
-.endif # test
-regression-test: build
+do-test:
 .if ${USE_PERL5:Mmodbuild*}
-	-cd ${TEST_WRKSRC}/ && ${SETENV} ${TEST_ENV} ${PERL5} ${PL_BUILD} ${TEST_TARGET} ${TEST_ARGS}
+	cd ${TEST_WRKSRC}/ && ${SETENV} ${TEST_ENV} ${PERL5} ${PL_BUILD} ${TEST_TARGET} ${TEST_ARGS}
 .elif ${USE_PERL5:Mconfigure}
-	-cd ${TEST_WRKSRC}/ && ${SETENV} ${TEST_ENV} ${MAKE_CMD} ${TEST_ARGS} ${TEST_TARGET}
+	cd ${TEST_WRKSRC}/ && ${SETENV} ${TEST_ENV} ${MAKE_CMD} ${TEST_ARGS} ${TEST_TARGET}
 .endif # USE_PERL5:Mmodbuild*
-.endif # regression-test
+.endif # do-test
 .endif # defined(_POSTMKINCLUDED)

@@ -7,7 +7,7 @@
 # Please send all suggested changes to the maintainer instead of committing
 # them to SVN yourself.
 #
-# $FreeBSD: head/Mk/bsd.php.mk 379803 2015-02-24 15:05:17Z ale $
+# $FreeBSD: head/Mk/bsd.php.mk 398043 2015-09-27 18:37:34Z adamw $
 #
 # Adding 'USE_PHP=yes' to a port includes this Makefile after bsd.ports.pre.mk.
 # If the port requires a predefined set of PHP extensions, they can be
@@ -32,6 +32,8 @@
 # You may combine multiple WANT_PHP_* knobs.
 # Don't specify any WANT_PHP_* knob if your port will work with every PHP SAPI.
 #
+# If you are building PHP-based ports in poudriere(8) with ZTS enabled,
+# add WITH_MPM=event to /etc/make.conf to prevent build failures.
 
 .if !defined(_PHPMKINCLUDED)
 

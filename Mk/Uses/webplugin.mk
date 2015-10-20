@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/webplugin.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/webplugin.mk 394503 2015-08-17 13:31:25Z mat $
 #
 # Documentation and examples:
 #
@@ -167,6 +167,7 @@ PLIST_FILES+=	${d}/${l}
 .endfor
 .endfor
 
+_USES_install+=	600:webplugin-post-install
 webplugin-post-install:
 .for d in ${_WEBPLUGIN_LINKFARMS}
 	${MKDIR} ${STAGEDIR}${d}

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/bsd.sanity.mk 379358 2015-02-19 18:19:28Z makc $
+# $FreeBSD: head/Mk/bsd.sanity.mk 399023 2015-10-10 21:24:22Z bapt $
 #
 # MAINTAINER: portmgr@FreeBSD.org
 #
@@ -15,14 +15,13 @@ WARNING+=	"WITH_NEW_XORG and WITHOUT_NEW_XORG knobs were removed and have no eff
 WARNING+=	"WITH_KMS was removed and has no effect"
 .endif
 
-#.if defined(PKGORIGIN)
-#.for _c in ${CATEGORIES}
-#_CAT?=	${_c}
-#.endfor
-#.if ${.CURDIR:H:T} != ${_CAT}
-#DEV_ERROR+=	"The first entry in CATEGORIES should be the directory where the port lives"
-#.endif
-#.endif
+.if exists(${.CURDIR}/../../Mk/bsd.port.mk)
+.if ${.CURDIR:H:T} != ${PKGCATEGORY}
+DEV_ERROR+=	"The first entry in CATEGORIES should be the directory where the port lives"
+.endif
+.else
+DEV_WARNING+=	"Not validating first entry in CATEGORIES due to being outside of PORTSDIR. Please ensure this is proper when committing."
+.endif
 
 #.if defined(WITHOUT_X11)
 #WARNING+=	"WITHOUT_X11 is deprecated use X11 option instead"
@@ -48,6 +47,10 @@ DEV_ERROR+=	"USE_KDELIBS_VER is unsupported"
 DEV_ERROR+=	"USE_QT_VER is unsupported"
 .endif
 
+.if defined(USE_GHOSTSCRIPT) || defined(USE_GHOSTSCRIPT_BUILD) || defined(USE_GHOSTSCRIPT_RUN)
+DEV_ERROR+=	"USE_GHOSTSCRIPT is unsupported, please use USES=ghostscript instead"
+.endif
+
 .if !empty(LIB_DEPENDS:M*/../*)
 DEV_ERROR+=	"LIB_DEPENDS contains unsupported relative path to dependency"
 .endif
@@ -64,6 +67,10 @@ DEV_ERROR+=	"USE_GNOME=pkgconfig is unsupported, please use USES=pkgconfig"
 DEV_ERROR+=	"USE_ZOPE=yes is unsupported, please use USES=zope instead"
 .endif
 
+.if defined(USE_GITHUB) && defined(GH_COMMIT)
+DEV_ERROR+=	"GH_COMMIT is unsupported, please convert GHL-\>GH in MASTER_SITES and set GH_TAGNAME to tag or commit hash and remove GH_COMMIT"
+.endif
+
 .if defined(USE_GNOME) && ${USE_GNOME:Mgnomehack}
 DEV_WARNING+=	"USE_GNOME=gnomehack is deprecated, please use USES=pathfix"
 .endif
@@ -73,7 +80,7 @@ DEV_WARNING+=	"USE_GNOME=desktopfileutils is deprecated, please use USES=desktop
 .endif
 
 .if defined(LIB_DEPENDS) && ${LIB_DEPENDS:Nlib*}
-DEV_ERROR+=	"Please use the new format for LIB_DEPENDS, see handbook for details"
+DEV_ERROR+=	"All LIB_DEPENDS should use the new format and start out with lib.  \(libfoo.so vs foo.so\)"
 .endif
 
 .if defined(USE_TCL) || defined(USE_TCL_BUILD) || defined(USE_TCL_RUN) || defined(USE_TCL_WRAPPER) || \
@@ -152,9 +159,12 @@ SANITY_UNSUPPORTED=	USE_OPENAL USE_FAM USE_MAKESELF USE_ZIP USE_LHA USE_CMAKE \
 		USE_GETTEXT USE_GMAKE USE_SCONS USE_DRUPAL NO_INSTALL_MANPAGES \
 		INSTALLS_SHLIB USE_PYDISTUTILS PYTHON_CONCURRENT_INSTALL \
 		PYDISTUTILS_AUTOPLIST PYTHON_PY3K_PLIST_HACK PYDISTUTILS_NOEGGINFO \
-		USE_PYTHON_PREFIX
-SANITY_DEPRECATED=	USE_XZ USE_BZIP2 PYTHON_PKGNAMESUFFIX
+		USE_PYTHON_PREFIX USE_BZIP2 USE_XZ USE_PGSQL NEED_ROOT \
+		UNIQUENAME LATEST_LINK
+SANITY_DEPRECATED=	PYTHON_PKGNAMESUFFIX USE_AUTOTOOLS PLIST_DIRSTRY
+SANITY_NOTNEEDED=	WX_UNICODE
 
+USE_AUTOTOOLS_ALT=	USES=autoreconf and GNU_CONFIGURE=yes
 USE_OPENAL_ALT=		USES=openal
 USE_FAM_ALT=		USES=fam
 USE_MAKESELF_ALT=	USES=makeself
@@ -176,7 +186,9 @@ USE_GETTEXT_ALT=	USES=gettext
 USE_SCONS_ALT=		USES=scons
 USE_DRUPAL_ALT=		USES=drupal
 USE_PYDISTUTILS_ALT=		USE_PYTHON=distutils
+USE_PGSQL_ALT=		USES=pgsql
 INSTALLS_SHLIB_ALT=	USE_LDCONFIG
+NEED_ROOT_ALT=		USES=fakeroot or USES=uidfix
 PYTHON_CONCURRENT_INSTALL_ALT=	USE_PYTHON=concurrent
 PYDISTUTILS_AUTOPLIST_ALT=	USE_PYTHON=autoplist
 PYTHON_PY3K_PLIST_HACK_ALT=	USE_PYTHON=py3kplist
@@ -184,10 +196,20 @@ PYDISTUTILS_NOEGGINFO_ALT=	USE_PYTHON=noegginfo
 USE_PYTHON_PREFIX_ALT=		USE_PYTHON=pythonprefix
 PYTHON_PKGNAMESUFFIX_ALT=	PYTHON_PKGNAMEPREFIX
 NO_INSTALL_MANPAGES_ALT=	USES=imake:noman
+UNIQUENAME_ALT=		PKGBASE
+LATEST_LINK_ALT=	PKGBASE
+WX_UNICODE_REASON=	Now no-op as only unicode is supported now
+PLIST_DIRSTRY_ALT=	PLIST_DIRS
 
 .for a in ${SANITY_DEPRECATED}
 .if defined(${a})
 DEV_WARNING+=	"${a} is deprecated, please use ${${a}_ALT}"
+.endif
+.endfor
+
+.for a in ${SANITY_NOTNEEDED}
+.if defined(${a})
+DEV_WARNING+=	"${a} is not needed: ${${a}_REASON}"
 .endif
 .endfor
 

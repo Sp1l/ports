@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/objc.mk 373004 2014-11-21 17:22:06Z antoine $
+# $FreeBSD: head/Mk/Uses/objc.mk 399346 2015-10-15 14:55:14Z mat $
 #
 # Objective C support
 #
@@ -10,8 +10,9 @@
 .if !defined(_INCLUDE_USES_OBJC_MK)
 _INCLUDE_USES_OBJC_MK=	yes
 
-.if !empty(objc_ARGS)
-IGNORE=	USES=objc takes no arguments
+objc_ARGS?=
+.if !empty(objc_ARGS) && ! ${objc_ARGS:Mcompiler}
+IGNORE=	USES=objc only accepts no arguments or 'compiler'
 .endif
 
 _CCVERSION!=	${CC} --version
@@ -49,16 +50,14 @@ BUILD_DEPENDS+=	${LOCALBASE}/bin/clang34:${PORTSDIR}/lang/clang34
 CPP=	${LOCALBASE}/bin/clang-cpp34
 CC=	${LOCALBASE}/bin/clang34
 CXX=	${LOCALBASE}/bin/clang++34
-.if ${OSVERSION} < 900033
-USE_BINUTILS=	yes
-LDFLAGS+=	-B${LOCALBASE}/bin
-.endif
 .endif
 .endif
 
+.if ! ${objc_ARGS:Mcompiler}
 LIB_DEPENDS+=	libobjc.so.4.6:${PORTSDIR}/lang/libobjc2
 OBJCFLAGS+=	-I${LOCALBASE}/include
 LDFLAGS+=	-L${LOCALBASE}/lib
+.endif
 CONFIGURE_ENV+=	OBJC="${CC}" OBJCFLAGS="${OBJCFLAGS}"
 MAKE_ENV+=	OBJC="${CC}" OBJCFLAGS="${OBJCFLAGS}"
 

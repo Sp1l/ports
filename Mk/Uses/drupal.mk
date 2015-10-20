@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/drupal.mk 372608 2014-11-15 17:05:44Z antoine $
+# $FreeBSD: head/Mk/Uses/drupal.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Support for Drupal ports and modules.
 #

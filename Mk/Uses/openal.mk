@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/openal.mk 374303 2014-12-08 16:48:38Z tijl $
+# $FreeBSD: head/Mk/Uses/openal.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Handle dependency on OpenAL
 #

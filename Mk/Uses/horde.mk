@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/horde.mk 376603 2015-01-09 12:59:05Z mm $
+# $FreeBSD: head/Mk/Uses/horde.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Feature:	horde
 # Usage:	USES=horde
@@ -18,6 +18,8 @@ PKGNAMEPREFIX?=	pear-
 HORDE_DIR?=	www/horde
 
 CONFLICTS+=	horde3-*.[0-9]*
+
+CPE_VENDOR?=	horde
 
 DIST_SUBDIR=	Horde
 PEAR_CHANNEL=	horde

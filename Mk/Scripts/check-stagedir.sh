@@ -1,6 +1,6 @@
 #!/bin/sh
 # ports/Mk/Scripts/check-stagedir.sh - called from ports/Mk/bsd.stage.mk
-# $FreeBSD: head/Mk/Scripts/check-stagedir.sh 377696 2015-01-22 21:05:51Z bdrewery $
+# $FreeBSD: head/Mk/Scripts/check-stagedir.sh 399701 2015-10-19 17:04:33Z bdrewery $
 #
 # MAINTAINER: portmgr@FreeBSD.org
 #
@@ -93,13 +93,15 @@ setup_plist_seds() {
 	unset PLIST_SUB_SED
 	# Used for generate_plist
 	sed_files_gen="s!^${PREFIX}/!!g; ${sed_plist_sub} \
-	    ${sed_portdocsexamples} /^share\/licenses/d;"
+	    ${sed_portdocsexamples} /^share\/licenses/d; \
+	    \#${LOCALBASE}/lib/debug#d;"
 	sed_dirs_gen="s!^${PREFIX}/!!g; ${sed_plist_sub} s,^,@dir ,; \
 	    ${sed_portdocsexamples} \
 	    /^@dir share\/licenses/d;"
 
 	# These prevent ignoring DOCS/EXAMPLES dirs with sed_portdocsexamples
-	sed_files="s!^${PREFIX}/!!g; ${sed_plist_sub} /^share\/licenses/d;"
+	sed_files="s!^${PREFIX}/!!g; ${sed_plist_sub} /^share\/licenses/d; \
+	    \#${LOCALBASE}/lib/debug#d;"
 	sed_dirs="s!^${PREFIX}/!!g; ${sed_plist_sub} s,^,@dir ,; \
 	    /^@dir share\/licenses/d;"
 
@@ -152,8 +154,8 @@ check_orphans_from_plist() {
 		*/.svnignore) ;;
 		*/CVS/*|'@dir '*/CVS) ;;
 		*/info/dir|info/dir) ;;
-		lib/X11/fonts/*/fonts.dir) ;;
-		lib/X11/fonts/*/fonts.scale) ;;
+		share/fonts/*/fonts.dir) ;;
+		share/fonts/*/fonts.scale) ;;
 		share/applications/mimeinfo.cache) ;;
 		share/mime/XMLnamespaces) ;;
 		share/mime/aliases) ;;
@@ -224,20 +226,8 @@ case "$1" in
 esac
 
 # validate environment
-envfault=
-for i in STAGEDIR PREFIX LOCALBASE WRKDIR WRKSRC MTREE_FILE \
-    TMPPLIST PLIST_SUB_SED SCRIPTSDIR \
-    PORT_OPTIONS NO_PREFIX_RMDIR
-do
-    if ! ( eval ": \${${i}?}" ) 2>/dev/null ; then
-		envfault="${envfault}${envfault:+" "}${i}"
-    fi
-done
-if [ -n "$envfault" ] ; then
-	echo "Environment variables $envfault undefined. Aborting." \
-	| fmt >&2
-	exit 1
-fi
+validate_env STAGEDIR PREFIX LOCALBASE WRKDIR WRKSRC MTREE_FILE \
+    TMPPLIST PLIST_SUB_SED SCRIPTSDIR PORT_OPTIONS NO_PREFIX_RMDIR
 
 set -u
 

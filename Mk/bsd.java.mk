@@ -9,7 +9,7 @@
 # Please send all suggested changes to the maintainer instead of committing
 # them to svn yourself.
 #
-# $FreeBSD: head/Mk/bsd.java.mk 359603 2014-06-27 20:05:36Z swills $
+# $FreeBSD: head/Mk/bsd.java.mk 399693 2015-10-19 16:14:29Z swills $
 #
 
 .if !defined(Java_Include)
@@ -187,8 +187,8 @@ _JAVA_OS_native=	Native
 _JAVA_OS_linux=		Linux
 
 # List all JDK ports in order of preference
-__JAVA_PORTS_ALL=	JAVA_PORT_NATIVE_OPENJDK_JDK_1_7 \
-					JAVA_PORT_NATIVE_OPENJDK_JDK_1_8 \
+__JAVA_PORTS_ALL=	JAVA_PORT_NATIVE_OPENJDK_JDK_1_8 \
+					JAVA_PORT_NATIVE_OPENJDK_JDK_1_7 \
 					JAVA_PORT_NATIVE_OPENJDK_JDK_1_6 \
 					JAVA_PORT_LINUX_SUN_JDK_1_7 \
 					JAVA_PORT_LINUX_ORACLE_JDK_1_8

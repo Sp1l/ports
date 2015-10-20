@@ -1,5 +1,5 @@
 #	from: @(#)bsd.subdir.mk	5.9 (Berkeley) 2/1/91
-# $FreeBSD: head/Mk/bsd.port.subdir.mk 366875 2014-09-01 13:03:25Z bapt $
+# $FreeBSD: head/Mk/bsd.port.subdir.mk 399163 2015-10-12 22:42:57Z bdrewery $
 #
 # The include file <bsd.port.subdir.mk> contains the default targets
 # for building ports subdirectories.
@@ -63,6 +63,7 @@ STRIP?=	-s
 .if !defined(ARCH)
 ARCH!=	${UNAME} -p
 .endif
+_EXPORTED_VARS+=	ARCH
 
 .if !defined(OSVERSION)
 .if exists(/usr/include/sys/param.h)
@@ -73,20 +74,24 @@ OSVERSION!=	${AWK} '/^\#define[[:blank:]]__FreeBSD_version/ {print $$3}' < ${SRC
 OSVERSION!=	${SYSCTL} -n kern.osreldate
 .endif
 .endif
+_EXPORTED_VARS+=	OSVERSION
 
 WITH_PKG=	yes
 WITH_PKGNG=	yes
 
 .if !defined(_OSRELEASE)
-_OSRELEASE!=			${UNAME} -r
+_OSRELEASE!=		${UNAME} -r
 .endif
+_EXPORTED_VARS+=	_OSRELEASE
 .if !defined(OSREL)
 OSREL=	${_OSRELEASE:C/[-(].*//}
 .endif
+_EXPORTED_VARS+=	OSREL
 
 .if !defined(OPSYS)
 OPSYS!=	${UNAME} -s
 .endif
+_EXPORTED_VARS+=	OPSYS
 
 .if ${ARCH} == "amd64" || ${ARCH} =="ia64"
 .if !defined(HAVE_COMPAT_IA32_KERN)
@@ -96,30 +101,37 @@ HAVE_COMPAT_IA32_KERN!= if ${SYSCTL} -n compat.ia32.maxvmem >/dev/null 2>&1; the
 .endif
 .endif
 .endif
+_EXPORTED_VARS+=	HAVE_COMPAT_IA32_KERN
 
 .if !defined(CONFIGURE_MAX_CMD_LEN)
 CONFIGURE_MAX_CMD_LEN!= ${SYSCTL} -n kern.argmax
 .endif
+_EXPORTED_VARS+=	CONFIGURE_MAX_CMD_LEN
 
 .if !defined(_JAVA_VERSION_LIST_REGEXP)
 _JAVA_VERSION_LIST_REGEXP!=	${MAKE} -V _JAVA_VERSION_LIST_REGEXP USE_JAVA=1 -f ${PORTSDIR}/Mk/bsd.port.mk
 .endif
+_EXPORTED_VARS+=	_JAVA_VERSION_LIST_REGEXP
 
 .if !defined(_JAVA_VENDOR_LIST_REGEXP)
 _JAVA_VENDOR_LIST_REGEXP!=	${MAKE} -V _JAVA_VENDOR_LIST_REGEXP USE_JAVA=1 -f ${PORTSDIR}/Mk/bsd.port.mk
 .endif
+_EXPORTED_VARS+=	_JAVA_VENDOR_LIST_REGEXP
 
 .if !defined(_JAVA_OS_LIST_REGEXP)
 _JAVA_OS_LIST_REGEXP!=		${MAKE} -V _JAVA_OS_LIST_REGEXP USE_JAVA=1 -f ${PORTSDIR}/Mk/bsd.port.mk
 .endif
+_EXPORTED_VARS+=	_JAVA_OS_LIST_REGEXP
 
 .if !defined(_JAVA_PORTS_INSTALLED)
 _JAVA_PORTS_INSTALLED!=		${MAKE} -V _JAVA_PORTS_INSTALLED USE_JAVA=1 -f ${PORTSDIR}/Mk/bsd.port.mk
 .endif
+_EXPORTED_VARS+=	_JAVA_PORTS_INSTALLED
 
 .if !defined(UID)
 UID!=	${ID} -u
 .endif
+_EXPORTED_VARS+=	UID
 
 .endif
 
@@ -127,9 +139,7 @@ INDEXDIR?=	${PORTSDIR}
 INDEXFILE?=	INDEX-${OSVERSION:C/([0-9]*)[0-9]{5}/\1/}
 
 # local customization of the ports tree
-.if exists(${.CURDIR}/Makefile.local)
-.include "${.CURDIR}/Makefile.local"
-.endif
+.sinclude "${.CURDIR}/Makefile.local"
 
 TARGETS+=	all
 TARGETS+=	build
@@ -338,20 +348,12 @@ README.html:
 	@${RM} -f $@.tmp $@.tmp2 $@.tmp3 $@.tmp4
 
 # Pass in the cached invariant variables to child makes.
-# XXX Why are we trying to escape these characters using regexps and not using ':Q'?
 .if !defined(NOPRECIOUSMAKEVARS)
-.MAKEFLAGS: \
-	ARCH="${ARCH:S/"/"'"'"/g:S/\$/\$\$/g:S/\\/\\\\/g}" \
-	OPSYS="${OPSYS:S/"/"'"'"/g:S/\$/\$\$/g:S/\\/\\\\/g}" \
-	OSREL="${OSREL:S/"/"'"'"/g:S/\$/\$\$/g:S/\\/\\\\/g}" \
-	OSVERSION="${OSVERSION:S/"/"'"'"/g:S/\$/\$\$/g:S/\\/\\\\/g}" \
-	UID="${UID:S/"/"'"'"/g:S/\$/\$\$/g:S/\\/\\\\/g}" \
-	HAVE_COMPAT_IA32_KERN="${HAVE_COMPAT_IA32_KERN}" \
-	CONFIGURE_MAX_CMD_LEN="${CONFIGURE_MAX_CMD_LEN}" \
-	_JAVA_VERSION_LIST_REGEXP="${_JAVA_VERSION_LIST_REGEXP:Q}" \
-	_JAVA_VENDOR_LIST_REGEXP="${_JAVA_VENDOR_LIST_REGEXP:Q}" \
-	_JAVA_OS_LIST_REGEXP="${_JAVA_OS_LIST_REGEXP:Q}" \
-	_JAVA_PORTS_INSTALLED="${_JAVA_PORTS_INSTALLED}"
+.for var in ${_EXPORTED_VARS}
+.if empty(.MAKEFLAGS:M${var}=*) && !empty(${var})
+.MAKEFLAGS:	${var}=${${var}:Q}
+.endif
+.endfor
 .endif
 
 PORTSEARCH_DISPLAY_FIELDS?=name,path,info,maint,index,bdeps,rdeps,www

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/blaslapack.mk 376359 2015-01-05 20:43:02Z thierry $
+# $FreeBSD: head/Mk/Uses/blaslapack.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Handle dependencies on Blas / Lapack
 #

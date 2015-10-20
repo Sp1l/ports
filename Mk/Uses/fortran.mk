@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/fortran.mk 377909 2015-01-26 00:03:46Z gerald $
+# $FreeBSD: head/Mk/Uses/fortran.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # Fortran support
 #

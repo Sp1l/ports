@@ -1,6 +1,6 @@
 #!/bin/sh
 # MAINTAINER: portmgr@FeeeBSD.org
-# $FreeBSD: head/Mk/Scripts/actual-package-depends.sh 378742 2015-02-09 17:16:43Z bapt $
+# $FreeBSD: head/Mk/Scripts/actual-package-depends.sh 383711 2015-04-10 08:45:09Z antoine $
 
 if [ -z "${PKG_BIN}" ]; then
 	echo "PKG_BIN required in environment." >&2
@@ -50,7 +50,8 @@ find_dep() {
 	pattern=$1
 	case ${pattern} in
 	*\>*|*\<*|*=*)
-		${PKG_BIN} info -Eg "${pattern}" 2>/dev/null
+		${PKG_BIN} info -Eg "${pattern}" 2>/dev/null ||
+			echo "actual-package-depends: dependency on ${pattern} not registered" >&2
 		return
 		;;
 	/*)
@@ -61,7 +62,6 @@ find_dep() {
 		;;
 	esac
 	if [ -n "${searchfile}" ]; then
-		echo $(resolv_symlink ${searchfile}) >&2
 		${PKG_BIN} which -q ${searchfile} || ${PKG_BIN} which -q "$(resolv_symlink ${searchfile} 2>/dev/null)" ||
 			echo "actual-package-depends: dependency on ${searchfile} not registered (normal if it belongs to base)" >&2
 	fi

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/gperf.mk 370364 2014-10-07 16:45:30Z antoine $
+# $FreeBSD: head/Mk/Uses/gperf.mk 399326 2015-10-15 07:36:38Z bapt $
 #
 # handle dependency on gperf
 #
