@@ -1,13 +1,12 @@
-# $FreeBSD: head/databases/mariadb-client/Makefile 373557 2014-11-28 11:33:14Z marino $
+# $FreeBSD: head/databases/mariadb-client/Makefile 398832 2015-10-08 15:11:28Z olgeni $
 
 PORTNAME=	mariadb
+PORTREVISION=	7
 PKGNAMESUFFIX=	53-client
-
-UNIQUENAME=	${PORTNAME}${PKGNAMESUFFIX}
 
 COMMENT=	Database client - drop-in replacement for MySQL
 
-MASTERDIR=	${.CURDIR}/../mariadb-server
+MASTERDIR=	${.CURDIR}/../mariadb53-server
 MARIADB_CLIENT_SLAVE=	yes
 
 USES+=		readline
@@ -20,10 +19,11 @@ THREADSAFE_DESC=	Build thread-safe client
 CONFLICTS=	mariadb5[4-9]-client-* \
 		mariadb1[0-9][0-9]-client-* \
 		mysql*-client-* \
-		percona*-client-* 
+		percona*-client-*
 
 PATCHDIR=	${.CURDIR}/files
 PLIST=		${.CURDIR}/pkg-plist
+PKGMESSAGE=	${.CURDIR}/pkg-message
 
 MANS=	mysql_config.1 mysql_upgrade.1 mysql.1 mysqladmin.1 \
 	mysqlbinlog.1 mysqlbug.1 mysqlcheck.1 \
@@ -42,5 +42,8 @@ post-patch:
 
 post-install:
 	${INSTALL_DATA} ${WRKSRC}/support-files/mysql.m4 ${STAGEDIR}${PREFIX}/share/aclocal/
+
+post-stage:
+	@${RM} -rf ${STAGEDIR}/${PREFIX}/include/mysql/private
 
 .include "${MASTERDIR}/Makefile"
