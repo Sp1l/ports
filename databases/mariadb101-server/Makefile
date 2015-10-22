@@ -22,7 +22,7 @@ SUB_FILES=	pkg-message
 PKGMESSAGE=	${WRKDIR}/pkg-message
 
 SLAVEDIRS=	databases/mariadb100-client
-USES=		bison:build cmake execinfo gmake shebangfix cpe
+USES=		bison:build cmake cpe execinfo gmake shebangfix
 USE_LDCONFIG=	${PREFIX}/lib/mysql ${PREFIX}/lib/mysql/plugin
 SHEBANG_FILES=	scripts/*.sh
 SITESDIR=	mariadb/mariadb-${PORTVERSION}/source
@@ -86,13 +86,13 @@ WITHOUT_SSL_CMAKE_ON=	-DWITH_SSL=no
 
 .if defined(CLIENT_ONLY)
 # MySQL-Client part
-uSES+=		readline
+USES+=		readline
 .else
 # MySQL-Server part
 
 CONFLICTS_INSTALL=	mysql*-server-* \
 			mariadb[0-9][0-9]-server-* \
-			mariadb10[^1]-server-* \
+			mariadb10[02-9]-server-* \
 			percona*-server-*
 
 USE_MYSQL=	yes
@@ -136,7 +136,7 @@ CMAKE_ARGS+=	-DWITH_JEMALLOC="no"
 USE_GCC=	yes
 .endif
 
-.if ${PORT_OPTIONS:MOQGRPAH}
+.if ${PORT_OPTIONS:MOQGRAPH}
 IGNORE=	currently MariaDB doesn't build correctly with OQGraph \
 	See https://mariadb.atlassian.net/browse/MDEV-8128.
 .endif
