@@ -15,13 +15,13 @@ MASTER_SITES=	http://ftp.osuosl.org/pub/mariadb/${PORTNAME}-${PORTVERSION}/kvm-t
 		http://mirror.switch.ch/mirror/mariadb/${PORTNAME}-${PORTVERSION}/kvm-tarbake-jaunty-x86/
 PKGNAMESUFFIX?=	53-server
 
-MAINTAINER=	spil.oss@gmail.com
+MAINTAINER=	brnrd@FreeBSD.org
 COMMENT=	Database server - drop-in replacement for MySQL
 
 LICENSE=	GPLv2
 
 CONFLICTS?=	mariadb5[4-9]-server-* \
-		mariadb1[0-9][0-9]-server-* \
+		mariadb1*-server-* \
 		mysql*-server-* \
 		percona*-server-*
 
@@ -43,11 +43,13 @@ USE_LDCONFIG=	${PREFIX}/lib/mysql
 USERS=		mysql
 GROUPS=		mysql
 
-OPTIONS_DEFINE+=	STATIC SSL OPENSSL
-OPTIONS_DEFAULT+=	SSL
+OPTIONS_DEFINE+=	STATIC
+OPTIONS_RADIO=		SSL
+OPTIONS_RADIO_SSL=	BUNDLEDSSL OPENSSL
+OPTIONS_DEFAULT+=	BUNDLEDSSL
 STATIC_DESC=	Statically link executables (not on 9.x)
-SSL_DESC=	Activate SSL support
-OPENSSL_DESC=	Use OpenSSL instead of bundled yassl
+BUNDLEDSSL_DESC=	Use bundled yassl SSL support
+OPENSSL_DESC=	Use OpenSSL SSL support
 
 .if !defined(MARIADB_CLIENT_SLAVE)
 LIB_DEPENDS=	libevent.so:${PORTSDIR}/devel/libevent2
@@ -62,27 +64,32 @@ INFO=		mysql
 CONFIGURE_ARGS+=	--with-embedded-server --enable-local-infile
 USE_RC_SUBR=	mysql-server
 
-OPTIONS_DEFINE+=	ARIADB ARCHIVE BLACKHOLE SPHINX FEDX FEDERATED XTRADB INNODB \
-			OQGRAPH PBXT PARTITION HANDLERSOCKET EXAMPLES MAXKEY
+OPTIONS_DEFINE+=	EXAMPLES MAXKEY
+OPTIONS_GROUP=		PLUGINS
+OPTIONS_GROUP_PLUGINS=	ARIADB ARCHIVE BLACKHOLE FEDX FEDERATED HANDLERSOCKET \
+			INNODB OQGRAPH PARTITION PBXT SPHINX XTRADB
 
 ARIADB_DESC=		Aria storage engine
 ARCHIVE_DESC=		Archive storage plugin
 BLACKHOLE_DESC=		Blackhole storage engine
-SPHINX_DESC=		SE client for Sphinx search daemon
+EXAMPLES_DESC=		Example engine, daemon and ftsearch plugins
 FEDX_DESC=		FederatedX (new) storage engine
 FEDERATED_DESC=		Federated (old) storage engine
-XTRADB_DESC=		XtraDB (InnoDB replacement) engine
-INNODB_DESC=		InnoDB (old) engine
-OQGRAPH_DESC=		Open Query Graph Computation engine
-PBXT_DESC=		MVCC-based transactional engine
-PARTITION_DESC=		Partitioning support
 HANDLERSOCKET_DESC=	HandlerSocket support
-NDB_DESC=		Enable NDB support (implies PARTITION)
-EXAMPLES_DESC=		Example engine,daemon and ftsearch plugins
+INNODB_DESC=		InnoDB (old) engine
 MAXKEY_DESC=		Change max key length from 1000 to 4000
+NDB_DESC=		Enable NDB support (implies PARTITION)
+OQGRAPH_DESC=		Open Query Graph Computation engine
+PARTITION_DESC=		Partitioning support
+PBXT_DESC=		MVCC-based transactional engine
+PLUGINS_DESC=		MariaDB server plugins
+SPHINX_DESC=		SE client for Sphinx search daemon
+XTRADB_DESC=		XtraDB (InnoDB replacement) engine
 
 OPTIONS_DEFAULT+=	ARIADB ARCHIVE BLACKHOLE SPHINX FEDX XTRADB HANDLERSOCKET
 .endif	# .if !defined(MARIADB_CLIENT_SLAVE)
+
+OPTIONS_SUB=	yes
 
 .include <bsd.port.options.mk>
 
@@ -96,136 +103,73 @@ CONFIGURE_ARGS+=	--enable-assembler
 .if ${ARCH} == "i386"
 CONFIGURE_ARGS+=	--with-big-tables
 .endif
-.if ${PORT_OPTIONS:MSSL}
-.if ${PORT_OPTIONS:MOPENSSL}
-USE_OPENSSL=	yes
-CONFIGURE_ARGS+=	--with-ssl=${OPENSSLBASE}
-.else
-CONFIGURE_ARGS+=	--with-ssl=bundled
+.if ${PORT_OPTIONS:MBUNDLEDSSL}
+BUNDLEDSSL_CONFIGURE_WITH=	ssl=bundled
 MDB_EXTRA_SUBDIRS=	extra
-.endif
+.elif ${PORT_OPTIONS:MOPENSSL}
+OPENSSL_USE=		openssl=yes
+OPENSSL_CONFIGURE_WITH=	ssl=${OPENSSLBASE}
 .else
 CONFIGURE_ARGS+=	--without-ssl
 .endif
-.if ${PORT_OPTIONS:MSTATIC}
-CONFIGURE_ARGS+=	--with-client-ldflags="-static -all-static"
-.endif
-.if ${PORT_OPTIONS:MTHREADSAFE}
-CONFIGURE_ARGS+=	--enable-thread-safe-client
-.endif
+STATIC_CONFIGURE_WITH=	client-ldflags="-static -all-static"
+THREADSAFE_CONFIGURE_ENABLE=	thread-safe-client
 
 .if !defined(MARIADB_CLIENT_SLAVE)
-.if ${PORT_OPTIONS:MARIADB}
-PLIST_SUB+=	ARIADB=""
-CONFIGURE_ARGS+=	--with-plugin-aria --with-aria-tmp-tables
-PLUGINS+=	aria
-.else
-CONFIGURE_ARGS+=	--without-plugin-aria
-PLIST_SUB+=	ARIADB="@comment "
-.endif
-.if ${PORT_OPTIONS:MSPHINX}
-PLIST_SUB+=	SPHINX=""
-PLUGINS+=	sphinx
-.else
-CONFIGURE_ARGS+=	--without-plugin-sphinx
-PLIST_SUB+=	SPHINX="@comment "
-.endif
+ARIADB_CONFIGURE_WITH=	plugin-aria aria-tmp-tables
+ARCHIVE_CONFIGURE_WITH=	plugin-archive
 .if ${PORT_OPTIONS:MARCHIVE}
-PLIST_SUB+=	ARCHIVE=""
 PLUGINS+=	archive
-.else
-CONFIGURE_ARGS+=	--without-plugin-archive
-PLIST_SUB+=	ARCHIVE="@comment "
 .endif
+BLACKHOLE_CONFIGURE_WITH=	plugin-blackhole
 .if ${PORT_OPTIONS:MBLACKHOLE}
-PLIST_SUB+=	BLACKHOLE=""
 PLUGINS+=	blackhole
-.else
-CONFIGURE_ARGS+=	--without-plugin-blackhole
-PLIST_SUB+=	BLACKHOLE="@comment "
 .endif
+FEDERATED_CONFIGURE_WITH= plugin-federated
 .if ${PORT_OPTIONS:MFEDERATED}
-PLIST_SUB+=	FEDERATED=""
 PLUGINS+=	federated
-.else
-CONFIGURE_ARGS+=	--without-plugin-federated
-PLIST_SUB+=	FEDERATED="@comment "
 .endif
+FEDX_CONFIGURE_WITH=	plugin-federatedx
 .if ${PORT_OPTIONS:MFEDX}
-PLIST_SUB+=	FEDERATEDX=""
 PLUGINS+=	federatedx
-.else
-CONFIGURE_ARGS+=	--without-plugin-federatedx
-PLIST_SUB+=	FEDERATEDX="@comment "
 .endif
-.if ${PORT_OPTIONS:MINNODB}
-PLIST_SUB+=	INNODB=""
-PLUGINS+=	innodb_plugin
-.else
-CONFIGURE_ARGS+=	--without-plugin-innodb_plugin
-PLIST_SUB+=	INNODB="@comment "
-.endif
-.if ${PORT_OPTIONS:MXTRADB}
-PLIST_SUB+=	XTRADB=""
-PLUGINS+=	xtradb
-.else
-CONFIGURE_ARGS+=	--without-plugin-xtradb
-PLIST_SUB+=	XTRADB="@comment "
-.endif
+HANDLERSOCKET_CONFIGURE_WITH=	plugin-handlersocket
 .if ${PORT_OPTIONS:MHANDLERSOCKET}
-PLIST_SUB+=	HANDLERSOCKET=""
 PLUGINS+=	handlersocket
-.else
-CONFIGURE_ARGS+=	--without-plugin-handlersocket
-PLIST_SUB+=	HANDLERSOCKET="@comment "
 .endif
-.if ${PORT_OPTIONS:MOQGRAPH}
-CONFIGURE_ARGS+=	--with-plugin-oqgraph
-PLIST_SUB+=	OQGRAPH=""
-LIB_DEPENDS+=	libboost_system.so:${PORTSDIR}/devel/boost-libs
-PLUGINS+=	oqgraph
-.else
-CONFIGURE_ARGS+=	--without-plugin-oqgraph
-PLIST_SUB+=	OQGRAPH="@comment "
+INNODB_CONFIGURE_WITH=	plugin-innodb_plugin
+.if ${PORT_OPTIONS:MINNODB}
+PLUGINS+=	innodb_plugin
 .endif
-.if ${PORT_OPTIONS:MPBXT}
-CONFIGURE_ARGS+=	--with-plugin-pbxt
-PLIST_SUB+=	PBXT=""
-PLUGINS+=	pbxt
-.else
-CONFIGURE_ARGS+=	--without-plugin-pbxt
-PLIST_SUB+=	PBXT="@comment "
-.endif
-.if ${PORT_OPTIONS:MEXAMPLES}
-PLIST_SUB+=	EXAMPLES=""
-.else
-CONFIGURE_ARGS+=	--without-plugin-example --without-plugin-daemon_example --without-plugin-ftexample
-PLIST_SUB+=	EXAMPLES="@comment "
-.endif
+NDB_CONFIGURE_WITH=	plugin-ndbcluster
+NDB_IMPLIES=	PARTITION
 .if ${PORT_OPTIONS:MNDB}
-CONFIGURE_ARGS+=	--with-plugin-ndbcluster
-WITH_PARTITION=yes
-PLIST_SUB+=	NDB=""
 PLUGINS+=	ndbcluster
-.else
-CONFIGURE_ARGS+=	--without-plugin-ndbcluster
-PLIST_SUB+=	NDB="@comment "
 .endif
+OQGRAPH_CONFIGURE_WITH=	plugin-oqgraph
+OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs
+.if ${PORT_OPTIONS:MOQGRAPH}
+PLUGINS+=	oqgraph
+.endif
+PBXT_CONFIGURE_WITH=	plugin-pbxt
+.if ${PORT_OPTIONS:MPBXT}
+PLUGINS+=	pbxt
+.endif
+EXAMPLES_CONFIGURE_WITH=	plugin-example plugin-daemon_example plugin-ftexample
+PARTITION_CONFIGURE_WITH=	plugin-partition	
 .if ${PORT_OPTIONS:MPARTITION}
-CONFIGURE_ARGS+=	--with-plugin-partition
 PLUGINS+=	partition
-.else
-CONFIGURE_ARGS+=	--without-plugin-partition
 .endif
-.if ${PORT_OPTIONS:MSTATIC}
-CONFIGURE_ARGS+=	--with-mysqld-ldflags="-static -all-static" --with-plugins="${PLUGINS}"
-PLIST_SUB+=	STATIC="@comment "
-.else
-PLIST_SUB+=	STATIC=""
+SPHINX_CONFIGURE_WITH=	plugin-sphinx
+.if ${PORT_OPTIONS:MSPHINX}
+PLUGINS+=	sphinx
 .endif
-.if ${PORT_OPTIONS:MMAXKEY}
-EXTRA_PATCHES+=	${FILESDIR}/extra-patch-include__my_handler.h
+XTRADB_CONFIGURE_WITH=	plugin-xtradb
+.if ${PORT_OPTIONS:MXTRADB}
+PLUGINS+=	xtradb
 .endif
+STATIC_CONFIGURE_WITH=	mysqld-ldflags="-static -all-static" with-plugins="${PLUGINS}"
+MAXKEY_EXTRA_PATCHES=	${FILESDIR}/extra-patch-include__my_handler.h
 .endif	# .if !defined(MARIADB_CLIENT_SLAVE)
 
 .if defined(WITH_CHARSET) && ${WITH_CHARSET} != ""
