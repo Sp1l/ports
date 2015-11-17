@@ -2,13 +2,12 @@
 # $FreeBSD$
 
 PORTNAME?=	mysql
-PORTVERSION=	5.7.8
-DISTVERSIONSUFFIX?=     -rc
-PORTREVISION?=	0
+PORTVERSION=	5.7.9
 CATEGORIES=	databases ipv6
-MASTER_SITES=	${MASTER_SITE_MYSQL}
-MASTER_SITE_SUBDIR=	MySQL-5.7
+MASTER_SITES=	${MASTER_SITE_MYSQL}:MySQL SF/boost/boost/${PORTVERSION}:boost
+MASTER_SITE_SUBDIR=	MySQL-5.7:MySQL
 PKGNAMESUFFIX?=	57-server
+DISTFILES=	mysql-5.7.9.tar.gz:MySQL boost_1_59_0.tar.gz:boost
 
 MAINTAINER=	mokhi64@gmail.com
 COMMENT?=	Multithreaded SQL database (server)
@@ -57,7 +56,8 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 		-DINSTALL_SBINDIR="libexec" \
 		-DINSTALL_SCRIPTDIR="bin" \
 		-DINSTALL_SHAREDIR="share" \
-		-DINSTALL_SUPPORTFILESDIR="share/mysql"
+		-DINSTALL_SUPPORTFILESDIR="share/mysql" \
+		-DLOCAL_BOOST_DIR=${WRKSRC}/../boost_1_59_0
 #		-DINSTALL_SQLBENCHDIR="share/mysql" \
 #		-DWITH_EDITLINE=system \
 #		-DWITH_LIBWRAP=1
