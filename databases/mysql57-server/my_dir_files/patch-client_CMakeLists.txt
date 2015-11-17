@@ -1,0 +1,62 @@
+--- client/CMakeLists.txt.orig	2015-07-20 16:55:08.000000000 +0430
++++ client/CMakeLists.txt	2015-11-14 14:49:21.000000000 +0330
+@@ -111,11 +111,13 @@
+ ENDIF()
+ 
+ ADD_DEFINITIONS(${SSL_DEFINES})
++IF(FALSE)
+ MYSQL_ADD_EXECUTABLE(mysql completion_hash.cc mysql.cc readline.cc ../sql-common/sql_string.cc)
+ TARGET_LINK_LIBRARIES(mysql mysqlclient)
+ IF(UNIX)
+   TARGET_LINK_LIBRARIES(mysql ${EDITLINE_LIBRARY})
+ ENDIF(UNIX)
++ENDIF()
+ 
+ IF(NOT WITHOUT_SERVER)
+   MYSQL_ADD_EXECUTABLE(mysql_upgrade
+@@ -135,6 +137,7 @@
+ ADD_CONVENIENCE_LIBRARY(mysqlcheck_core check/mysqlcheck_core.cc)
+ TARGET_LINK_LIBRARIES(mysqlcheck_core mysqlclient)
+ 
++IF(FALSE)
+ MYSQL_ADD_EXECUTABLE(mysqlcheck check/mysqlcheck.cc)
+ TARGET_LINK_LIBRARIES(mysqlcheck mysqlcheck_core)
+ 
+@@ -144,13 +147,17 @@
+ MYSQL_ADD_EXECUTABLE(mysqlimport mysqlimport.c)
+ SET_SOURCE_FILES_PROPERTIES(mysqlimport.c PROPERTIES COMPILE_FLAGS "-DTHREADS")
+ TARGET_LINK_LIBRARIES(mysqlimport mysqlclient)
++ENDIF()
+ 
++IF(FALSE)
+ MYSQL_ADD_EXECUTABLE(mysqlshow mysqlshow.c)
+ TARGET_LINK_LIBRARIES(mysqlshow mysqlclient)
++ENDIF()
+ 
+ MYSQL_ADD_EXECUTABLE(mysql_plugin mysql_plugin.c)
+ TARGET_LINK_LIBRARIES(mysql_plugin mysqlclient)
+ 
++IF(FALSE)
+ MYSQL_ADD_EXECUTABLE(mysqlbinlog mysqlbinlog.cc)
+ ADD_COMPILE_FLAGS(
+   mysqlbinlog.cc
+@@ -167,6 +174,7 @@
+ 
+ MYSQL_ADD_EXECUTABLE(mysql_config_editor mysql_config_editor.cc)
+ TARGET_LINK_LIBRARIES(mysql_config_editor mysqlclient)
++ENDIF()
+ 
+ MYSQL_ADD_EXECUTABLE(mysql_secure_installation mysql_secure_installation.cc)
+ TARGET_LINK_LIBRARIES(mysql_secure_installation mysqlclient)
+@@ -193,11 +201,6 @@
+ 
+ SET_TARGET_PROPERTIES (
+   mysql_plugin
+-  mysqlcheck
+-  mysqldump
+-  mysqlimport
+-  mysqlshow
+-  mysqlslap
+ PROPERTIES HAS_CXX TRUE)
+ 
+ ADD_DEFINITIONS(-DHAVE_DLOPEN)

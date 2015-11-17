@@ -1,0 +1,12 @@
+--- CMakeLists.txt.orig	2015-11-15 23:27:10.000000000 +0330
++++ CMakeLists.txt	2015-11-15 23:28:48.000000000 +0330
+@@ -448,7 +448,8 @@
+   ${CMAKE_CURRENT_BINARY_DIR}/include
+   ${CMAKE_SOURCE_DIR}/extra/rapidjson/include
+   ${CMAKE_CURRENT_BINARY_DIR}/libbinlogevents/include
+-  ${CMAKE_SOURCE_DIR}/libbinlogevents/export)
++  ${CMAKE_SOURCE_DIR}/libbinlogevents/export
++  ${CMAKE_SOURCE_DIR}/include)
+ # Add bundled or system zlib.
+ MYSQL_CHECK_ZLIB_WITH_COMPRESS()
+ # Add bundled yassl/taocrypt or system openssl.
