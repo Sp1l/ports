@@ -13,33 +13,33 @@ MAINTAINER=	mokhi64@gmail.com
 COMMENT?=	Multithreaded SQL database (server)
 
 SLAVEDIRS=	databases/mysql57-client
-RUN_DEPENDS=	libboost_atomic.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_chrono.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_context.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_coroutine.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_date_time.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_filesystem.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_graph.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_iostreams.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_locale.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_log.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_log_setup.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_math_c99.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_math_c99f.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_math_tr1.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_math_tr1f.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_prg_exec_monitor.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_program_options.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_python.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_random.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_regex.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_serialization.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_signals.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_system.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_thread.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_timer.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_unit_test_framework.so.1.58.0:${PORTSDIR}/devel/boost-libs
-RUN_DEPENDS=	libboost_wave.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_atomic.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_chrono.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_context.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_coroutine.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_date_time.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_filesystem.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_graph.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_iostreams.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_locale.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_log.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_log_setup.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_math_c99.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_math_c99f.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_math_tr1.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_math_tr1f.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_prg_exec_monitor.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_program_options.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_python.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_random.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_regex.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_serialization.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_signals.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_system.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_thread.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_timer.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_unit_test_framework.so.1.58.0:${PORTSDIR}/devel/boost-libs
+#RUN_DEPENDS=	libboost_wave.so.1.58.0:${PORTSDIR}/devel/boost-libs
 #RUN_DEPENDS=    libboost_wserialization.so.1.58.0:${PORTSDIR}/devel/boost-libs
 USES=		cmake:outsource shebangfix
 
@@ -64,20 +64,16 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 
 SHEBANG_FILES=	scripts/*.pl* scripts/*.sh
 
-.ifdef USE_MYSQL
-.error You have `USE_MYSQL' variable defined either in environment or in make(1) arguments. Please undefine and try again.
-.endif
-
 # MySQL-Server part
 .if !defined(CLIENT_ONLY)
-USE_MYSQL=	yes
-WANT_MYSQL_VER=	57
-WITH_MYSQL_VER=	57
+USES=		mysql:5.7
 
 USES+=		perl5
 USE_PERL5=	run
 
-CONFLICTS_INSTALL=	mysql5.[0-57-9]-server-* mysql[0-46-9][0-9]-server-* percona[0-9][0-9]-server-* mariadb[0-9][0-9]-server-*
+CONFLICTS_INSTALL=	mariadb[0-9]*-server-* \
+			mysql[0-46-9][0-689]-server-* \
+			percona[0-9]*-server-*
 
 USE_RC_SUBR=	mysql-server
 
