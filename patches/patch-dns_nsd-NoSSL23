@@ -1,0 +1,89 @@
+Index: dns/nsd/files/patch-nsd-control.c
+===================================================================
+--- dns/nsd/files/patch-nsd-control.c	(revision 0)
++++ dns/nsd/files/patch-nsd-control.c	(working copy)
+@@ -0,0 +1,17 @@
++--- nsd-control.c.orig	2015-06-04 09:09:46 UTC
+++++ nsd-control.c
++@@ -125,10 +125,14 @@ setup_ctx(nsd_options_t* cfg)
++         ctx = SSL_CTX_new(SSLv23_client_method());
++ 	if(!ctx)
++ 		ssl_err("could not allocate SSL_CTX pointer");
+++#ifndef OPENSSL_NO_SSL2
++         if(!(SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2))
++ 		ssl_err("could not set SSL_OP_NO_SSLv2");
+++#endif
+++#ifndef OPENSSL_NO_SSL3
++         if(!(SSL_CTX_set_options(ctx, SSL_OP_NO_SSLv3) & SSL_OP_NO_SSLv3))
++ 		ssl_err("could not set SSL_OP_NO_SSLv3");
+++#endif
++ 	if(!SSL_CTX_use_certificate_file(ctx,c_cert,SSL_FILETYPE_PEM) ||
++ 		!SSL_CTX_use_PrivateKey_file(ctx,c_key,SSL_FILETYPE_PEM)
++ 		|| !SSL_CTX_check_private_key(ctx))
+
+Property changes on: dns/nsd/files/patch-nsd-control.c
+___________________________________________________________________
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Index: dns/nsd/files/patch-remote.c
+===================================================================
+--- dns/nsd/files/patch-remote.c	(revision 0)
++++ dns/nsd/files/patch-remote.c	(working copy)
+@@ -0,0 +1,24 @@
++--- remote.c.orig	2015-08-05 13:00:42 UTC
+++++ remote.c
++@@ -262,17 +262,21 @@ daemon_remote_create(nsd_options_t* cfg)
++ 		free(rc);
++ 		return NULL;
++ 	}
+++#ifndef OPENSSL_NO_SSL2
++ 	/* no SSLv2, SSLv3 because has defects */
++ 	if(!(SSL_CTX_set_options(rc->ctx, SSL_OP_NO_SSLv2) & SSL_OP_NO_SSLv2)){
++ 		log_crypto_err("could not set SSL_OP_NO_SSLv2");
++ 		daemon_remote_delete(rc);
++ 		return NULL;
++ 	}
+++#endif
+++#ifndef OPENSSL_NO_SSL3
++ 	if(!(SSL_CTX_set_options(rc->ctx, SSL_OP_NO_SSLv3) & SSL_OP_NO_SSLv3)){
++ 		log_crypto_err("could not set SSL_OP_NO_SSLv3");
++ 		daemon_remote_delete(rc);
++ 		return NULL;
++ 	}
+++#endif
++ 	s_cert = cfg->server_cert_file;
++ 	s_key = cfg->server_key_file;
++ 	VERBOSITY(2, (LOG_INFO, "setup SSL certificates"));
+
+Property changes on: dns/nsd/files/patch-remote.c
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
