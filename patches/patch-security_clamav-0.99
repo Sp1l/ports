@@ -1,0 +1,47 @@
+Index: security/clamav/Makefile
+===================================================================
+--- security/clamav/Makefile	(revision 402620)
++++ security/clamav/Makefile	(working copy)
+@@ -2,7 +2,7 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	clamav
+-PORTVERSION=	0.98.7
++PORTVERSION=	0.99
+ CATEGORIES=	security
+ MASTER_SITES=	SF
+ 
+Index: security/clamav/distinfo
+===================================================================
+--- security/clamav/distinfo	(revision 402620)
++++ security/clamav/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (clamav-0.98.7.tar.gz) = 282417b707740de13cd8f18d4cbca9ddd181cf96b444db2cad98913a5153e272
+-SIZE (clamav-0.98.7.tar.gz) = 15118851
++SHA256 (clamav-0.99.tar.gz) = d2792c8cfadd685fffc40b2199679628815df031fd3149ccf961649fc8787ea9
++SIZE (clamav-0.99.tar.gz) = 15968038
+Index: security/clamav/pkg-plist
+===================================================================
+--- security/clamav/pkg-plist	(revision 402620)
++++ security/clamav/pkg-plist	(working copy)
+@@ -12,14 +12,14 @@
+ include/clamav.h
+ include/clamav-config.h
+ lib/libclamav.so
+-lib/libclamav.so.6
+-lib/libclamav.so.6.1.26
++lib/libclamav.so.7
++lib/libclamav.so.7.1.1
+ %%UNRAR%%lib/libclamunrar.so
+-%%UNRAR%%lib/libclamunrar.so.6
+-%%UNRAR%%lib/libclamunrar.so.6.1.26
++%%UNRAR%%lib/libclamunrar.so.7
++%%UNRAR%%lib/libclamunrar.so.7.1.1
+ %%UNRAR%%lib/libclamunrar_iface.so
+-%%UNRAR%%lib/libclamunrar_iface.so.6
+-%%UNRAR%%lib/libclamunrar_iface.so.6.1.26
++%%UNRAR%%lib/libclamunrar_iface.so.7
++%%UNRAR%%lib/libclamunrar_iface.so.7.1.1
+ libdata/pkgconfig/libclamav.pc
+ man/man1/clambc.1.gz
+ man/man1/clamconf.1.gz

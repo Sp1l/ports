@@ -2,7 +2,7 @@
 # $FreeBSD: head/security/clamav/Makefile 385583 2015-05-07 00:46:25Z amdmi3 $
 
 PORTNAME=	clamav
-PORTVERSION=	0.98.7
+PORTVERSION=	0.99
 CATEGORIES=	security
 MASTER_SITES=	SF
 
