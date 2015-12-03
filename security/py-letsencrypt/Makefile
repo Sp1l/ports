@@ -2,7 +2,7 @@
 # $FreeBSD: head/security/py-letsencrypt/Makefile 402668 2015-11-30 13:56:54Z brnrd $
 
 PORTNAME=	letsencrypt
-DISTVERSION=	0.0.0.dev20151123
+DISTVERSION=	0.1.0
 CATEGORIES=	security python
 MASTER_SITES=	CHEESESHOP
 PKGNAMEPREFIX=	${PYTHON_PKGNAMEPREFIX}
