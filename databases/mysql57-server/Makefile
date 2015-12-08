@@ -65,7 +65,8 @@ SHEBANG_FILES=	scripts/*.pl* scripts/*.sh
 
 # MySQL-Server part
 .if !defined(CLIENT_ONLY)
-USES=		mysql:5.7
+USE_MYSQL=	yes
+WANT_MYSQL_VER=	57
 
 USES+=		perl5
 USE_PERL5=	run
