@@ -12,7 +12,6 @@ bin/mysqld_multi
 bin/mysqld_safe
 bin/mysqldumpslow
 bin/mysqltest
-etc/rc.d/mysql-server
 include/mysql/binary_log_types.h
 lib/mysql/libmysqld.a
 lib/mysql/plugin/adt_null.so

@@ -55,7 +55,7 @@ USE_MYSQL=	yes
 WANT_MYSQL_VER=	57
 MYSQL57_LIBVER=		20
 
-USES+=		perl5
+USES+=		perl5 bison
 USE_PERL5=	run
 
 CONFLICTS_INSTALL=	mariadb[0-9]*-server-* \
