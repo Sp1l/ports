@@ -1,4 +1,4 @@
-# $FreeBSD: head/www/apache24/Makefile.options.desc 378215 2015-01-31 15:22:51Z ohauer $
+# $FreeBSD: head/www/apache24/Makefile.options.desc 399207 2015-10-13 18:17:28Z ohauer $
 
 # vim: syntax=make ts=8 noet
 # =====================================
@@ -99,6 +99,7 @@ FILTER_DESC=			Smart Filtering
 HEADERS_DESC=			HTTP header control
 HEARTBEAT_DESC=			Generates Heartbeats
 HEARTMONITOR_DESC=		Collects Heartbeats
+HTTP2_DESC=			HTTP/2 (RFC 7540) support (experimental)
 
 IDENT_DESC=			RFC 1413 ident lookups
 IMAGEMAP_DESC=			Server-side imagemaps

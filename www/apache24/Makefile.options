@@ -1,4 +1,4 @@
-# $FreeBSD: head/www/apache24/Makefile.options 378215 2015-01-31 15:22:51Z ohauer $
+# $FreeBSD: head/www/apache24/Makefile.options 399207 2015-10-13 18:17:28Z ohauer $
 
 # ===========================================================
 # Only the most important modules are enabled per default in 
@@ -55,7 +55,7 @@ MOST_ENABLED_MODULES= \
 	WATCHDOG 
 
 MOST_DISABLED_MODULES:= \
-	AUTHNZ_LDAP IDENT LDAP LUA SOCACHE_DC SUEXEC XML2ENC
+	AUTHNZ_LDAP IDENT LDAP LUA SOCACHE_DC SUEXEC XML2ENC HTTP2
 
 # XXX PROXY and SESSION are modules but also used to
 #     enable/disable additional PROXY/SESSION modules
