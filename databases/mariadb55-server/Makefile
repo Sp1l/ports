@@ -1,7 +1,7 @@
-# $FreeBSD: head/databases/mariadb55-server/Makefile 377184 2015-01-16 15:53:54Z xmj $
+# $FreeBSD: head/databases/mariadb55-server/Makefile 402786 2015-12-01 20:48:54Z brnrd $
 
 PORTNAME?=	mariadb
-PORTVERSION=	5.5.43
+PORTVERSION=	5.5.47
 CATEGORIES=	databases ipv6
 MASTER_SITES=	http://ftp.osuosl.org/pub/mariadb/${PORTNAME}-${PORTVERSION}/source/ \
 		http://mirrors.supportex.net/mariadb/${PORTNAME}-${PORTVERSION}/source/ \
@@ -16,6 +16,8 @@ PKGNAMESUFFIX?=	55-server
 
 MAINTAINER=	never@nevermind.kiev.ua
 COMMENT?=	Multithreaded SQL database (server)
+
+LICENSE=	GPLv2
 
 SUB_FILES=	pkg-message
 PKGMESSAGE=	${WRKDIR}/pkg-message
@@ -58,10 +60,10 @@ BROKEN_armv6=		Does not compile on arm
 USE_MYSQL=	yes
 WANT_MYSQL_VER=	55m
 
-CONFLICTS_INSTALL=	mysql*-server-* \
-			mariadb1[0-9][0-9]-server-* \
-			mariadb5[0-46-9]-server-* \
-			percona*-server-*
+CONFLICTS_INSTALL=	mariadb5[0-46-9]-server-* \
+			mariadb1*-server-* \
+			mysql[0-9]*-server-* \
+			percona[0-9]*-server-*
 
 USE_RC_SUBR=	mysql-server
 
@@ -119,7 +121,7 @@ CMAKE_ARGS+=	-DWITH_JEMALLOC="no"
 
 # Server segfaults on i386 when built with clang >= 3.4
 .if ${ARCH} == 'i386' && ${OSVERSION} >= 1001000
-USE_GCC=        yes
+USE_GCC=	yes
 .endif
 
 post-patch:
