@@ -1,0 +1,11 @@
+--- usr/lib/pkcs11/api/shrd_mem.c.in.orig	2015-12-04 22:06:36 UTC
++++ usr/lib/pkcs11/api/shrd_mem.c.in
+@@ -357,7 +357,7 @@ attach_shared_memory() {
+    // only check group membership if not root user
+    if (uid != 0 && euid != 0) {
+ 	   int i, member=0;
+-	   grp = getgrnam("pkcs11");
++	   grp = getgrnam(PKCS11GROUP);
+ 	   if (!grp) {
+ 		   // group pkcs11 not known to the system
+ 		   return NULL;
