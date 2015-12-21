@@ -45,7 +45,7 @@
  CFLAGS="$CFLAGS -DPKCS64 -D_XOPEN_SOURCE=500 -Wall -Wno-pointer-sign"
  
 -CFLAGS+=' -DCONFIG_PATH=\"$(localstatedir)/lib/opencryptoki\" -DSBIN_PATH=\"$(sbindir)\" -DLIB_PATH=\"$(libdir)\" -DLOCKDIR_PATH=\"$(lockdir)\" -DOCK_CONFDIR=\"$(sysconfdir)/opencryptoki\" -DOCK_LOGDIR=\"$(logdir)\"'
-+CFLAGS="$CFLAGS -DCONFIG_PATH=\"$(localstatedir)/lib/opencryptoki\" -DSBIN_PATH=\"$(sbindir)\" -DLIB_PATH=\"$(libdir)\" -DLOCKDIR_PATH=\"$(lockdir)\" -DOCK_CONFDIR=\"$(sysconfdir)/opencryptoki\" -DOCK_LOGDIR=\"$(logdir)\""
++CFLAGS="$CFLAGS -DCONFIG_PATH='\"$(localstatedir)/lib/opencryptoki\"' -DSBIN_PATH='\"$(sbindir)\"' -DLIB_PATH='\"$(libdir)\"' -DLOCKDIR_PATH='\"$(lockdir)\"' -DOCK_CONFDIR='\"$(sysconfdir)/opencryptoki\"' -DOCK_LOGDIR='\"$(logdir)\"'"
 +
 +CFLAGS="$CFLAGS -DPKCS11USER='\"${pkcs11_user}\"' -DPKCS11GROUP='\"${pkcs11_group}\"'"
  
