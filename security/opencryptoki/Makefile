@@ -1,11 +1,11 @@
 # Created by: Ralf Meister
-# $FreeBSD: head/security/opencryptoki/Makefile 371252 2014-10-20 10:09:19Z marino $
+# $FreeBSD: head/security/opencryptoki/Makefile 384225 2015-04-18 12:58:34Z tijl $
 
 PORTNAME=	opencryptoki
-PORTVERSION=	2.3.2
-PORTREVISION=	8
+PORTVERSION=	3.4.1
 CATEGORIES=	security
-MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}/${PORTVERSION}
+MASTER_SITES=	SF/${PORTNAME}/${PORTNAME}/3.4
+DISTNAME=	${PORTNAME}-v${PORTVERSION}
 
 MAINTAINER=	hrs@FreeBSD.org
 COMMENT=	Open PKCS\#11 implementation library
@@ -17,11 +17,13 @@ LICENSE_PERMS=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
 LIB_DEPENDS=	libtspi.so:${PORTSDIR}/security/trousers
 
-USES=		alias gmake libtool tar:bzip2
+
+WRKSRC=		${WRKDIR}/${PORTNAME}
+
+USES=		alias autoreconf gmake libtool tar:tgz
 USE_LDCONFIG=	${PREFIX}/lib/opencryptoki
-USE_AUTOTOOLS=	libtoolize aclocal autoconf automake
-AUTOMAKE_ARGS=	-a -c -f
 INSTALL_TARGET=	install-strip
+GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--enable-swtok --enable-tpmtok \
 		--disable-crtok --disable-aeptok \
 		--disable-ccatok --disable-bcomtok \
