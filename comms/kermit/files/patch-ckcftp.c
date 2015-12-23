@@ -1,24 +1,14 @@
---- ckcftp.c.orig	2011-07-14 18:17:30.000000000 +0200
-+++ ckcftp.c	2015-10-03 14:48:01.112575165 +0200
-@@ -10196,15 +10196,21 @@ ssl_auth() {
- #define SSL_OP_DONT_INSERT_EMPTY_FRAGMENTS 0L
- #endif
-     if (auth_type && !strcmp(auth_type,"TLS")) {
+--- ckcftp.c.orig	2015-02-05 20:08:09 UTC
++++ ckcftp.c
+@@ -10210,9 +10210,11 @@ ssl_auth() {
+     if (ftp_bug_use_ssl_v2) {
+         /* allow SSL 2.0 or later */
+         client_method = SSLv23_client_method();
 +#ifndef OPENSSL_NO_SSL3
-         ssl_ftp_ctx=SSL_CTX_new(SSLv3_client_method());
+     } else if (ftp_bug_use_ssl_v3) {
+         /* allow SSL 3.0 ONLY - previous default */
+         client_method = SSLv3_client_method();
 +#endif
-         if (!ssl_ftp_ctx)
-           return(0);
-         SSL_CTX_set_options(ssl_ftp_ctx,
-                             SSL_OP_SINGLE_DH_USE|SSL_OP_EPHEMERAL_RSA
-                             );
      } else {
-+#ifndef OPENSSL_NO_SSL3
-         ssl_ftp_ctx = SSL_CTX_new(ftp_bug_use_ssl_v2 ? SSLv23_client_method() : 
-                                   SSLv3_client_method());
-+#else
-+        ssl_ftp_ctx = SSL_CTX_new(SSLv23_client_method());
-+#endif
-         if (!ssl_ftp_ctx)
-           return(0);
-         SSL_CTX_set_options(ssl_ftp_ctx,
+         /* default - allow TLS 1.0 or later */
+         client_method = TLSv1_client_method();

@@ -2,11 +2,13 @@
 # $FreeBSD: head/comms/kermit/Makefile 373991 2014-12-04 23:38:02Z feld $
 
 PORTNAME=	kermit
-PORTVERSION=	9.0.302
+PORTVERSION=	9.0.304
+DISTVERSIONPREFIX=	cku
+DISTVERSION=	304
+DISTVERSIONSUFFIX=	dev14
 CATEGORIES=	comms ftp net
-MASTER_SITES=	ftp://kermit.columbia.edu/kermit/archives/ \
-		ftp://ftp.icm.edu.pl/pub/kermit/archives/
-DISTNAME=	cku${PORTVERSION:E}
+MASTER_SITES=	ftp://ftp.kermitproject.org/kermit/test/tar/
+DISTNAME=	${DISTVERSIONPREFIX}${DISTVERSION}-${DISTVERSIONSUFFIX}
 
 MAINTAINER=	danfe@FreeBSD.org
 COMMENT=	Portable scriptable network and serial communication program
@@ -36,9 +38,9 @@ do-install:
 	${INSTALL_DATA} ${WRKSRC}/*.txt ${STAGEDIR}${DOCSDIR}
 	${LN} -sf ckaaaa.txt ${STAGEDIR}${DOCSDIR}/READ.ME
 	@${MKDIR} ${STAGEDIR}${EXAMPLESDIR}
-	${INSTALL_DATA} ${WRKSRC}/ckermit.ini \
-		${STAGEDIR}${EXAMPLESDIR}/dot.kermrc
-	${INSTALL_DATA} ${WRKSRC}/ckermod.ini \
-		${STAGEDIR}${EXAMPLESDIR}/dot.mykermrc
+#	${INSTALL_DATA} ${WRKSRC}/ckermit.ini \
+#		${STAGEDIR}${EXAMPLESDIR}/dot.kermrc
+#	${INSTALL_DATA} ${WRKSRC}/ckermod.ini \
+#		${STAGEDIR}${EXAMPLESDIR}/dot.mykermrc
 
 .include <bsd.port.mk>
