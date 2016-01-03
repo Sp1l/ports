@@ -1,4 +1,4 @@
---- include/CMakeLists.txt.orig	2015-10-15 15:43:36 UTC
+--- include/CMakeLists.txt.orig	2015-12-23 15:33:29 UTC
 +++ include/CMakeLists.txt
 @@ -66,13 +66,18 @@ INSTALL(FILES ${HEADERS} DESTINATION ${I
  FOREACH(f ${HEADERS_GEN_CONFIGURE})

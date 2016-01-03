@@ -1,8 +1,8 @@
---- include/mysql/service_encryption.h.orig	2015-10-15 17:43:37.000000000 +0200
-+++ include/mysql/service_encryption.h	2015-10-20 14:05:44.029525238 +0200
-@@ -35,9 +35,11 @@ extern "C" {
- #define inline __inline
- #endif
+--- include/mysql/service_encryption.h.orig	2015-12-23 15:33:29 UTC
++++ include/mysql/service_encryption.h
+@@ -37,9 +37,11 @@ extern "C" {
+ #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)
+ #include <stdlib.h>
  #else
 +#ifndef __FreeBSD__
  #include <alloca.h>

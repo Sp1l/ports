@@ -58,11 +58,12 @@ lib/mysql/plugin/ha_blackhole.so
 lib/mysql/plugin/ha_connect.so
 lib/mysql/plugin/ha_federated.so
 lib/mysql/plugin/ha_federatedx.so
-%%INNODB%%lib/mysql/plugin/ha_innodb.so
+%%INNOBASE%%lib/mysql/plugin/ha_innodb.so
 %%MROONGA%%lib/mysql/plugin/ha_mroonga.so
 %%OQGRAPH%%lib/mysql/plugin/ha_oqgraph.so
-lib/mysql/plugin/ha_sphinx.so
-lib/mysql/plugin/ha_spider.so
+%%SPINKX%%lib/mysql/plugin/ha_sphinx.so
+%%SPIDER%%lib/mysql/plugin/ha_spider.so
+%%TOKUDB%%lib/mysql/plugin/ha_tokudb.so
 lib/mysql/plugin/ha_test_sql_discovery.so
 lib/mysql/plugin/handlersocket.so
 lib/mysql/plugin/libdaemon_example.so
@@ -156,6 +157,8 @@ man/man8/mysqld.8.gz
 %%DATADIR%%/japanese/errmsg.sys
 %%DATADIR%%/korean/errmsg.sys
 %%DATADIR%%/magic
+%%DATADIR%%/maria_add_gis_sp.sql
+%%DATADIR%%/maria_add_gis_sp_bootstrap.sql
 %%MROONGA%%%%DATADIR%%/mroonga/install.sql
 %%MROONGA%%%%DATADIR%%/mroonga/uninstall.sql
 %%DATADIR%%/my-huge.cnf

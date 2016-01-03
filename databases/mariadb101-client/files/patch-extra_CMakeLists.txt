@@ -1,4 +1,4 @@
---- extra/CMakeLists.txt.orig	2015-10-15 15:43:36 UTC
+--- extra/CMakeLists.txt.orig	2015-12-23 15:33:29 UTC
 +++ extra/CMakeLists.txt
 @@ -46,6 +46,7 @@ ADD_CUSTOM_TARGET(GenError
                    DEPENDS 
@@ -8,9 +8,9 @@
  MYSQL_ADD_EXECUTABLE(my_print_defaults my_print_defaults.c)
  TARGET_LINK_LIBRARIES(my_print_defaults  mysys)
  
-@@ -79,18 +80,23 @@ IF(WITH_INNOBASE_STORAGE_ENGINE OR WITH_
-       ../storage/innobase/page/page0zip.cc
-       )
+@@ -88,18 +89,23 @@ IF(WITH_INNOBASE_STORAGE_ENGINE OR WITH_
+          )
+   ENDIF()
  
 +IF(FALSE)
    MYSQL_ADD_EXECUTABLE(innochecksum innochecksum.cc ${INNOBASE_SOURCES})

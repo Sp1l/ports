@@ -1,22 +1,18 @@
---- cmake/jemalloc.cmake.orig	2015-10-15 15:43:36 UTC
+# Upstreamed https://github.com/MariaDB/server/pull/140
+
+--- cmake/jemalloc.cmake.orig	2015-12-23 15:33:29 UTC
 +++ cmake/jemalloc.cmake
-@@ -14,7 +14,7 @@ ENDMACRO()
- MACRO(JEMALLOC_TRY_DYNAMIC)
-   SET(libname jemalloc)
-   SET(what system)
--  CHECK_LIBRARY_EXISTS(${libname} malloc_stats_print "" HAVE_DYNAMIC_JEMALLOC)
-+  CHECK_LIBRARY_EXISTS(c malloc_stats_print "" HAVE_DYNAMIC_JEMALLOC)
+@@ -12,7 +12,12 @@ MACRO(JEMALLOC_TRY_STATIC)
  ENDMACRO()
  
- MACRO (CHECK_JEMALLOC)
-@@ -37,8 +37,8 @@ MACRO (CHECK_JEMALLOC)
- 
-   IF (libname)
-     IF (HAVE_DYNAMIC_JEMALLOC OR HAVE_STATIC_JEMALLOC)
--      SET(LIBJEMALLOC ${libname})
--      SET(MALLOC_LIBRARY "${what} jemalloc")
-+      SET(LIBJEMALLOC c)
-+      SET(MALLOC_LIBRARY "system jemalloc")
-     ELSEIF (NOT WITH_JEMALLOC STREQUAL "auto")
-       MESSAGE(FATAL_ERROR "${libname} is not found")
-     ENDIF()
+ MACRO(JEMALLOC_TRY_DYNAMIC)
+-  SET(libname jemalloc)
++  IF(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" AND 
++    CMAKE_SYSTEM_VERSION STRGREATER "10.0")
++    SET(libname c)
++  ELSE()
++    SET(libname jemalloc)
++  ENDIF()
+   SET(what system)
+   CHECK_LIBRARY_EXISTS(${libname} malloc_stats_print "" HAVE_DYNAMIC_JEMALLOC)
+ ENDMACRO()

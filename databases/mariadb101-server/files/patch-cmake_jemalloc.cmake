@@ -1,22 +1,21 @@
---- cmake/jemalloc.cmake.orig	2015-10-15 17:43:36.000000000 +0200
-+++ cmake/jemalloc.cmake	2015-10-20 13:21:41.875704694 +0200
-@@ -14,7 +14,7 @@ ENDMACRO()
+--- cmake/jemalloc.cmake.orig	2015-12-23 15:33:29 UTC
++++ cmake/jemalloc.cmake
+@@ -12,9 +12,16 @@ MACRO(JEMALLOC_TRY_STATIC)
+ ENDMACRO()
+ 
  MACRO(JEMALLOC_TRY_DYNAMIC)
-   SET(libname jemalloc)
+-  SET(libname jemalloc)
    SET(what system)
 -  CHECK_LIBRARY_EXISTS(${libname} malloc_stats_print "" HAVE_DYNAMIC_JEMALLOC)
-+  CHECK_LIBRARY_EXISTS(c malloc_stats_print "" HAVE_DYNAMIC_JEMALLOC)
++  IF (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" AND
++      CMAKE_SYSTEM_VERSION STRGREATER "10.0")
++    # Since FreeBSD 10.0 jemalloc is in base libc
++    SET(libname c)
++    SET(HAVE_DYNAMIC_JEMALLOC ON)
++  ELSE()
++    SET(libname jemalloc)
++    CHECK_LIBRARY_EXISTS(${libname} malloc_stats_print "" HAVE_DYNAMIC_JEMALLOC)
++  ENDIF()
  ENDMACRO()
  
  MACRO (CHECK_JEMALLOC)
-@@ -37,8 +37,8 @@ MACRO (CHECK_JEMALLOC)
- 
-   IF (libname)
-     IF (HAVE_DYNAMIC_JEMALLOC OR HAVE_STATIC_JEMALLOC)
--      SET(LIBJEMALLOC ${libname})
--      SET(MALLOC_LIBRARY "${what} jemalloc")
-+      SET(LIBJEMALLOC c)
-+      SET(MALLOC_LIBRARY "system jemalloc")
-     ELSEIF (NOT WITH_JEMALLOC STREQUAL "auto")
-       MESSAGE(FATAL_ERROR "${libname} is not found")
-     ENDIF()

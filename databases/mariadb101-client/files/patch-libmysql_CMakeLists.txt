@@ -1,4 +1,4 @@
---- libmysql/CMakeLists.txt.orig	2015-10-15 15:43:37 UTC
+--- libmysql/CMakeLists.txt.orig	2015-12-23 15:33:29 UTC
 +++ libmysql/CMakeLists.txt
 @@ -441,6 +441,8 @@ IF(NOT DISABLE_SHARED)
      # libtool compatability

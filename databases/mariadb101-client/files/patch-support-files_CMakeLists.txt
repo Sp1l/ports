@@ -1,4 +1,4 @@
---- support-files/CMakeLists.txt.orig	2015-10-15 15:44:15 UTC
+--- support-files/CMakeLists.txt.orig	2015-12-23 15:33:33 UTC
 +++ support-files/CMakeLists.txt
 @@ -41,15 +41,18 @@ ELSE()
    SET(inst_location ${INSTALL_SUPPORTFILESDIR})
@@ -31,11 +31,11 @@
    INSTALL(FILES mysql.m4 DESTINATION ${INSTALL_SHAREDIR}/aclocal COMPONENT Development)
 -  
 +
-+  IF(FALSE)  
-   SET(bindir ${prefix}/${INSTALL_BINDIR})
-   SET(sbindir ${prefix}/${INSTALL_SBINDIR})
-   SET(scriptdir ${prefix}/${INSTALL_SCRIPTDIR})
-@@ -110,6 +115,7 @@ IF(UNIX)
++IF(FALSE)  
+   SET(bindir ${INSTALL_BINDIRABS})
+   SET(sbindir ${INSTALL_SBINDIRABS})
+   SET(scriptdir ${INSTALL_SCRIPTDIRABS})
+@@ -115,6 +120,7 @@ IF(UNIX)
      INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/mysql.server
              DESTINATION  ${INSTALL_SYSCONFDIR}/init.d
              RENAME mysql COMPONENT SupportFiles)

@@ -1,4 +1,4 @@
---- client/CMakeLists.txt.orig	2015-10-15 15:43:35 UTC
+--- client/CMakeLists.txt.orig	2015-12-23 15:33:29 UTC
 +++ client/CMakeLists.txt
 @@ -38,11 +38,12 @@ IF(UNIX)
    SET_TARGET_PROPERTIES(mysql PROPERTIES ENABLE_EXPORTS TRUE)

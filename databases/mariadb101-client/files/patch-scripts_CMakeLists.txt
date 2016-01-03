@@ -1,4 +1,4 @@
---- scripts/CMakeLists.txt.orig	2015-10-15 15:43:45 UTC
+--- scripts/CMakeLists.txt.orig	2015-12-23 15:33:31 UTC
 +++ scripts/CMakeLists.txt
 @@ -73,6 +73,7 @@ IF(UNIX)
  )
@@ -32,7 +32,7 @@
  
  ENDIF(UNIX)
  
-@@ -194,6 +198,7 @@ ELSE()
+@@ -195,6 +199,7 @@ ELSE()
    SET(localstatedir ${MYSQL_DATADIR})
  ENDIF()
  
@@ -40,7 +40,7 @@
  IF(UNIX)
  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mysql_install_db.sh
    ${CMAKE_CURRENT_BINARY_DIR}/mysql_install_db ESCAPE_QUOTES @ONLY)
-@@ -209,6 +214,7 @@ INSTALL_SCRIPT(
+@@ -208,6 +213,7 @@ INSTALL_SCRIPT(
    COMPONENT Server
    )
  ENDIF()
@@ -48,7 +48,7 @@
  
  SET(prefix "${CMAKE_INSTALL_PREFIX}")
  IF(INSTALL_SYSCONFDIR)
-@@ -287,18 +293,8 @@ ELSE()
+@@ -286,18 +292,8 @@ ELSE()
    SET(BIN_SCRIPTS
      msql2mysql
      mysql_config
