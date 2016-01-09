@@ -2,11 +2,9 @@
 # $FreeBSD$
 
 PORTNAME=	mod_h2
-PORTVERSION=	0.9.6
+PORTVERSION=	1.1.0
+DISTVERSIONPREFIX=	v
 CATEGORIES=	www
-MASTER_SITES=	https://github.com/${GH_ACCOUNT}/${PORTNAME}/releases/download/v${PORTVERSION}/
-#DISTNAME=	${PORT_NAME}-${PORTVERSION}.tar.gz
-# https://github.com/icing/mod_h2/releases/download/v0.9.6/mod_h2-0.9.6.tar.gz
 MAINTAINER=	brnrd@FreeBSD.org
 COMMENT=	HTTP/2 module for Apache httpd (EXPERIMENTAL)
 
@@ -16,10 +14,9 @@ BUILD_DEPENDS=	nghttp2>=1.2:${PORTSDIR}/www/nghttp2
 LIB_DEPENDS=	libnghttp2.so:${PORTSDIR}/www/nghttp2
 RUN_DEPENDS:=	${BUILD_DEPENDS}
 
-#USE_GITHUB=	no
+USE_GITHUB=	no
 GH_ACCOUNT=	icing
-#GH_PROJECT=	mod_h2
-#GH_TAGNAME=	e25881a26e
+GH_PROJECT=	${PORTNAME}
 
 USES=		autoreconf
 GNU_CONFIGURE=	yes
@@ -31,7 +28,16 @@ MODULENAME=	mod_h2
 
 CFLAGS+=	-I${LOCALBASE}/include
 
+#WARNING=	"This is an experimental port! Requires a patched apache24"
+
+post-build:
+
+
 post-install:
-	${STRIP_CMD} ${STAGEDIR}${PREFIX}/${APACHEMODDIR}/mod_h2.so.0.0.0
+	${MV} -f ${STAGEDIR}${PREFIX}/${APACHEMODDIR}/mod_http2.so.0.0.0 \
+		${STAGEDIR}${PREFIX}/${APACHEMODDIR}/${PORTNAME}.so
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/${APACHEMODDIR}/${PORTNAME}.so
+	${MV} ${STAGEDIR}${PREFIX}/share/doc/mod_http2 \
+		${STAGEDIR}/${DOCSDIR}
 
 .include <bsd.port.mk>
