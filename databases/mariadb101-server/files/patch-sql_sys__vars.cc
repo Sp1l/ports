@@ -1,3 +1,5 @@
+Fix clang build error
+
 --- sql/sys_vars.cc.orig	2015-10-15 15:43:47 UTC
 +++ sql/sys_vars.cc
 @@ -1040,7 +1040,7 @@ static Sys_var_ulong Sys_interactive_tim

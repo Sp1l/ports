@@ -1,3 +1,5 @@
+Fix up missing WITHOUT_DOCS, WITHOUT_CLIENT options
+
 --- client/CMakeLists.txt.orig	2015-10-15 15:43:35 UTC
 +++ client/CMakeLists.txt
 @@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES(

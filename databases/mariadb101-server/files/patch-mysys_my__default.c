@@ -1,3 +1,5 @@
+Obey hier(7)
+
 --- mysys/my_default.c.orig	2015-10-15 15:43:45 UTC
 +++ mysys/my_default.c
 @@ -90,7 +90,7 @@ static my_bool defaults_already_read= FA

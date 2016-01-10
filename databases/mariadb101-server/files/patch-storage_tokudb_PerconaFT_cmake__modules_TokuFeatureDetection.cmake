@@ -1,3 +1,5 @@
+Fix failing backtrace detection
+
 --- storage/tokudb/PerconaFT/cmake_modules/TokuFeatureDetection.cmake.orig	2015-10-15 15:43:51 UTC
 +++ storage/tokudb/PerconaFT/cmake_modules/TokuFeatureDetection.cmake
 @@ -87,13 +87,7 @@ if (NOT HAVE_DLSYM_WITHOUT_DL)

@@ -1,3 +1,5 @@
+Fix up missing WITHOUT_DOCS, WITHOUT_CLIENT options
+
 --- extra/CMakeLists.txt.orig	2015-10-15 15:43:36 UTC
 +++ extra/CMakeLists.txt
 @@ -91,6 +91,8 @@ IF(UNIX)

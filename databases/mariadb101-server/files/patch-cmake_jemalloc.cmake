@@ -1,3 +1,6 @@
+Fix jemalloc detection on FreeBSD 10.x
+Upstream https://github.com/MariaDB/server/pull/140
+
 --- cmake/jemalloc.cmake.orig	2015-12-23 15:33:29 UTC
 +++ cmake/jemalloc.cmake
 @@ -12,9 +12,16 @@ MACRO(JEMALLOC_TRY_STATIC)

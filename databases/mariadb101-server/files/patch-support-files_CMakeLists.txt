@@ -1,3 +1,5 @@
+Fix up missing WITHOUT_DOCS, WITHOUT_CLIENT options
+
 --- support-files/CMakeLists.txt.orig	2015-10-15 15:44:15 UTC
 +++ support-files/CMakeLists.txt
 @@ -64,7 +64,9 @@ IF(UNIX)

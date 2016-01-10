@@ -1,3 +1,5 @@
+Fix clang build error
+
 --- sql/sql_view.cc.orig	2015-10-15 15:43:47 UTC
 +++ sql/sql_view.cc
 @@ -720,46 +720,46 @@ static const int required_view_parameter

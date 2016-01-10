@@ -1,3 +1,6 @@
+MariaDB prefers static libraries, breaks builds with
+ports' OpenSSL libs
+
 --- cmake/ssl.cmake.orig	2015-12-23 15:33:29 UTC
 +++ cmake/ssl.cmake
 @@ -145,9 +145,9 @@ MACRO (MYSQL_CHECK_SSL)

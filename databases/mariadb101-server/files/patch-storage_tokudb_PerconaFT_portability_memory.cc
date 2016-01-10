@@ -1,3 +1,5 @@
+Fix build error
+
 --- storage/tokudb/PerconaFT/portability/memory.cc.orig	2015-10-15 15:43:52 UTC
 +++ storage/tokudb/PerconaFT/portability/memory.cc
 @@ -94,11 +94,6 @@ PATENT RIGHTS GRANT:

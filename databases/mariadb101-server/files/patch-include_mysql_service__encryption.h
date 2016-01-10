@@ -1,3 +1,5 @@
+Fix build error
+
 --- include/mysql/service_encryption.h.orig	2015-10-15 15:43:37 UTC
 +++ include/mysql/service_encryption.h
 @@ -35,9 +35,11 @@ extern "C" {

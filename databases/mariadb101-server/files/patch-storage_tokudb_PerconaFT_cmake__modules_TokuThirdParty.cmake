@@ -1,3 +1,5 @@
+Replace bundled liblzma library with base lzma
+
 --- storage/tokudb/PerconaFT/cmake_modules/TokuThirdParty.cmake.orig	2015-12-23 16:33:32.000000000 +0100
 +++ storage/tokudb/PerconaFT/cmake_modules/TokuThirdParty.cmake	2016-01-03 17:23:42.102122634 +0100
 @@ -34,6 +34,13 @@ if (CMAKE_PROJECT_NAME STREQUAL TokuDB)

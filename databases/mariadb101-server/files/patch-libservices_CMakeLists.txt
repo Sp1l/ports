@@ -1,3 +1,5 @@
+Fix up missing WITHOUT_DOCS, WITHOUT_CLIENT options
+
 --- libservices/CMakeLists.txt.orig	2015-10-15 15:43:37 UTC
 +++ libservices/CMakeLists.txt
 @@ -34,4 +34,6 @@ SET(MYSQLSERVICES_SOURCES

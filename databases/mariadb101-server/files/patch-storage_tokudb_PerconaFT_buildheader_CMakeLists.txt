@@ -1,3 +1,5 @@
+Fix build failure due to Linuxisms (bash)
+
 --- storage/tokudb/PerconaFT/buildheader/CMakeLists.txt.orig	2015-12-23 16:33:32.000000000 +0100
 +++ storage/tokudb/PerconaFT/buildheader/CMakeLists.txt	2016-01-03 15:09:21.941678309 +0100
 @@ -1,6 +1,6 @@

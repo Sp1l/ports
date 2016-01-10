@@ -1,3 +1,5 @@
+Obey hier(7)
+
 --- scripts/mysqld_safe.sh.orig	2015-10-15 15:43:45 UTC
 +++ scripts/mysqld_safe.sh
 @@ -558,10 +558,10 @@ fi

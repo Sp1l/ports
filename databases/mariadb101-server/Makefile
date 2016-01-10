@@ -27,15 +27,14 @@ USE_LDCONFIG=	${PREFIX}/lib/mysql ${PREFIX}/lib/mysql/plugin
 SHEBANG_FILES=	scripts/*.sh
 SITESDIR=	mariadb/mariadb-${PORTVERSION}/source
 
-OPTIONS_DEFINE=		BUNDLED_SSL FASTMTX
+OPTIONS_DEFINE=		FASTMTX
 
-BUNDLED_SSL_DESC=	Use (bundled) CyaSSL in stead of OpenSSL
 FASTMTX_DESC=		Replace mutexes with spinlocks
 
 .if !defined(CLIENT_ONLY)
 # MySQL-Server options
 OPTIONS_DEFINE+=	MAXKEY
-OPTIONS_DEFAULT+=	MAXKEY SPHINX SPIDER TOKUDB
+OPTIONS_DEFAULT+=	MAXKEY SPHINX SPIDER
 OPTIONS_GROUP=		ENGINES
 OPTIONS_GROUP_ENGINES=	INNOBASE MROONGA OQGRAPH SPHINX SPIDER TOKUDB
 
@@ -66,6 +65,7 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 		-DINSTALL_SUPPORTFILESDIR="share/mysql" \
 		-DWITH_UNIT_TESTS=0 \
 		-DWITH_LIBWRAP=1 \
+		-DWITH_SSL=${OPENSSLBASE} \
 		-DEXECINFO_ROOT=${LOCALBASE} \
 		-DCOMPILATION_COMMENT="FreeBSD Ports"
 
@@ -80,9 +80,7 @@ CONFLICTS_INSTALL=	mariadb5*-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
 			mysql[0-9]*-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
 			percona[0-9]*-${PKGNAMESUFFIX:C/^[0-9]*-//}-*
 
-BUNDLED_SSL_CMAKE_ON=	-DWITH_SSL=bundled
-BUNDLED_SSL_CMAKE_OFF=	-DWITH_SSL=${OPENSSLBASE}
-BUNDLED_SSL_USE_OFF=	OPENSSL=yes
+USE_OPENSSL=		yes
 FASTMTX_CMAKE_ON=	-DWITH_FAST_MUTEXES=1
 
 .if defined(CLIENT_ONLY)
@@ -101,8 +99,6 @@ CMAKE_ARGS+=	-DWITH_EMBEDDED_SERVER="ON" \
 		-DCMAKE_SKIP_BUILD_RPATH:BOOL=YES \
 		-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1
 
-CPPFLAGS=	-v
-
 .for ENGINE in ${OPTIONS_GROUP_ENGINES}
 ${ENGINE}_CMAKE_OFF=	-DWITHOUT_${ENGINE}=1
 .endfor
@@ -113,14 +109,11 @@ OQGRAPH_LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs \
 # Currently OQGraph does not build using clang.
 # See See https://mariadb.atlassian.net/browse/MDEV-8051.
 OQGRAPH_USE=		gcc=yes
-TOKUDB_USE=		binutils=yes
-TOKUDB_CMAKE_ON=	-DCMAKE_LINKER=${LOCALBASE}/bin/ld
-TOKUDB_LIB_DEPENDS=	${LOCALBASE}/lib/libsnappy.so:archivers/snappy
 
 post-install:
-	# Remove programs to avoid conflict with mariadb101-client
-	# These are "client" components, so there should be a switch that
-	# prevents them from being installed but it's unknown right now
+# Remove programs to avoid conflict with mariadb101-client
+# These are "client" components, so there should be a switch that
+# prevents them from being installed but it's unknown right now
 	${RM} ${STAGEDIR}${PREFIX}/bin/msql2mysql \
 		${STAGEDIR}${PREFIX}/bin/mysql_config \
 		${STAGEDIR}${PREFIX}/bin/mysql_find_rows \

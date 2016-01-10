@@ -1,3 +1,5 @@
+Fix up missing WITHOUT_DOCS, WITHOUT_CLIENT options
+
 --- CMakeLists.txt.orig	2015-10-15 15:43:35 UTC
 +++ CMakeLists.txt
 @@ -452,6 +452,7 @@ ADD_CUSTOM_TARGET(INFO_BIN ALL
