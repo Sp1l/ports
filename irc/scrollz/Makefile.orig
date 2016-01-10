@@ -3,8 +3,11 @@
 
 PORTNAME=	scrollz
 PORTVERSION=	2.2.3
-PORTREVISION=	2
+PORTREVISION=	1
 CATEGORIES=	irc ipv6
+MASTER_SITES=	http://www.netraam.net/scrollz/download/ \
+		http://www.scrollz.org/download/
+DISTNAME=	ScrollZ-${PORTVERSION}
 
 MAINTAINER=	ports@FreeBSD.org
 COMMENT=	Enhanced ircII client that supports scripts, colors, and more
@@ -15,10 +18,6 @@ LICENSE_FILE=	${WRKSRC}/COPYRIGHT
 USES=		gmake iconv ncurses
 GNU_CONFIGURE=	yes
 CONFIGURE_ARGS=	--enable-ipv6 --enable-regexp --enable-utf8
-USE_GITHUB=	yes
-GH_PROJECT=	ScrollZ
-GH_ACCOUNT=	${GH_PROJECT}
-GH_TAGNAME=	4dab3e7
 
 PLIST_SUB=	SCROLLZ_VER="${PORTVERSION}"
 

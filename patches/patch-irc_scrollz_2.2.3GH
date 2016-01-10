@@ -1,0 +1,163 @@
+Index: irc/scrollz/Makefile
+===================================================================
+--- irc/scrollz/Makefile	(revision 405242)
++++ irc/scrollz/Makefile	(working copy)
+@@ -3,11 +3,8 @@
+ 
+ PORTNAME=	scrollz
+ PORTVERSION=	2.2.3
+-PORTREVISION=	1
++PORTREVISION=	2
+ CATEGORIES=	irc ipv6
+-MASTER_SITES=	http://www.netraam.net/scrollz/download/ \
+-		http://www.scrollz.org/download/
+-DISTNAME=	ScrollZ-${PORTVERSION}
+ 
+ MAINTAINER=	ports@FreeBSD.org
+ COMMENT=	Enhanced ircII client that supports scripts, colors, and more
+@@ -18,6 +15,10 @@
+ USES=		gmake iconv ncurses
+ GNU_CONFIGURE=	yes
+ CONFIGURE_ARGS=	--enable-ipv6 --enable-regexp --enable-utf8
++USE_GITHUB=	yes
++GH_PROJECT=	ScrollZ
++GH_ACCOUNT=	${GH_PROJECT}
++GH_TAGNAME=	4dab3e7
+ 
+ PLIST_SUB=	SCROLLZ_VER="${PORTVERSION}"
+ 
+Index: irc/scrollz/distinfo
+===================================================================
+--- irc/scrollz/distinfo	(revision 405242)
++++ irc/scrollz/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (ScrollZ-2.2.3.tar.gz) = 7d95d323168d117b6cb6e73fe1de85b863de7c681b5004545b6eceb76c208d03
+-SIZE (ScrollZ-2.2.3.tar.gz) = 948958
++SHA256 (ScrollZ-ScrollZ-2.2.3-4dab3e7_GH0.tar.gz) = b5d9336cd16e701f71dffa7dda4ec4c54c0b40fdb16eacee06fa5f4220418762
++SIZE (ScrollZ-ScrollZ-2.2.3-4dab3e7_GH0.tar.gz) = 981230
+Index: irc/scrollz/files/patch-Makefile.in
+===================================================================
+--- irc/scrollz/files/patch-Makefile.in	(revision 405242)
++++ irc/scrollz/files/patch-Makefile.in	(working copy)
+@@ -1,37 +1,16 @@
+---- Makefile.in.orig	2011-04-29 17:21:18.000000000 +0900
+-+++ Makefile.in	2013-03-09 19:35:03.628110600 +0900
+-@@ -31,14 +31,14 @@
+- # @(#)$Id: Makefile.in,v 1.23 2006-10-31 12:31:27 f Exp $
+- 
+- # targets recognised by this makefile:
+--#   all, everything	- compiles ircii, ircio, ircflush and wserv
+-+#   all, everything	- compiles ircii, ircio, ircflush and wservz
+- #   ircio		- compiles ircio
+- #   ircflush		- compiles ircflush
+--#   wserv		- compiles wserv
+--#   install		- installs ircii, ircio, ircflush and wserv
+-+#   wservz		- compiles wservz
+-+#   install		- installs ircii, ircio, ircflush and wservz
+- #   installirc		- installs ircii
+- #   installio		- installs ircio
+--#   installwserv	- installs wserv
+-+#   installwservz	- installs wservz
+- #   installflush	- installs ircflush
+- #   installscript 	- installs the scripts
+- #   installhelp		- installs the help files
+-@@ -50,8 +50,8 @@
++--- Makefile.in.orig	2015-11-10 09:47:09 UTC
+++++ Makefile.in
++@@ -50,7 +50,7 @@
+  prefix = @prefix@
+  exec_prefix = @exec_prefix@
+  bindir = @bindir@
+ -sharedir = @prefix@/share
+--mandir = @prefix@/share/man/man1
+ +sharedir = @datadir@
+-+mandir = @mandir@/man1
++ datarootdir = @datarootdir@
++ mandir = @mandir@
+  
+- DESTDIR =
++@@ -106,7 +106,7 @@ INSTALL_IRCFLUSH = $(bindir)/ircflush
+  
+-@@ -105,7 +105,7 @@
+- 
+  # This program allows you to use screen/xterm's to put new irc windows
+  # on new screen/xterm windows.
+ -INSTALL_WSERV = $(bindir)/wserv
+@@ -39,7 +18,7 @@
+  
+  # This command will be used to install the irc help files.  If you don't
+  # want to install them, replace with the following:
+-@@ -126,14 +126,13 @@
++@@ -127,14 +127,13 @@ INSTALL_DATA = ./bsdinstall -c -m 644
+  VERSION = @VERSION@
+  
+  SHELL = /bin/sh
+@@ -55,7 +34,7 @@
+  	'IRCSHARE=$(IRCSHARE)'				\
+  	'IRCPATH=$(IRC_PATH)'				\
+  	'LDFLAGS=$(LDFLAGS)'				\
+-@@ -143,32 +142,23 @@
++@@ -144,32 +143,23 @@ MFLAGS ='CC=$(CC)'					\
+  	'LN=$(LN)'					\
+  	'RM=$(RM)'
+  
+@@ -68,7 +47,7 @@
+ -scrollz: source/Makefile Makefile
+ -	@cd source; $(MAKE) all
+ +scrollz ircio ircflush wservz: source/Makefile Makefile
+-+	$(MAKE) -C source $(MFLAGS) $@
+++	${MAKE} -C source $(MFLAGS) $@
+  
+  scrollz.1: scrollz.1.in
+  	sed -e "s,SHAREDIR,$(IRCSHARE)," < scrollz.1.in > scrollz.1
+@@ -94,7 +73,16 @@
+  installbin: installirc
+  
+  installirc: scrollz installdirs
+-@@ -189,8 +179,8 @@
++@@ -181,7 +171,7 @@ installirc: scrollz installdirs
++ 	@cp doc/ScrollZ.doc $(DESTDIR)/$(IRCDOC)
++ 
++ installman: installdirs scrollz.1
++-	$(INSTALL_DATA) scrollz.1 $(DESTDIR)/$(mandir)
+++	$(INSTALL_DATA) scrollz.1 $(DESTDIR)/$(mandir)/man1
++ 
++ installserv: installio
++ installio: ircio installdirs
++@@ -190,8 +180,8 @@ installio: ircio installdirs
+  installflush: ircflush installdirs
+  	$(INSTALL) source/ircflush $(DESTDIR)/$(INSTALL_IRCFLUSH)
+  
+Index: irc/scrollz/pkg-descr
+===================================================================
+--- irc/scrollz/pkg-descr	(revision 405242)
++++ irc/scrollz/pkg-descr	(working copy)
+@@ -8,4 +8,4 @@
+ (which has reget/resend ability), and its environment is highly
+ customizable.
+ 
+-WWW: http://www.scrollz.org/
++WWW: http://www.scrollz.info/
+Index: irc/scrollz/pkg-plist
+===================================================================
+--- irc/scrollz/pkg-plist	(revision 405242)
++++ irc/scrollz/pkg-plist	(working copy)
+@@ -517,6 +517,7 @@
+ %%DATADIR%%/help/set/input_aliases
+ %%DATADIR%%/help/set/input_encoding
+ %%DATADIR%%/help/set/input_prompt
++%%DATADIR%%/help/set/input_prompt_shift_new
+ %%DATADIR%%/help/set/input_protection
+ %%DATADIR%%/help/set/insert_mode
+ %%DATADIR%%/help/set/inverse_video
+@@ -567,6 +568,10 @@
+ %%DATADIR%%/help/set/show_numerics
+ %%DATADIR%%/help/set/show_status_all
+ %%DATADIR%%/help/set/show_who_hopcount
++%%DATADIR%%/help/set/ssl_ca_file
++%%DATADIR%%/help/set/ssl_priority_string
++%%DATADIR%%/help/set/ssl_verify_certificate
++%%DATADIR%%/help/set/url_buffer_size
+ %%DATADIR%%/help/set/stamp_format
+ %%DATADIR%%/help/set/status_away
+ %%DATADIR%%/help/set/status_channel

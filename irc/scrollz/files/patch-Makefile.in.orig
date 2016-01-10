@@ -1,15 +1,36 @@
---- Makefile.in.orig	2015-11-10 09:47:09 UTC
-+++ Makefile.in
-@@ -50,7 +50,7 @@
+--- Makefile.in.orig	2011-04-29 17:21:18.000000000 +0900
++++ Makefile.in	2013-03-09 19:35:03.628110600 +0900
+@@ -31,14 +31,14 @@
+ # @(#)$Id: Makefile.in,v 1.23 2006-10-31 12:31:27 f Exp $
+ 
+ # targets recognised by this makefile:
+-#   all, everything	- compiles ircii, ircio, ircflush and wserv
++#   all, everything	- compiles ircii, ircio, ircflush and wservz
+ #   ircio		- compiles ircio
+ #   ircflush		- compiles ircflush
+-#   wserv		- compiles wserv
+-#   install		- installs ircii, ircio, ircflush and wserv
++#   wservz		- compiles wservz
++#   install		- installs ircii, ircio, ircflush and wservz
+ #   installirc		- installs ircii
+ #   installio		- installs ircio
+-#   installwserv	- installs wserv
++#   installwservz	- installs wservz
+ #   installflush	- installs ircflush
+ #   installscript 	- installs the scripts
+ #   installhelp		- installs the help files
+@@ -50,8 +50,8 @@
  prefix = @prefix@
  exec_prefix = @exec_prefix@
  bindir = @bindir@
 -sharedir = @prefix@/share
+-mandir = @prefix@/share/man/man1
 +sharedir = @datadir@
- datarootdir = @datarootdir@
- mandir = @mandir@
++mandir = @mandir@/man1
  
-@@ -106,7 +106,7 @@ INSTALL_IRCFLUSH = $(bindir)/ircflush
+ DESTDIR =
+ 
+@@ -105,7 +105,7 @@
  
  # This program allows you to use screen/xterm's to put new irc windows
  # on new screen/xterm windows.
@@ -18,7 +39,7 @@
  
  # This command will be used to install the irc help files.  If you don't
  # want to install them, replace with the following:
-@@ -127,14 +127,13 @@ INSTALL_DATA = ./bsdinstall -c -m 644
+@@ -126,14 +126,13 @@
  VERSION = @VERSION@
  
  SHELL = /bin/sh
@@ -34,7 +55,7 @@
  	'IRCSHARE=$(IRCSHARE)'				\
  	'IRCPATH=$(IRC_PATH)'				\
  	'LDFLAGS=$(LDFLAGS)'				\
-@@ -144,32 +143,23 @@ MFLAGS ='CC=$(CC)'					\
+@@ -143,32 +142,23 @@
  	'LN=$(LN)'					\
  	'RM=$(RM)'
  
@@ -47,7 +68,7 @@
 -scrollz: source/Makefile Makefile
 -	@cd source; $(MAKE) all
 +scrollz ircio ircflush wservz: source/Makefile Makefile
-+	${MAKE} -C source $(MFLAGS) $@
++	$(MAKE) -C source $(MFLAGS) $@
  
  scrollz.1: scrollz.1.in
  	sed -e "s,SHAREDIR,$(IRCSHARE)," < scrollz.1.in > scrollz.1
@@ -73,16 +94,7 @@
  installbin: installirc
  
  installirc: scrollz installdirs
-@@ -181,7 +171,7 @@ installirc: scrollz installdirs
- 	@cp doc/ScrollZ.doc $(DESTDIR)/$(IRCDOC)
- 
- installman: installdirs scrollz.1
--	$(INSTALL_DATA) scrollz.1 $(DESTDIR)/$(mandir)
-+	$(INSTALL_DATA) scrollz.1 $(DESTDIR)/$(mandir)/man1
- 
- installserv: installio
- installio: ircio installdirs
-@@ -190,8 +180,8 @@ installio: ircio installdirs
+@@ -189,8 +179,8 @@
  installflush: ircflush installdirs
  	$(INSTALL) source/ircflush $(DESTDIR)/$(INSTALL_IRCFLUSH)
  
