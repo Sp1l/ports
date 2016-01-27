@@ -1,3 +1,5 @@
+Committed upstream https://github.com/bagder/curl/commit/e400a89b18
+
 --- docs/examples/getredirect.c.orig	2016-01-14 15:37:49 UTC
 +++ docs/examples/getredirect.c
 @@ -48,7 +48,7 @@ int main(void)
