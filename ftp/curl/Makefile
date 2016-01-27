@@ -2,8 +2,7 @@
 # $FreeBSD: head/ftp/curl/Makefile 406316 2016-01-17 13:08:15Z sunpoet $
 
 PORTNAME=	curl
-PORTVERSION=	7.46.0
-PORTREVISION=	2
+PORTVERSION=	7.47.0
 CATEGORIES=	ftp www
 MASTER_SITES=	http://curl.haxx.se/download/ \
 		LOCAL/sunpoet
