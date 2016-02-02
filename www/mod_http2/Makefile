@@ -1,8 +1,8 @@
 # Created by: Bernard Spil <brnrd@FreeBSD.org>
 # $FreeBSD$
 
-PORTNAME=	mod_h2
-PORTVERSION=	1.1.0
+PORTNAME=	mod_http2
+PORTVERSION=	1.2.4
 DISTVERSIONPREFIX=	v
 CATEGORIES=	www
 MAINTAINER=	brnrd@FreeBSD.org
@@ -16,15 +16,16 @@ RUN_DEPENDS:=	${BUILD_DEPENDS}
 
 USE_GITHUB=	no
 GH_ACCOUNT=	icing
-GH_PROJECT=	${PORTNAME}
+GH_PROJECT=	mod_h2
 
 USES=		autoreconf
 GNU_CONFIGURE=	yes
-CONFIGURE_ARGS+=	--disable-silent-rules CONFIG_SHELL=/bin/sh
+CONFIGURE_ARGS+=	--disable-silent-rules CONFIG_SHELL=/bin/sh \
+		--program-prefix=ext-
 CONFIGURE_ENV+=	CONFIG_SHELL=/bin/sh
 
 USE_APACHE=	24+
-MODULENAME=	mod_h2
+MODULENAME=	mod_http2
 
 CFLAGS+=	-I${LOCALBASE}/include
 
@@ -34,10 +35,10 @@ post-build:
 
 
 post-install:
-	${MV} -f ${STAGEDIR}${PREFIX}/${APACHEMODDIR}/mod_http2.so.0.0.0 \
-		${STAGEDIR}${PREFIX}/${APACHEMODDIR}/${PORTNAME}.so
-	${STRIP_CMD} ${STAGEDIR}${PREFIX}/${APACHEMODDIR}/${PORTNAME}.so
-	${MV} ${STAGEDIR}${PREFIX}/share/doc/mod_http2 \
-		${STAGEDIR}/${DOCSDIR}
+#	${MV} -f ${STAGEDIR}${PREFIX}/${APACHEMODDIR}/d_http2.so.0.0.0 \
+#		${STAGEDIR}${PREFIX}/${APACHEMODDIR}/${PORTNAME}.so
+	${STRIP_CMD} ${STAGEDIR}${PREFIX}/${APACHEMODDIR}/${MODULENAME}.so.0.0.0
+#	${MV} ${STAGEDIR}${PREFIX}/share/doc/mod_http2 \
+#		${STAGEDIR}/${DOCSDIR}
 
 .include <bsd.port.mk>
