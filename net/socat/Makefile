@@ -1,9 +1,9 @@
 # Created by: ijliao
-# $FreeBSD: head/net/socat/Makefile 384479 2015-04-22 06:55:23Z ehaupt $
+# $FreeBSD: head/net/socat/Makefile 407779 2016-02-01 22:13:46Z feld $
 
 PORTNAME=	socat
-PORTVERSION=	1.7.3.0
-PORTREVISION=	2
+PORTVERSION=	1.7.3.1
+PORTREVISION=	0
 CATEGORIES=	net ipv6
 MASTER_SITES=	http://www.dest-unreach.org/socat/download/ \
 		LOCAL/ehaupt
@@ -17,6 +17,8 @@ USES=		compiler tar:bzip2 cpe
 GNU_CONFIGURE=	yes
 USE_RC_SUBR=	socat
 USE_OPENSSL=	yes
+
+CPE_VENDOR=	dest-unreach
 
 PORTSCOUT=	skipv:2.0.0-b2
 
