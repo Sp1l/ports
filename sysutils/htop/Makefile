@@ -17,11 +17,8 @@ CPPFLAGS+=	-I${LOCALBASE}/include
 LIBS+=		-L${LOCALBASE}/lib -lexecinfo
 
 CONFIGURE_ARGS=	--enable-unicode
-USES=		autoreconf ncurses libtool execinfo python:2,build
+USES=		autoreconf execinfo libtool ncurses python:2,build shebangfix
 USE_GITHUB=	yes
 GH_ACCOUNT=	hishamhm
-
-post-patch:
-	@${REINPLACE_CMD} -e 's:/usr/bin/python:${PYTHON_CMD}:' ${WRKSRC}/scripts/MakeHeader.py
 
 .include <bsd.port.mk>
