@@ -81,12 +81,7 @@ _HEADERS=	sys/types.h sys/stat.h stdint.h
 
 .undef _FIXUP_KRB5CONFIG
 .if empty(gssapi_ARGS)
-.ifdef WITH_OPENSSL_PORT
-# Prevent conflicts with ports' OpenSSL
-gssapi_ARGS=	heimdal
-.else
 gssapi_ARGS=	base
-.endif
 .endif
 .for _A in ${gssapi_ARGS}
 _local:=	${_A}
@@ -101,9 +96,6 @@ GSSAPILIBS=	-lkrb5 -lgssapi -lgssapi_krb5
 GSSAPILDFLAGS=	-L"${GSSAPILIBDIR}"
 .if empty(OSREL:N9.3)
 _FIXUP_KRB5CONFIG=	yes
-.endif
-.ifdef WITH_OPENSSL_PORT
-IGNORE=		Base GSSAPI is not compatible with OpenSSL from ports.
 .endif
 .elif ${_local} == "heimdal"
 HEIMDAL_HOME?=	${LOCALBASE}
