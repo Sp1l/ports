@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/cmake.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/cmake.mk 406603 2016-01-18 18:27:47Z rakuco $
 #
 # Provide support for CMake based projects
 #
@@ -106,8 +106,8 @@ CMAKE_SOURCE_PATH?=	${WRKSRC}
 .if ${cmake_ARGS:Moutsource}
 _CMAKE_MSG=		"===>  Performing out-of-source build"
 CONFIGURE_WRKSRC=	${WRKDIR}/.build
-BUILD_WRKSRC=		${CONFIGURE_WRKSRC}
-INSTALL_WRKSRC=		${CONFIGURE_WRKSRC}
+BUILD_WRKSRC?=		${CONFIGURE_WRKSRC}
+INSTALL_WRKSRC?=	${CONFIGURE_WRKSRC}
 .endif
 
 .if !target(do-configure)

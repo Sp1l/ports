@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/fonts.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/fonts.mk 399911 2015-10-21 14:16:36Z mat $
 #
 # handle fonts
 # Feature:	fonts
@@ -64,6 +64,6 @@ FONTSDIR?=	${PREFIX}/share/fonts/${FONTNAME}
 PLIST_FILES+=	"@${fonts_ARGS} ${FONTSDIR}"
 .endif
 SUB_LIST+=	FONTSDIR="${FONTSDIR}"
-PLIST_SUB+=	FONTSDIR="${FONTSDIR}"
+PLIST_SUB+=	FONTSDIR="${FONTSDIR:S,^${PREFIX}/,,}"
 .endif
 

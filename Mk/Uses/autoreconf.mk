@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/autoreconf.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/autoreconf.mk 401710 2015-11-15 15:34:51Z tijl $
 #
 # Run autoreconf in CONFIGURE_WRKSRC to update configure, Makefile.in and
 # other build scripts.
@@ -48,7 +48,7 @@
 # Usage:	USES=autoreconf or USES=autoreconf:args
 # Valid args:	build	Don't run autoreconf, only add build dependencies
 #
-# MAINTAINER:	autotools@FreeBSD.org
+# MAINTAINER:	portmgr@FreeBSD.org
 
 .if !defined(_INCLUDE_USES_AUTORECONF_MK)
 _INCLUDE_USES_AUTORECONF_MK=	yes
@@ -63,6 +63,8 @@ BUILD_DEPENDS+=	autoconf-2.69:${PORTSDIR}/devel/autoconf \
 .if defined(libtool_ARGS) && empty(libtool_ARGS:Mbuild)
 BUILD_DEPENDS+=	libtoolize:${PORTSDIR}/devel/libtool
 .endif
+
+AUTORECONF?=	${LOCALBASE}/bin/autoreconf
 
 .endif
 
@@ -83,7 +85,7 @@ do-autoreconf:
 		if ${EGREP} -q '^(AC|IT)_PROG_INTLTOOL' $${configure}; \
 		then ${LOCALBASE}/bin/intltoolize -f -c; fi)
 .endif
-	@(cd ${CONFIGURE_WRKSRC} && ${LOCALBASE}/bin/autoreconf -f -i)
+	@(cd ${CONFIGURE_WRKSRC} && ${AUTORECONF} -f -i)
 .endif
 
 .endif

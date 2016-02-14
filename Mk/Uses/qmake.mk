@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/qmake.mk 397043 2015-09-16 08:55:04Z rakuco $
+# $FreeBSD: head/Mk/Uses/qmake.mk 404694 2015-12-28 18:51:41Z rakuco $
 #
 # Provide support for qmake-based projects
 #
@@ -48,19 +48,6 @@ IGNORE=	Incorrect 'USES+= qmake' usage: argument '${arg}' is not recognized
 .if ! ${qmake_ARGS:M_env}
 USE_QT${_QT_VERSION:R:R}+=	qmake_build
 .endif
-
-.if ${_QT_VERSION:M5*}
-# We deliberately do not pass -I${LOCALBASE}/include and -L${LOCALBASE}/lib
-# in the FreeBSD mkspecs because in Qt5 they are always added before the
-# paths in ${WRKSRC}. In other words, if one is upgrading an existing
-# installation the old headers and libraries will always be picked up.
-# Those directories to be passed though, they just need to be passed last.
-# See QTBUG-40825 and ports/194088 for more information.
-CONFIGURE_ENV+=	CPATH=${LOCALBASE}/include \
-		LIBRARY_PATH=${LOCALBASE}/lib
-MAKE_ENV+=	CPATH=${LOCALBASE}/include \
-		LIBRARY_PATH=${LOCALBASE}/lib
-.endif  # ${_QT_VERSION:M5*}
 
 # QMAKESPEC belongs to bsd.qt.mk.
 QMAKE_ENV?=	${CONFIGURE_ENV}

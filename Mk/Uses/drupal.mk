@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/drupal.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/drupal.mk 405770 2016-01-11 08:51:49Z marino $
 #
 # Support for Drupal ports and modules.
 #
@@ -8,7 +8,7 @@
 #
 # module	The port is a drupal module
 #
-# MAINTAINER: miwi@FreeBSD.org
+# MAINTAINER: ports@FreeBSD.org
 
 .if !defined(_INCLUDE_USES_DRUPAL_Mk)
 _INCLUDE_USES_DRUPAL_Mk=	yes
@@ -47,9 +47,6 @@ DOCSDIR?=	${DRUPAL_DOCSDIR}
 .if ${_DRUPAL_COMP}
 _USES_POST+=	drupal
 PKGNAMEPREFIX=  drupal${_DRUPAL_VERSION}-
-.if defined(DOC_FILES)
-OPTIONS_DEFINE=	DOCS
-.endif
 
 # drupal contributions must be licensed under the GPLv2 or GPLv3.  This is
 # documented at: http://drupal.org/licensing/faq/

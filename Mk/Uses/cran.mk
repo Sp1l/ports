@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/cran.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/cran.mk 408802 2016-02-13 14:41:46Z dbn $
 #
 # Use the Comprehensive R Archive Network 
 #
@@ -45,7 +45,7 @@ R_COMMAND=	${LOCALBASE}/bin/R
 R_POSTCMD_CHECK_OPTIONS?=	--timings
 
 .if !exists(${LOCALBASE}/bin/pdflatex)
-R_POSTCMD_CHECK_OPTIONS+=	--no-manual --no-rebuild-vignettes
+R_POSTCMD_CHECK_OPTIONS+=	--no-manual --no-build-vignettes
 .endif
 
 do-test:

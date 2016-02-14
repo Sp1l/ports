@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/ncurses.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/ncurses.mk 403050 2015-12-05 09:46:20Z bapt $
 #
 # handle dependency on the ncurses port
 #
@@ -71,7 +71,7 @@ NCURSES_SHLIBVER?=	${NCURSES_SHLIBFILE:E}
 .endif
 
 NCURSES_PORT?=		devel/ncurses
-NCURSES_SHLIBVER?=	5
+NCURSES_SHLIBVER?=	6
 
 BUILD_DEPENDS+=		${LOCALBASE}/lib/libncurses.so.${NCURSES_SHLIBVER}:${PORTSDIR}/${NCURSES_PORT}
 RUN_DEPENDS+=		${LOCALBASE}/lib/libncurses.so.${NCURSES_SHLIBVER}:${PORTSDIR}/${NCURSES_PORT}

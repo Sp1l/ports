@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/perl5.mk 399791 2015-10-19 20:53:15Z bdrewery $
+# $FreeBSD: head/Mk/Uses/perl5.mk 404962 2015-12-31 21:06:14Z rene $
 #
 # Provide support to use perl5
 #
@@ -43,18 +43,14 @@ IGNORE=	Incorrect 'USES+=perl5:${perl5_ARGS}' perl5 takes no arguments
 USE_PERL5?=	run build
 
 # remove when 5.20 goes away.
-.if !defined(_PORTS_ENV_CHECK)
 .sinclude "${LOCALBASE}/etc/perl5_version"
-.endif
 .if defined(PERL_VERSION)
 PERL5_DEPEND=	${PERL5}
 THIS_IS_OLD_PERL=	yes
 .else
 # end of remove
 .include "${PORTSDIR}/Mk/bsd.default-versions.mk"
-.if ${PERL5_DEFAULT} == 5.16
-.include "${PORTSDIR}/lang/perl5.16/version.mk"
-.elif ${PERL5_DEFAULT} == 5.18
+.if ${PERL5_DEFAULT} == 5.18
 .include "${PORTSDIR}/lang/perl5.18/version.mk"
 .elif ${PERL5_DEFAULT} == 5.20
 .include "${PORTSDIR}/lang/perl5.20/version.mk"
@@ -96,10 +92,8 @@ PERL_ARCH?=	mach
 PERL_PORT?=	perl5.22
 .elif   ${PERL_LEVEL} >= 502000
 PERL_PORT?=	perl5.20
-.elif ${PERL_LEVEL} >= 501800
+.else # ${PERL_LEVEL} < 502000
 PERL_PORT?=	perl5.18
-.else # ${PERL_LEVEL} < 501800
-PERL_PORT?=	perl5.16
 .endif
 
 SITE_PERL_REL?=	lib/perl5/site_perl

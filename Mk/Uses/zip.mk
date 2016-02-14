@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/zip.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/zip.mk 400846 2015-11-05 12:35:26Z mat $
 #
 # handle zip archives
 #
@@ -13,7 +13,7 @@ _INCLUDE_USES_ZIP_MK=	yes
 EXTRACT_SUFX?=	.zip
 
 EXTRACT_BEFORE_ARGS?=	-qo
-EXTRACT_AFTER_ARGS?=	-d ${WRKDIR}
+EXTRACT_AFTER_ARGS?=	-d ${EXTRACT_WRKDIR}
 
 .if empty(zip_ARGS)
 EXTRACT_CMD?=		${UNZIP_NATIVE_CMD}

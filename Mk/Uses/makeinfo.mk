@@ -1,10 +1,10 @@
-# $FreeBSD: head/Mk/Uses/makeinfo.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/makeinfo.mk 408573 2016-02-09 15:17:01Z mat $
 #
 # handle dependency on the makeinfo port
 #
 # Feature:	makeinfo
 # Usage:	USES=makeinfo
-# Valid ARGS:	build (default, implicit), run, both
+# Valid ARGS:	none
 #
 # MAINTAINER: portmgr@FreeBSD.org
 
