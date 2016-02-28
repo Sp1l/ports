@@ -22,33 +22,51 @@ CONFLICTS?=	libressl-*
 LICENSE=	OpenSSL
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-OPTIONS_DEFINE=	SHARED THREADS I386 SSE2 ASM PADLOCK ZLIB SCTP SSL3 RFC3779 MD2 RC5 EXPCIPHERS DOCS MAN3
-OPTIONS_DEFAULT=SHARED THREADS SSE2 SCTP MD2 MAN3
+OPTIONS_GROUP=	CIPHERS HASHES OPTIMS PROTOS
+OPTIONS_GROUP_CIPHERS=	IDEA JPAKE RC2 RC4 RC5
+OPTIONS_GROUP_HASHES=	MD2 MD4 MDC2 MD_GHOST94 RMD160
+OPTIONS_GROUP_OPTIMS=	ASM I386 SSE2
+OPTIONS_GROUP_PROTOS=	NEXTPROTONEG SCTP SSL3
+
+OPTIONS_DEFINE=	SHARED THREADS ZLIB RFC3779 MAN3
+OPTIONS_DEFAULT=	ASM MAN3 RMD160 SCTP SHARED SSE2 THREADS
 .for a in amd64 ia64
-OPTIONS_DEFINE_${a}=	EC
+OPTIONS_GROUP_OPTIMS_${a}=	EC
 OPTIONS_DEFAULT_${a}=	EC
 .endfor
 TARGET_ARCH?=	${MACHINE_ARCH}
 .if ${TARGET_ARCH} == "mips64el"
-OPTIONS_DEFINE_mips=	EC
-OPTIONS_DEFAULT_mips=	EC
+OPTIONS_GROUP_OPTIMS+=	EC
+OPTIONS_DEFAULT+=	EC
 .endif
+ASM_DESC=	optimized Assembler code
+CIPHERS_DESC=	Cipher suites
+EC_DESC=	Optimize NIST elliptic curves
+HASHES_DESC=	Cryptographic Hash Functions
+I386_DESC=	Optimize for i386 (instead of i486+)
+IDEA_DESC=	IDEA cipher
+JPAKE_DESC=	J-PAKE cipher (experimental)
+MAN3_DESC=	Install API manpages (section 3)
+MD2_DESC=	MD2 hash (obsolete)
+MD4_DESC=	MD4 hash
+MDC2_DESC=	MDC-2 hash
+MD_GHOST94_DESC=	GHOST94 hash
+NEXTPROTONEG_DESC=	NPN Protocol (SPDY)
+OPTIMS_DESC=	Optimizations
+PROTOS_DESC=	Cryptographic protocols
+RC2_DESC=	RC2 cipher (unsafe)
+RC4_DESC=	RC4 cipher (unsafe)
+RC5_DESC=	RC5 cipher (patented)
+RMD160_DESC=	RIPEMD-160 hash
+RFC3779_DESC=	RFC3779 support (BGP)
+SCTP_DESC=	SCTP protocol support
+SHARED_DESC=	build shared libraries
+SSE2_DESC=	runtime SSE2 detection
+SSL3_DESC=	SSLv3 protocol support
+ZLIB_DESC=	zlib compression support
+
 NO_OPTIONS_SORT=yes
 OPTIONS_SUB=	yes
-ASM_DESC?=	optimized Assembler code
-EC_DESC?=	Optimize NIST elliptic curves
-EXPCIPHERS_DESC?=	Include experimental ciphers
-I386_DESC?=	Optimize for i386 (instead of i486+)
-MAN3_DESC?=	Install API manpages (section 3)
-MD2_DESC?=	MD2 hash (obsolete)
-PADLOCK_DESC?=	VIA Padlock support
-RC5_DESC?=	RC5 cipher (patented)
-RFC3779_DESC?=	RFC3779 support (BGP)
-SCTP_DESC?=	SCTP protocol support
-SHARED_DESC?=	build of shared libs
-SSE2_DESC?=	runtime SSE2 detection
-SSL3_DESC?=	SSLv3 protocol support
-ZLIB_DESC?=	zlib compression support
 
 MAKE_JOBS_UNSAFE=	yes
 NOPRECIOUSMAKEVARS=	Too many _MLINKS for fetch
@@ -59,13 +77,16 @@ USE_PERL5=	build
 MAKE_ARGS+=	WHOLE_ARCHIVE_FLAG=--whole-archive
 MAKE_ENV+=	LIBRPATH="${PREFIX}/lib" GREP_OPTIONS=
 SUB_FILES=	pkg-message
+TEST_TARGET=	test
 
 CPE_VERSION=	${PORTVERSION}${DISTVERSIONSUFFIX}
 
-.for _option in asm md2 rc5 rfc3779 sctp sse2 ssl3 threads
+.for _option in asm idea md2 md4 mdc2 md_ghost94 nextprotoneg rc5 rfc3779 rmd160 sctp sse2 ssl3 threads
 ${_option:tu}_CONFIGURE_ON=	enable-${_option}
 ${_option:tu}_CONFIGURE_OFF=	no-${_option}
 .endfor
+EC_CONFIGURE_ON+=	enable-ec_nistp_64_gcc_128
+EC_CONFIGURE_OFF+=	no-ec_nistp_64_gcc_128
 SSL3_CONFIGURE_OFF+=		no-ssl3-method
 
 .include <bsd.port.pre.mk>
@@ -97,21 +118,6 @@ CONFIGURE_ARGS+=	shared
 MAKE_ENV+=	SHLIBVER=${OPENSSL_SHLIBVER}
 PLIST_SUB+=	SHLIBVER=${OPENSSL_SHLIBVER}
 USE_LDCONFIG=	yes
-.endif
-
-.if ${PORT_OPTIONS:MPADLOCK}
-PATCH_DIST_STRIP=	-p1
-PATCH_SITES+=	http://git.alpinelinux.org/cgit/aports/plain/main/openssl/:padlock
-PATCHFILES+=	1001-crypto-hmac-support-EVP_MD_CTX_FLAG_ONESHOT-and-set-.patch:padlock \
-		1002-backport-changes-from-upstream-padlock-module.patch:padlock \
-		1003-engines-e_padlock-implement-sha1-sha224-sha256-accel.patch:padlock \
-		1004-crypto-engine-autoload-padlock-dynamic-engine.patch:padlock
-.endif
-
-.if ${PORT_OPTIONS:MEC}
-EC_CONFIGURE_ON+=	enable-ec_nistp_64_gcc_128
-.else
-EC_CONFIGURE_OFF+=	no-ec_nistp_64_gcc_128
 .endif
 
 .if ${OPENSSL_SHLIBVER_BASE} > ${OPENSSL_SHLIBVER}
@@ -147,7 +153,6 @@ do-configure:
 	cd ${WRKSRC} \
 	&& ${SETENV} CC="${CC}" FREEBSDCC="${CC}" CFLAGS="${CFLAGS}" PERL="${PERL}" \
 	./config --prefix=${PREFIX} --openssldir=${OPENSSLDIR} \
-		--install_prefix=${STAGEDIR} \
 		-L${PREFIX}/lib ${CONFIGURE_ARGS:C/--\(no|enable\)/\1/g}
 .endif
 	${REINPLACE_CMD} \
@@ -167,14 +172,5 @@ post-install:
 	${RM} -rf ${STAGEDIR}/${PREFIX}/man/man3
 	${REINPLACE_CMD} -e 's|^man/man3/.*||' ${TMPPLIST}
 .endif
-
-#post-install-DOCS-on:
-#	${MKDIR} ${STAGEDIR}${DOCSDIR}
-#	${INSTALL_DATA} ${WRKSRC}/doc/openssl.txt ${STAGEDIR}${DOCSDIR}/
-
-test: build
-	cd ${WRKSRC} && ${MAKE} test
-
-regression-test:	test
 
 .include <bsd.port.post.mk>
