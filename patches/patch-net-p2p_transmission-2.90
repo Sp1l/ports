@@ -1,0 +1,96 @@
+Index: net-p2p/transmission-cli/Makefile
+===================================================================
+--- net-p2p/transmission-cli/Makefile	(revision 409802)
++++ net-p2p/transmission-cli/Makefile	(working copy)
+@@ -1,8 +1,7 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	transmission
+-PORTVERSION=	2.84
+-PORTREVISION?=	4
++PORTVERSION=	2.90
+ CATEGORIES?=	net-p2p
+ #MASTER_SITES=	http://download.m0k.org/${PORTNAME}/files/
+ MASTER_SITES=	http://transmission.cachefly.net/
+@@ -37,7 +36,8 @@
+ 		libminiupnpc.so:${PORTSDIR}/net/miniupnpc \
+ 		libnatpmp.so:${PORTSDIR}/net/libnatpmp \
+ 		libutp.so:${PORTSDIR}/net/libutp \
+-		libevent.so:${PORTSDIR}/devel/libevent2
++		libevent.so:${PORTSDIR}/devel/libevent2 \
++		libb64.so:${PORTSDIR}/converters/libb64
+ GEN_RUN_DEPENDS=${LOCALBASE}/share/transmission/web/index.html:${PORTSDIR}/www/transmission-web
+ 
+ # This is master port of transmission-*, so don't override USES definition
+@@ -50,6 +50,7 @@
+ 		 --without-inotify \
+ 		 --disable-utp \
+ 		 --enable-external-natpmp \
++		 --enable-external-b64 \
+ 		${EXTRA_CONF_ARGS}
+ CONFIGURE_ENV=	OPENSSL_CFLAGS="-I${OPENSSLINC}" \
+ 		OPENSSL_LIBS="-L${OPENSSLLIB} -lcrypto" \
+Index: net-p2p/transmission-cli/distinfo
+===================================================================
+--- net-p2p/transmission-cli/distinfo	(revision 409802)
++++ net-p2p/transmission-cli/distinfo	(working copy)
+@@ -1,2 +1,2 @@
+-SHA256 (transmission-2.84.tar.xz) = a9fc1936b4ee414acc732ada04e84339d6755cd0d097bcbd11ba2cfc540db9eb
+-SIZE (transmission-2.84.tar.xz) = 3077836
++SHA256 (transmission-2.90.tar.xz) = 69ff8caf81684155926f437f46bf7df1b1fb304f52c7809f546257e8923f2fd2
++SIZE (transmission-2.90.tar.xz) = 3377720
+Index: net-p2p/transmission-cli/files/patch-daemon_Makefile.in
+===================================================================
+--- net-p2p/transmission-cli/files/patch-daemon_Makefile.in	(revision 409802)
++++ net-p2p/transmission-cli/files/patch-daemon_Makefile.in	(working copy)
+@@ -1,4 +1,4 @@
+---- daemon/Makefile.in.orig	2015-04-15 08:35:09 UTC
++--- daemon/Makefile.in.orig	2014-07-01 17:11:58 UTC
+ +++ daemon/Makefile.in
+ @@ -141,7 +141,7 @@ am__v_CC_1 = 
+  CCLD = $(CC)
+Index: net-p2p/transmission-cli/files/patch-fix_without_ipv6
+===================================================================
+--- net-p2p/transmission-cli/files/patch-fix_without_ipv6	(revision 409802)
++++ net-p2p/transmission-cli/files/patch-fix_without_ipv6	(working copy)
+@@ -1,11 +1,11 @@
+---- libtransmission/fdlimit.c.orig	2013-06-26 05:35:25.603458000 +0300
+-+++ libtransmission/fdlimit.c	2013-06-30 10:01:10.000000000 +0300
+-@@ -668,7 +668,7 @@
++--- libtransmission/fdlimit.c.orig	2015-10-24 03:35:22.638234000 +0200
+++++ libtransmission/fdlimit.c	2016-02-29 16:04:50.841607666 +0100
++@@ -517,7 +517,7 @@ tr_fdSocketCreate (tr_session * session,
+  
+    if (gFd->peerCount < session->peerLimit)
+-     if ((s = socket (domain, type, 0)) < 0)
++     if ((s = socket (domain, type, 0)) == TR_BAD_SOCKET)
+ -      if (sockerrno != EAFNOSUPPORT)
+ +      if (sockerrno != EPROTONOSUPPORT)
+-         tr_logAddError (_("Couldn't create socket: %s"), tr_strerror (sockerrno));
+- 
+-   if (s > -1)
++         {
++           char err_buf[512];
++           tr_logAddError (_("Couldn't create socket: %s"),
+Index: net-p2p/transmission-cli/files/patch-libtransmission_upnp.c
+===================================================================
+--- net-p2p/transmission-cli/files/patch-libtransmission_upnp.c	(revision 409802)
++++ net-p2p/transmission-cli/files/patch-libtransmission_upnp.c	(working copy)
+
+Property changes on: net-p2p/transmission-cli/files/patch-libtransmission_upnp.c
+___________________________________________________________________
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Index: net-p2p/transmission-daemon/Makefile
+===================================================================
+--- net-p2p/transmission-daemon/Makefile	(revision 409802)
++++ net-p2p/transmission-daemon/Makefile	(working copy)
+@@ -1,6 +1,5 @@
+ # $FreeBSD$
+ 
+-PORTREVISION=	3
+ PKGNAMESUFFIX=	-daemon
+ 
+ MAINTAINER=	crees@FreeBSD.org
