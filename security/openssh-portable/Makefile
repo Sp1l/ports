@@ -2,7 +2,7 @@
 # $FreeBSD: head/security/openssh-portable/Makefile 407996 2016-02-03 22:15:11Z marino $
 
 PORTNAME=	openssh
-DISTVERSION=	7.1p2
+DISTVERSION=	7.2p1
 PORTREVISION=	0
 PORTEPOCH=	1
 CATEGORIES=	security ipv6
@@ -56,6 +56,7 @@ LDNS_CFLAGS=		-I${LOCALBASE}/include
 LDNS_CONFIGURE_ON=	--with-ldflags='-L${LOCALBASE}/lib'
 
 # http://www.psc.edu/index.php/hpn-ssh
+HPN_BROKEN=			HPN patches have not been released for 7.2
 HPN_CONFIGURE_WITH=		hpn
 NONECIPHER_CONFIGURE_WITH=	nonecipher
 
@@ -116,8 +117,6 @@ EXTRA_PATCHES+=		${FILESDIR}/extra-patch-hpn:-p2
 CONFIGURE_LIBS+=	-lutil
 
 CONFIGURE_ARGS+=	--disable-utmp --disable-wtmp --disable-wtmpx --without-lastlog
-
-EXTRA_PATCHES+=		${FILESDIR}/extra-patch-hostkeyalg_plus:-p1
 
 # Keep this last
 EXTRA_PATCHES+=		${FILESDIR}/extra-patch-version-addendum
