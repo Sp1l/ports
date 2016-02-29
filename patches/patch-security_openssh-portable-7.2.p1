@@ -1,0 +1,129 @@
+Index: security/openssh-portable/Makefile
+===================================================================
+--- security/openssh-portable/Makefile	(revision 409802)
++++ security/openssh-portable/Makefile	(working copy)
+@@ -2,7 +2,7 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	openssh
+-DISTVERSION=	7.1p2
++DISTVERSION=	7.2p1
+ PORTREVISION=	0
+ PORTEPOCH=	1
+ CATEGORIES=	security ipv6
+@@ -56,6 +56,7 @@
+ LDNS_CONFIGURE_ON=	--with-ldflags='-L${LOCALBASE}/lib'
+ 
+ # http://www.psc.edu/index.php/hpn-ssh
++HPN_BROKEN=			HPN patches have not been released for 7.2
+ HPN_CONFIGURE_WITH=		hpn
+ NONECIPHER_CONFIGURE_WITH=	nonecipher
+ 
+@@ -117,8 +118,6 @@
+ 
+ CONFIGURE_ARGS+=	--disable-utmp --disable-wtmp --disable-wtmpx --without-lastlog
+ 
+-EXTRA_PATCHES+=		${FILESDIR}/extra-patch-hostkeyalg_plus:-p1
+-
+ # Keep this last
+ EXTRA_PATCHES+=		${FILESDIR}/extra-patch-version-addendum
+ 
+Index: security/openssh-portable/distinfo
+===================================================================
+--- security/openssh-portable/distinfo	(revision 409802)
++++ security/openssh-portable/distinfo	(working copy)
+@@ -1,8 +1,2 @@
+-SHA256 (openssh-7.1p2.tar.gz) = dd75f024dcf21e06a0d6421d582690bf987a1f6323e32ad6619392f3bfde6bbd
+-SIZE (openssh-7.1p2.tar.gz) = 1475829
+-SHA256 (openssh-6.8p1-sctp-2573.patch.gz) = 0348713ad4cb4463e90cf5202ed41c8f726d7d604f3f93922a9aa55b86abf04a
+-SIZE (openssh-6.8p1-sctp-2573.patch.gz) = 8531
+-SHA256 (openssh-7.0p1+x509-8.5.diff.gz) = 6000557f1ddae06aff8837d440d93342a923fada571fec59fc5dedf388fb5f9e
+-SIZE (openssh-7.0p1+x509-8.5.diff.gz) = 411960
+-SHA256 (openssh-7.1p2-gsskex-all-20141021-debian-rh-20160104.patch.gz) = 420f3ee70705de57bb9a9ad66e72c1d40c318d8a882815d108816687fcc79b62
+-SIZE (openssh-7.1p2-gsskex-all-20141021-debian-rh-20160104.patch.gz) = 25798
++SHA256 (openssh-7.2p1.tar.gz) = 973cc37b2f3597e4cf599b09e604e79c0fe5d9b6f595a24e91ed0662860b4ac3
++SIZE (openssh-7.2p1.tar.gz) = 1499707
+Index: security/openssh-portable/files/extra-patch-ldns
+===================================================================
+--- security/openssh-portable/files/extra-patch-ldns	(revision 409802)
++++ security/openssh-portable/files/extra-patch-ldns	(working copy)
+@@ -35,9 +35,9 @@
+ +#   VerifyHostKeyDNS yes
+  #   ProxyCommand ssh -q -W %h:%p gateway.example.com
+  #   RekeyLimit 1G 1h
+---- ssh_config.5	2013-10-03 08:15:03.621130815 -0500
+-+++ ssh_config.5	2013-10-03 08:15:22.851132133 -0500
+-@@ -1246,7 +1246,10 @@ The argument must be
++--- ssh_config.5.orig   2016-02-26 04:40:04.000000000 +0100
+++++ ssh_config.5        2016-02-29 09:53:46.954136880 +0100
++@@ -1715,7 +1715,10 @@ The argument must be
+  or
+  .Dq ask .
+  The default is
+@@ -46,6 +46,6 @@
+ +if compiled with LDNS and
+ +.Dq no
+ +otherwise.
+- Note that this option applies to protocol version 2 only.
+  .Pp
+  See also VERIFYING HOST KEYS in
++ .Xr ssh 1 .
+Index: security/openssh-portable/files/patch-servconf.c
+===================================================================
+--- security/openssh-portable/files/patch-servconf.c	(revision 409802)
++++ security/openssh-portable/files/patch-servconf.c	(working copy)
+@@ -38,12 +38,3 @@
+  	if (options->kbd_interactive_authentication == -1)
+  		options->kbd_interactive_authentication = 0;
+  	if (options->challenge_response_authentication == -1)
+-@@ -412,7 +417,7 @@ fill_default_server_options(ServerOption
+- 
+- 	/* Turn privilege separation on by default */
+- 	if (use_privsep == -1)
+--		use_privsep = PRIVSEP_NOSANDBOX;
+-+		use_privsep = PRIVSEP_ON;
+- 
+- #define CLEAR_ON_NONE(v) \
+- 	do { \
+Index: security/openssh-portable/files/patch-ssh-agent.1
+===================================================================
+--- security/openssh-portable/files/patch-ssh-agent.1	(revision 409802)
++++ security/openssh-portable/files/patch-ssh-agent.1	(working copy)
+@@ -10,17 +10,8 @@
+  .Sh SYNOPSIS
+  .Nm ssh-agent
+  .Op Fl c | s
+--.Op Fl Dd
+-+.Op Fl Ddx
++-.Op Fl \&Dd
+++.Op Fl \&Ddx
+  .Op Fl a Ar bind_address
+  .Op Fl E Ar fingerprint_hash
+  .Op Fl t Ar life
+-@@ -128,6 +128,8 @@
+- .Xr ssh-add 1
+- overrides this value.
+- Without this option the default maximum lifetime is forever.
+-+.It Fl x
+-+Exit after the last client has disconnected.
+- .El
+- .Pp
+- If a commandline is given, this is executed as a subprocess of the agent.
+Index: security/openssh-portable/pkg-plist
+===================================================================
+--- security/openssh-portable/pkg-plist	(revision 409802)
++++ security/openssh-portable/pkg-plist	(working copy)
+@@ -1,5 +1,3 @@
+-@comment slogin must be deleted first
+-bin/slogin
+ bin/scp
+ bin/sftp
+ bin/ssh
+@@ -23,7 +21,6 @@
+ man/man1/ssh-keyscan.1.gz
+ man/man1/scp.1.gz
+ man/man1/ssh.1.gz
+-man/man1/slogin.1.gz
+ man/man5/moduli.5.gz
+ man/man5/ssh_config.5.gz
+ man/man5/sshd_config.5.gz
