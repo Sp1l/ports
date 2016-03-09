@@ -1,0 +1,40 @@
+Index: mail/spamassassin/files/patch-spamc_libspamc.c
+===================================================================
+--- mail/spamassassin/files/patch-spamc_libspamc.c	(revision 0)
++++ mail/spamassassin/files/patch-spamc_libspamc.c	(working copy)
+@@ -0,0 +1,20 @@
++--- spamc/libspamc.c.orig	2015-04-28 19:56:59 UTC
+++++ spamc/libspamc.c
++@@ -1216,7 +1216,7 @@ int message_filter(struct transport *tp,
++ 	if (flags & SPAMC_TLSV1) {
++ 	    meth = TLSv1_client_method();
++ 	} else {
++-	    meth = SSLv3_client_method(); /* default */
+++	    meth = SSLv23_client_method(); /* default */
++ 	}
++ 	SSL_load_error_strings();
++ 	ctx = SSL_CTX_new(meth);
++@@ -1604,7 +1604,7 @@ int message_tell(struct transport *tp, c
++     if (flags & SPAMC_USE_SSL) {
++ #ifdef SPAMC_SSL
++ 	SSLeay_add_ssl_algorithms();
++-	meth = SSLv3_client_method();
+++	meth = SSLv23_client_method();
++ 	SSL_load_error_strings();
++ 	ctx = SSL_CTX_new(meth);
++ #else
+
+Property changes on: mail/spamassassin/files/patch-spamc_libspamc.c
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
