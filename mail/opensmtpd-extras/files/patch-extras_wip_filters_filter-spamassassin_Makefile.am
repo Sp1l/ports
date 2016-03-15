@@ -1,8 +1,0 @@
---- extras/wip/filters/filter-spamassassin/Makefile.am.orig	2015-06-11 20:14:46 UTC
-+++ extras/wip/filters/filter-spamassassin/Makefile.am
-@@ -5,3 +5,5 @@ pkglibexec_PROGRAMS	 = filter-spamassass
- 
- filter_spamassassin_SOURCES	 = $(SRCS)
- filter_spamassassin_SOURCES	+= filter_spamassassin.c
-+
-+man_MANS		 = filter-spamassassin.8

@@ -1,143 +1,69 @@
-# Created by: Bernard Spil <brnrd@freebsd.org>
-# $FreeBSD$
+# Created by: gahr
+# $FreeBSD: head/mail/opensmtpd-extras/Makefile 409808 2016-02-29 12:06:32Z gahr $
 
 PORTNAME=	opensmtpd-extras
-PORTVERSION=	5.7.1
+PORTVERSION=	201602042118
 CATEGORIES=	mail
 MASTER_SITES=	http://www.opensmtpd.org/archives/
 
-MAINTAINER=	brnrd@freebsd.org
-COMMENT=	Official add-ons for OpenSMTPd
+MAINTAINER=	gahr@FreeBSD.org
+COMMENT=	Addons for OpenSMTPD
 
-RUN_DEPENDS=	opensmtpd>=5.7:${PORTSDIR}/mail/opensmtpd
+LICENSE=	ISCL
+
+OPTIONS_GROUP=		TABLE
+OPTIONS_GROUP_TABLE=	LDAP MYSQL PASSWD PGSQL PYTHON REDIS SMAP SQLITE
+OPTIONS_DEFAULT=	LDAP MYSQL PASSWD PGSQL PYTHON REDIS SMAP SQLITE
+
+PASSWD_DESC=	passwd(5) table support
+SMAP_DESC=	Socketmap protocol support
+
+OPTIONS_SUB=	yes
+
 LIB_DEPENDS=	libevent.so:${PORTSDIR}/devel/libevent2
+RUN_DEPENDS=	${LOCALBASE}/sbin/smtpctl:${PORTSDIR}/mail/opensmtpd
 
-USES=		autoreconf libtool
-CPE_VENDOR=	openbsd
+USES=		autoreconf libtool pkgconfig
 USE_OPENSSL=	yes
 WITH_OPENSSL_PORT=	yes
 GNU_CONFIGURE=	yes
-CONFIGURE_ARGS=	--with-libevent-dir=${LOCALBASE} --sysconfdir=${PREFIX}/etc/mail/ \
-		--with-ssl-dir=${OPENSSLBASE}
+PLIST_FILES=	man/man3/filter_api.3.gz
+INSTALL_DIR=	libexec/opensmtpd
 
-#LIB_DEPENDS=	libevent.so:${PORTSDIR}/devel/libevent2
-PLIST_SUB=	LIBEXEC=libexec/opensmtpd
+#
+# Tables
+#
+MYSQL_CONFIGURE_WITH=	table-mysql
+MYSQL_VARS=		USE_MYSQL=client \
+			LDFLAGS+=-L${LOCALBASE}/lib/mysql \
+			PLIST_FILES+=${INSTALL_DIR}/table-mysql
 
-OPTIONS_GROUP=	FILTERS QUEUE TABLE SCHEDULER
-OPTIONS_GROUP_FILTERS=	FILTER_CLAMAV FILTER_DKIMSIGN FILTER_DNSBL FILTER_LUA \
-		FILTER_MONKEY FILTER_PAUSE FILTER_PERL FILTER_PYTHON FILTER_REGEX \
-		FILTER_SPAMASS FILTER_TRACE FILTER_VOID
-OPTIONS_GROUP_QUEUE=	QUEUE_NULL QUEUE_PYTHON QUEUE_RAM
-OPTIONS_GROUP_TABLE=	TABLE_LDAP TABLE_MYSQL TABLE_POSTGRES TABLE_REDIS \
-		TABLE_SOCKETMAP TABLE_PASSWD TABLE_PYTHON TABLE_SQLITE
-OPTIONS_GROUP_SCHEDULER=	SCHEDULER_RAM SCHEDULER_PYTHON
-OPTIONS_SUB=	yes
+PASSWD_CONFIGURE_WITH=	table-passwd
+PASSWD_VARS=		PLIST_FILES+=${INSTALL_DIR}/table-passwd \
+			PLIST_FILES+=man/man5/table-passwd.5.gz
 
-FILTERS_DESC=		Filters
-FILTER_CLAMAV_DESC=	ClamAV filter
-FILTER_DKIMSIGN_DESC=	DKIM-signer filter
-FILTER_DNSBL_DESC=	DNSBL filter
-FILTER_LUA_DESC=	Lua filter
-FILTER_MONKEY_DESC=	Monkey filter
-FILTER_PAUSE_DESC=	Pause filter
-FILTER_PERL_DESC=	Perl filter
-FILTER_PYTHON_DESC=	Python filter
-FILTER_REGEX_DESC=	Regular expression filter
-FILTER_SPAMASS_DESC=	SpamAssassin filter
-FILTER_TRACE_DESC=	Trace filter
-FILTER_VOID_DESC=	Void filter
-QUEUE_DESC=		Queueing modules
-QUEUE_NULL_DESC=	Null queueing
-QUEUE_PYTHON_DESC=	Python queueing
-QUEUE_RAM_DESC=		RAM queueing
-TABLE_DESC=		Table modules
-TABLE_LDAP_DESC=	LDAP lookups
-TABLE_MYSQL_DESC=	MySQL lookups
-TABLE_POSTGRES_DESC=	PostgreSQL lookups
-TABLE_REDIS_DESC=	Redis lookups
-TABLE_SOCKETMAP_DESC=	SocketMap lookups
-TABLE_PASSWD_DESC=	passwd lookup
-TABLE_PYTHON_DESC=	Python lookup
-TABLE_SQLITE_DESC=	SQLite lookup
-SCHEDULER_DESC=		Schedulers
-SCHEDULER_RAM_DESC=	RAM scheduler
-SCHEDULER_PYTHON_DESC=	Python scheduler
+PGSQL_CONFIGURE_WITH= 	table-postgres
+PGSQL_USES=		pgsql
+PGSQL_VARS=		PLIST_FILES+=${INSTALL_DIR}/table-postgres
 
-FILTER_CLAMAV_CONFIGURE_WITH=	filter-clamav
-FILTER_CLAMAV_RUN_DEPENDS=	clamav>=0:${PORTSDIR}/security/clamav
+PYTHON_CONFIGURE_WITH=	table-python python-type=${PYTHON_VERSION}
+PYTHON_USES=		python
+PYTHON_VARS=		PLIST_FILES+=${INSTALL_DIR}/table-python
 
-FILTER_DKIMSIGN_CONFIGURE_WITH=	filter-dkim-signer
+REDIS_CONFIGURE_WITH=	table-redis
+REDIS_CONFIGURE_ENV=	REDIS_CONFIG=${LOCALBASE}/bin/pkgconf
+REDIS_LIB_DEPENDS=	libhiredis.so:${PORTSDIR}/databases/hiredis
+REDIS_VARS=		CFLAGS+=-I${LOCALBASE}/include/hiredis \
+			PLIST_FILES+=${INSTALL_DIR}/table-redis \
+			PLIST_FILES+=man/man5/table-redis.5.gz
 
-FILTER_DNSBL_CONFIGURE_WITH=	filter-dnsbl
-FILTER_DNSBL_LIB_DEPENDS=	libasr.so:${PORTSDIR}/dns/libasr
+SMAP_CONFIGURE_WITH=	table-socketmap
+SMAP_VARS=		PLIST_FILES+=${INSTALL_DIR}/table-socketmap \
+			PLIST_FILES+=man/man5/table-socketmap.5.gz
 
-FILTER_LUA_CONFIGURE_WITH=	filter-lua lua=${LOCALBASE}
-FILTER_LUA_USES=	lua
-FILTER_LUA_CPPFLAGS=	-I ${LUA_INCDIR}
-
-FILTER_MONKEY_CONFIGURE_WITH=	filter-monkey
-
-FILTER_PAUSE_CONFIGURE_WITH=	filter-pause
-
-FILTER_PERL_CONFIGURE_WITH=	filter-perl perl=${LOCALBASE}
-FILTER_PERL_USE=	perl5
-
-FILTER_PYTHON_CONFIGURE_WITH=	filter-python 
-
-FILTER_REGEX_CONFIGURE_WITH=	filter-regex
-
-FILTER_SPAMASS_CONFIGURE_WITH=	filter-spamassassin
-FILTER_SPAMASS_RUN_DEPENDS=	spamassassin>=0:${PORTSDIR}/mail/spamassassin
-
-FILTER_TRACE_CONFIGURE_WITH=	filter-trace
-
-FILTER_VOID_CONFIGURE_WITH=	filter-void
-
-QUEUE_NULL_CONFIGURE_WITH=	queue-null
-
-QUEUE_PYTHON_CONFIGURE_WITH=	queue-python
-
-QUEUE_RAM_CONFIGURE_WITH=	queue-ram
-
-TABLE_LDAP_CONFIGURE_WITH=	table-ldap
-TABLE_LDAP_USE=		openldap=yes
-
-TABLE_MYSQL_CONFIGURE_WITH=	table-mysql
-TABLE_MYSQL_USE=	mysql=yes
-TABLE_MYSQL_CFLAGS=	-I${LOCALBASE}/include
-TABLE_MYSQL_LDFLAGS=	-L${LOCALBASE}/lib/mysql
-
-TABLE_POSTGRES_CONFIGURE_WITH=	table-postgres
-TABLE_POSTGRES_USES=	pgsql
-
-TABLE_REDIS_CONFIGURE_WITH=	table-redis
-TABLE_REDIS_LIB_DEPENDS=	libhiredis.so:${PORTSDIR}/databases/hiredis
-TABLE_REDIS_CPPFLAGS=	-I ${LOCALBASE}/include/hiredis
-
-TABLE_SOCKETMAP_CONFIGURE_WITH=	table-socketmap
-
-TABLE_PASSWD_CONFIGURE_WITH=	table-passwd
-
-TABLE_PYTHON_CONFIGURE_WITH=	table-python
-
-TABLE_SQLITE_CONFIGURE_WITH=	table-sqlite
-TABLE_SQLITE_USE=	sqlite=yes
-TABLE_SQLITE_CFLAGS=	-I${LOCALBASE}/include
-TABLE_SQLITE_LDFLAGS=	-L${LOCALBASE}/liB
-
-SCHEDULER_RAM_CONFIGURE_WITH=	scheduler-ram
-
-SCHEDULER_PYTHON_CONFIGURE_WITH=	scheduler-python
-
-.include <bsd.port.options.mk>
-
-.if ${PORT_OPTIONS:MFILTER_PYTHON} || ${PORT_OPTIONS:MQUEUE_PYTHON} \
-	|| ${PORT_OPTIONS:MTABLE_PYTHON} || ${PORT_OPTIONS:MSCHEDULER_PYTHON}
-USES+=		python
-CONFIGURE_ARGS+=	--with-python=${PYTHONBASE}
-.endif
-
-post-patch:
-	@${REINPLACE_CMD} -e 's|python-config|python${PYTHON_VER}-config|' ${WRKSRC}/configure.ac
+SQLITE_CONFIGURE_WITH=	table-sqlite
+SQLITE_USES=		sqlite
+SQLITE_VARS=		PLIST_FILES+=${INSTALL_DIR}/table-sqlite \
+			PLIST_FILES+=man/man5/table-sqlite.5.gz
 
 .include <bsd.port.mk>

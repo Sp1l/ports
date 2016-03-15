@@ -1,3 +1,3 @@
-OpenSMTPd-extras extends OpenSMTPd with additional tables filters, queues and
-schedulers. These have found to be not really useful in the stock daemon and
-therefor have been separated from the OpenSMTPd core.
+OpenSMTPD addons.
+
+WWW: https://github.com/OpenSMTPD/OpenSMTPD-extras

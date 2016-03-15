@@ -1,8 +1,0 @@
---- extras/wip/filters/filter-dnsbl/Makefile.am.orig	2015-06-11 20:14:46 UTC
-+++ extras/wip/filters/filter-dnsbl/Makefile.am
-@@ -9,3 +9,5 @@ filter_dnsbl_SOURCES	+= $(filters_srcdir
- if !NO_LIBASR
- LDADD	 += -lasr
- endif
-+
-+man_MANS		 = filter-dnsbl.8
