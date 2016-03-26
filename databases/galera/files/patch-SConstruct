@@ -1,15 +1,15 @@
---- ./SConstruct.orig	2014-08-01 16:33:09.000000000 -0400
-+++ ./SConstruct	2014-08-01 16:34:45.000000000 -0400
-@@ -153,7 +153,7 @@
- 
- # Initialize CPPFLAGS and LIBPATH from environment to get user preferences
- env.Replace(CPPFLAGS = os.getenv('CPPFLAGS', ''))
--env.Replace(LIBPATH = [os.getenv('LIBPATH', '')])
-+env.Replace(RPATH = [os.getenv('RPATH', '')])
+--- SConstruct.orig	2016-03-12 10:07:22.000000000 +0100
++++ SConstruct	2016-03-26 22:31:19.381845557 +0100
+@@ -171,7 +171,7 @@ env.Replace(CCFLAGS   = os.getenv('CCFLA
+ env.Replace(CFLAGS    = os.getenv('CFLAGS',   ''))
+ env.Replace(CXXFLAGS  = os.getenv('CXXFLAGS', ''))
+ env.Replace(LINKFLAGS = os.getenv('LDFLAGS',  link_arch))
+-env.Replace(LIBPATH   = [os.getenv('LIBPATH', '')])
++env.Replace(RPATH   = [os.getenv('RPATH', '')])
  
  # Set -pthread flag explicitly to make sure that pthreads are
  # enabled on all platforms.
-@@ -165,6 +165,9 @@
+@@ -183,6 +183,9 @@ if sysname == 'freebsd' or sysname == 's
      env.Append(CPPFLAGS = ' -I/usr/local/include ')
  if sysname == 'sunos':
     env.Replace(SHLINKFLAGS = '-shared ')

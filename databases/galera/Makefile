@@ -2,55 +2,31 @@
 # $FreeBSD: head/databases/galera/Makefile 399346 2015-10-15 14:55:14Z mat $
 
 PORTNAME=	galera
-PORTVERSION=	25.3.5
-DISTVERSIONSUFFIX=	-src
-PORTREVISION=	2
+PORTVERSION=	25.3.15
+DISTVERSIONPREFIX=	3-
 CATEGORIES=	databases
-MASTER_SITES=	https://launchpadlibrarian.net/170877450/
+MASTER_SITES=	http://releases.galeracluster.com/source/
 
 MAINTAINER=	horia@racoviceanu.com
 COMMENT=	Synchronous multi-master replication engine
 
 LICENSE=	GPLv2
 
-BUILD_DEPENDS=	checkmk:${PORTSDIR}/devel/libcheck \
-		doxygen:${PORTSDIR}/devel/doxygen \
-		${PYTHON_PKGNAMEPREFIX}cloud_sptheme>=0:${PORTSDIR}/textproc/py-cloud_sptheme
+BUILD_DEPENDS=	checkmk:${PORTSDIR}/devel/libcheck
 LIB_DEPENDS=	libboost_date_time.so:${PORTSDIR}/devel/boost-libs
 
-USES=		execinfo python:build scons shebangfix
+USES=		execinfo scons shebangfix
 
 USE_CXXSTD=	c++11
-USE_GCC=	yes
 USE_LDCONFIG=	yes
 USE_OPENSSL=	yes
 
 LDFLAGS+=	-lboost_program_options -lboost_system
-MAKE_ARGS+=	--config=force
-
-SHEBANG_FILES=	docs/sphinx-*
 
 PLIST_FILES=	lib/libgalera_smm.so \
 		lib/libgalera.so
 
-PORTDOCS=	*
-
-DOCSRCDIR1=	${WRKSRC}
-DOC_FILES1=	AUTHORS README
-
-DOCSRCDIR2=	${DOCSRCDIR1}/docs/build/doc
-
-DOCSRCDIR3=	${DOCSRCDIR1}/galerautils
-DOCSDIR3=	${DOCSDIR}/galerautils
-DOC_FILES3=	ChangeLog README
-
-DOCSRCDIR4=	${DOCSRCDIR1}/gcache
-DOCSDIR4=	${DOCSDIR}/gcache
-DOC_FILES4=	AUTHORS README
-
-DOCSRCDIR5=	${DOCSRCDIR1}/gcs
-DOCSDIR5=	${DOCSDIR}/gcs
-DOC_FILES5=	ChangeLog README doc/*.txt doc/*.odt doc/*.png
+PORTDOCS=	AUTHORS README
 
 OPTIONS_DEFINE=	BOOSTPOOL BPOSTATIC DEBUG DOCS TEST
 OPTIONS_GROUP=	DOCS
@@ -82,9 +58,15 @@ post-patch:
 		${WRKSRC}/SConstruct
 	@${REINPLACE_CMD} -e '/#\/asio/d; s|asio.hpp|boost/&|; \
 		s|asio/ssl.hpp|boost/&|' ${WRKSRC}/SConstruct
-	@${REINPLACE_CMD} -e 's|asio.hpp|boost/&|; s|asio/ssl.hpp|boost/&|' \
-		${WRKSRC}/galera/src/ist.hpp \
-		${WRKSRC}/gcomm/src/asio_protonet.hpp
+	@${REINPLACE_CMD} -e 's|asio.hpp|boost/&|' -e 's|asio/ssl.hpp|boost/&|' \
+		-e 's|gu_boost/asio.hpp|gu_asio.hpp|' \
+		-e 's|asio::error_code|::boost::system::error_code|g' \
+		-e 's|asio::system_error|::boost::system::system_error|g' \
+		-e 's|asio::|::boost::asio::|g' \
+		${WRKSRC}/galerautils/src/gu_asio.hpp \
+		${WRKSRC}/galerautils/src/gu_asio.cpp
+#		${WRKSRC}/galera/src/ist.hpp \
+#		${WRKSRC}/gcomm/src/asio_protonet.hpp
 	@${REINPLACE_CMD} -e 's|asio::system_error|::boost::system::system_error|g' \
 		${WRKSRC}/galera/src/ist.cpp \
 		${WRKSRC}/gcomm/src/asio_tcp.cpp \
@@ -96,7 +78,6 @@ post-patch:
 	@${REINPLACE_CMD} -e 's|asio::|boost::&|g' \
 		${WRKSRC}/galera/src/ist.*pp \
 		${WRKSRC}/galera/src/ist_proto.hpp \
-		${WRKSRC}/gcomm/src/asio_addr.hpp \
 		${WRKSRC}/gcomm/src/asio_protonet.*pp \
 		${WRKSRC}/gcomm/src/asio_tcp.*pp \
 		${WRKSRC}/gcomm/src/asio_udp.*pp
@@ -113,8 +94,8 @@ post-patch:
 		${WRKSRC}/galera/SConscript
 .endif
 
-	@${REINPLACE_CMD} -e "s|\[u'Codership Oy'\], 1|\[u'Codership Oy'\], 8|" \
-		${WRKSRC}/docs/pasture/source/conf.py
+#	@${REINPLACE_CMD} -e "s|\[u'Codership Oy'\], 1|\[u'Codership Oy'\], 8|" \
+#		${WRKSRC}/docs/pasture/source/conf.py
 
 .for d in galerautils gcomm gcs
 	@${REINPLACE_CMD} -e 's|= ./|= ../../docs/build/doc/${d}|; \
@@ -130,82 +111,10 @@ post-patch:
 . endif
 .endfor
 
-post-build:
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b man \
-		-d build/doctrees source build/man/man1)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b man \
-		-d build/doctrees/pasture pasture/source build/man/man8)
-
-.if ${PORT_OPTIONS:MDOCS}
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b html \
-		-d build/doctrees source build/doc/galera/html)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b text \
-		-d build/doctrees source build/doc/galera/text)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b html \
-		-d build/doctrees/pasture pasture/source build/doc/pasture/html)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b text \
-		-d build/doctrees/pasture pasture/source build/doc/pasture/text)
-
-. if ${PORT_OPTIONS:MEPUB}
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b epub \
-		-d build/doctrees source build/doc/galera/epub)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b epub \
-		-d build/doctrees/pasture pasture/source build/doc/pasture/epub)
-. endif
-
-. if ${PORT_OPTIONS:MJSON}
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b json \
-		-d build/doctrees source build/doc/galera/json)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b json \
-		-d build/doctrees/pasture pasture/source build/doc/pasture/json)
-. endif
-
-. if ${PORT_OPTIONS:MLATEX}
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b latex \
-		-d build/doctrees source build/doc/galera/latex)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b latex \
-		-d build/doctrees/pasture pasture/source \
-		build/doc/pasture/latex)
-. endif
-
-. if ${PORT_OPTIONS:MPICKLE}
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b pickle \
-		-d build/doctrees source build/doc/galera/pickle)
-	@(cd ${BUILD_WRKSRC}/docs && sphinx-build -a -b pickle \
-		-d build/doctrees/pasture \
-		pasture/source build/doc/pasture/pickle)
-. endif
-.endif
-
-	@(cd ${BUILD_WRKSRC}/galerautils/doc && doxygen Doxyfile)
-	@(cd ${BUILD_WRKSRC}/gcomm/doc && doxygen Doxyfile)
-	@(cd ${BUILD_WRKSRC}/gcs/doc && doxygen Doxyfile)
-
 do-install:
 	${INSTALL_LIB} ${WRKDIR}/${DISTNAME}/libgalera_smm.so \
 		${STAGEDIR}${PREFIX}/lib/
 	@(cd ${STAGEDIR}${PREFIX}/lib && ${LN} -sf libgalera_smm.so \
 		libgalera.so)
-
-	@(cd ${WRKSRC}/docs/build/man/man1 && ${INSTALL_MAN} \
-		${PORTNAME}.1 ${STAGEDIR}${MAN1PREFIX}/man/man1/)
-	@(cd ${WRKSRC}/docs/build/man/man3 && ${RM} _*.3 && ${INSTALL_MAN} \
-		*.3 ${STAGEDIR}${MAN3PREFIX}/man/man3/)
-	@(cd ${WRKSRC}/docs/build/man/man8 && ${INSTALL_MAN} \
-		${PORTNAME}.8 ${STAGEDIR}${MAN8PREFIX}/man/man8/)
-
-	@cd ${STAGEDIR}${MANPREFIX} && \
-		${FIND} -H -s man/man*/ -maxdepth 1 -type f -print | \
-		${SED} 's|$$|.gz|' >> ${TMPPLIST}
-
-post-install:
-.if ${PORT_OPTIONS:MDOCS}
-	@${MKDIR} ${STAGEDIR}${DOCSDIR} ${STAGEDIR}${DOCSDIR4}
-	${INSTALL_DATA} ${DOC_FILES1:S|^|${DOCSRCDIR1}/|} ${STAGEDIR}${DOCSDIR}
-	(cd ${DOCSRCDIR2} && ${COPYTREE_SHARE} . ${STAGEDIR}${DOCSDIR})
-	${INSTALL_DATA} ${DOC_FILES3:S|^|${DOCSRCDIR3}/|} ${STAGEDIR}${DOCSDIR3}
-	${INSTALL_DATA} ${DOC_FILES4:S|^|${DOCSRCDIR4}/|} ${STAGEDIR}${DOCSDIR4}
-	${INSTALL_DATA} ${DOC_FILES5:S|^|${DOCSRCDIR5}/|} ${STAGEDIR}${DOCSDIR5}
-.endif
 
 .include <bsd.port.post.mk>
