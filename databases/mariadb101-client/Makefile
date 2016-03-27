@@ -1,4 +1,4 @@
-# $FreeBSD$
+# $FreeBSD: head/databases/mariadb101-client/Makefile 408822 2016-02-13 19:02:11Z brnrd $
 
 PORTNAME=	mariadb
 PKGNAMESUFFIX=	101-client
@@ -26,5 +26,10 @@ post-install:
 		${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/${b}
 .	endfor
 	${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/libmysqlclient.so.18
+.	for b in auth_gssapi_client.so dialog.so mysql_clear_password.so 
+		${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/plugin/${b}
+.	endfor
+	# Fix https://mariadb.atlassian.net/browse/MDEV-9388
+	@${REINPLACE_CMD} 's/-l-pthread/-lpthread/' ${STAGEDIR}${PREFIX}/bin/mysql_config
 
 .include "${MASTERDIR}/Makefile"

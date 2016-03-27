@@ -33,6 +33,8 @@ bin/perror
 bin/replace
 bin/resolve_stack_dump
 bin/resolveip
+%%TOKUDB%%bin/tokuft_logprint
+%%TOKUDB%%bin/tokuftdump
 bin/wsrep_sst_common
 bin/wsrep_sst_mysqldump
 bin/wsrep_sst_rsync
@@ -44,6 +46,7 @@ lib/mysql/libmysqld.so
 lib/mysql/libmysqld.so.18
 lib/mysql/plugin/adt_null.so
 lib/mysql/plugin/auth_0x0100.so
+%%NO_GSSAPI_NONE%%lib/mysql/plugin/auth_gssapi.so
 lib/mysql/plugin/auth_pam.so
 lib/mysql/plugin/auth_socket.so
 lib/mysql/plugin/auth_test_plugin.so
