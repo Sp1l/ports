@@ -111,6 +111,10 @@ post-patch:
 . endif
 .endfor
 
+post-install:
+	${MKDIR} ${STAGEDIR}${DOCSDIR}
+	${INSTALL_MAN} ${WRKSRC}/AUTHORS ${WRKSRC}/README ${STAGEDIR}${DOCSDIR}
+
 do-install:
 	${INSTALL_LIB} ${WRKDIR}/${DISTNAME}/libgalera_smm.so \
 		${STAGEDIR}${PREFIX}/lib/
