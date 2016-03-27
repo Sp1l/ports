@@ -1,3 +1,6 @@
+Patch to allow build with clang from Don Lewis
+https://jira.mariadb.org/projects/MDEV/issues/MDEV-8051
+
 --- storage/oqgraph/oqgraph_shim.h.orig	2016-01-28 12:12:55 UTC
 +++ storage/oqgraph/oqgraph_shim.h
 @@ -254,7 +254,7 @@ namespace boost

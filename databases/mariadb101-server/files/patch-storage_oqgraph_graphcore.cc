@@ -1,3 +1,6 @@
+Patch to allow build with clang from Don Lewis
+https://jira.mariadb.org/projects/MDEV/issues/MDEV-8051
+
 --- storage/oqgraph/graphcore.cc.orig	2016-01-28 12:12:55 UTC
 +++ storage/oqgraph/graphcore.cc
 @@ -485,7 +485,7 @@ namespace open_query
