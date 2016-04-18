@@ -1,0 +1,52 @@
+--- scripts/CMakeLists.txt.orig	2016-04-16 19:47:27.000000000 +0200
++++ scripts/CMakeLists.txt	2016-04-18 15:36:55.902854189 +0200
+@@ -73,6 +73,7 @@ IF(UNIX)
+ )
+ ENDIF()
+ 
++IF(FALSE)
+ INSTALL(FILES 
+   ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_tables.sql 
+   ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_tables_data.sql
+@@ -82,6 +83,7 @@ INSTALL(FILES 
+   ${FIX_PRIVILEGES_SQL}
+   DESTINATION ${INSTALL_MYSQLSHAREDIR} COMPONENT Server
+ )
++ENDIF()
+ 
+ # TCMalloc hacks
+ IF(MALLOC_LIB)
+@@ -157,6 +159,7 @@ ELSE()
+   SET(localstatedir ${MYSQL_DATADIR})
+ ENDIF()
+ 
++IF()
+ IF(UNIX)
+ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mysql_install_db.sh
+   ${CMAKE_CURRENT_BINARY_DIR}/mysql_install_db ESCAPE_QUOTES @ONLY)
+@@ -170,6 +173,7 @@ INSTALL_SCRIPT(
+   COMPONENT Server
+   )
+ ENDIF()
++ENDIF()
+ 
+ SET(prefix "${CMAKE_INSTALL_PREFIX}")
+ IF(INSTALL_SYSCONFDIR)
+@@ -248,17 +252,8 @@ ELSE()
+   SET(BIN_SCRIPTS
+     msql2mysql
+     mysql_config
+-    mysql_fix_extensions
+-    mysql_setpermission
+-    mysql_secure_installation
+     mysqlaccess
+-    mysql_convert_table_format
+     mysql_find_rows
+-    mytop
+-    mysqlhotcopy
+-    mysqldumpslow
+-    mysqld_multi
+-    mysqld_safe
+     ${WSREP_BINARIES}
+     ${SYSTEMD_SCRIPTS}
+   )
