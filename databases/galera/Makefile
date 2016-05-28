@@ -1,8 +1,8 @@
 # Created by: Horia Racoviceanu <horia@racoviceanu.com>
-# $FreeBSD: head/databases/galera/Makefile 399346 2015-10-15 14:55:14Z mat $
+# $FreeBSD: head/databases/galera/Makefile 412346 2016-04-01 14:00:51Z mat $
 
 PORTNAME=	galera
-PORTVERSION=	25.3.15
+PORTVERSION=	25.3.16
 DISTVERSIONPREFIX=	3-
 CATEGORIES=	databases
 MASTER_SITES=	http://releases.galeracluster.com/source/
@@ -12,8 +12,11 @@ COMMENT=	Synchronous multi-master replication engine
 
 LICENSE=	GPLv2
 
-BUILD_DEPENDS=	checkmk:${PORTSDIR}/devel/libcheck
-LIB_DEPENDS=	libboost_date_time.so:${PORTSDIR}/devel/boost-libs
+BUILD_DEPENDS=	checkmk:devel/libcheck \
+
+#		doxygen:devel/doxygen \
+#		${PYTHON_PKGNAMEPREFIX}cloud_sptheme>=0:textproc/py-cloud_sptheme
+LIB_DEPENDS=	libboost_date_time.so:devel/boost-libs
 
 USES=		execinfo scons shebangfix
 
