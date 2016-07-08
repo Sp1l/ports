@@ -1,0 +1,13 @@
+--- tools/Makefile.orig	2016-05-03 15:44:42.000000000 +0200
++++ tools/Makefile	2016-07-08 21:19:06.232189161 +0200
+@@ -13,8 +13,8 @@ CFLAGS= $(INCLUDES) $(CFLAG)
+ 
+ GENERAL=Makefile
+ TEST=
+-APPS= c_rehash
+-MISC_APPS= c_hash c_info c_issuer c_name
++APPS= 
++MISC_APPS= 
+ 
+ all:
+ 
