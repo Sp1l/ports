@@ -1,5 +1,5 @@
 # Created by: Horia Racoviceanu <horia@racoviceanu.com>
-# $FreeBSD: head/databases/galera/Makefile 412346 2016-04-01 14:00:51Z mat $
+# $FreeBSD: head/databases/galera/Makefile 417703 2016-06-28 09:11:31Z rakuco $
 
 PORTNAME=	galera
 PORTVERSION=	25.3.16
@@ -7,24 +7,21 @@ DISTVERSIONPREFIX=	3-
 CATEGORIES=	databases
 MASTER_SITES=	http://releases.galeracluster.com/source/
 
-MAINTAINER=	horia@racoviceanu.com
+MAINTAINER=	brnrd@FreeBSD.org
 COMMENT=	Synchronous multi-master replication engine
 
 LICENSE=	GPLv2
 
 BUILD_DEPENDS=	checkmk:devel/libcheck \
 
-#		doxygen:devel/doxygen \
-#		${PYTHON_PKGNAMEPREFIX}cloud_sptheme>=0:textproc/py-cloud_sptheme
 LIB_DEPENDS=	libboost_date_time.so:devel/boost-libs
 
-USES=		execinfo scons shebangfix
+USES=		execinfo scons shebangfix ssl
 
 USE_CXXSTD=	c++11
 USE_LDCONFIG=	yes
-USE_OPENSSL=	yes
 
-LDFLAGS+=	-lboost_program_options -lboost_system
+LDFLAGS+=	-lboost_program_options -lboost_system -lssl -lcrypto
 
 PLIST_FILES=	lib/libgalera_smm.so \
 		lib/libgalera.so
@@ -68,8 +65,6 @@ post-patch:
 		-e 's|asio::|::boost::asio::|g' \
 		${WRKSRC}/galerautils/src/gu_asio.hpp \
 		${WRKSRC}/galerautils/src/gu_asio.cpp
-#		${WRKSRC}/galera/src/ist.hpp \
-#		${WRKSRC}/gcomm/src/asio_protonet.hpp
 	@${REINPLACE_CMD} -e 's|asio::system_error|::boost::system::system_error|g' \
 		${WRKSRC}/galera/src/ist.cpp \
 		${WRKSRC}/gcomm/src/asio_tcp.cpp \
@@ -96,9 +91,6 @@ post-patch:
 	@${REINPLACE_CMD} -e "s|, 'tests/SConscript'||" \
 		${WRKSRC}/galera/SConscript
 .endif
-
-#	@${REINPLACE_CMD} -e "s|\[u'Codership Oy'\], 1|\[u'Codership Oy'\], 8|" \
-#		${WRKSRC}/docs/pasture/source/conf.py
 
 .for d in galerautils gcomm gcs
 	@${REINPLACE_CMD} -e 's|= ./|= ../../docs/build/doc/${d}|; \
