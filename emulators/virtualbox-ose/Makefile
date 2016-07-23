@@ -1,51 +1,58 @@
 # Created by: Bernhard Froehlich <decke@bluelife.at>
-# $FreeBSD: head/emulators/virtualbox-ose/Makefile 381456 2015-03-16 23:04:40Z jkim $
+# $FreeBSD: head/emulators/virtualbox-ose/Makefile 418931 2016-07-22 20:28:01Z jkim $
 
 PORTNAME=	virtualbox-ose
-DISTVERSION=	4.3.26
+PORTVERSION=	5.0.26
 CATEGORIES=	emulators
-MASTER_SITES=	http://download.virtualbox.org/virtualbox/${DISTVERSION}/ \
-		http://tmp.chruetertee.ch/ \
-		http://disasterarea.chruetertee.ch/ \
-		http://download.virtualbox.org/virtualbox/${VBOX_GUEST_VER}/:guestadditions
-DISTFILES=	VirtualBox-${DISTVERSION}${EXTRACT_SUFX} ${GADISTFILES}
-EXTRACT_ONLY=	VirtualBox-${DISTVERSION}${EXTRACT_SUFX}
+MASTER_SITES=	http://download.virtualbox.org/virtualbox/${PORTVERSION}/
+DISTFILES=	VirtualBox-${PORTVERSION}${EXTRACT_SUFX} ${GUESTADDITIONS}
+EXTRACT_ONLY=	VirtualBox-${PORTVERSION}${EXTRACT_SUFX}
 
-MAINTAINER=	vbox@FreeBSD.org
+MAINTAINER?=	vbox@FreeBSD.org
 COMMENT=	General-purpose full virtualizer for x86 hardware
 
 LICENSE=	GPLv2
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-BUILD_DEPENDS=	yasm:${PORTSDIR}/devel/yasm \
-		xsltproc:${PORTSDIR}/textproc/libxslt \
-		kmk:${PORTSDIR}/devel/kBuild \
-		gtar:${PORTSDIR}/archivers/gtar \
-		cdrecord:${PORTSDIR}/sysutils/cdrtools
-LIB_DEPENDS=	libpng.so:${PORTSDIR}/graphics/png \
-		libxslt.so:${PORTSDIR}/textproc/libxslt \
-		libcurl.so:${PORTSDIR}/ftp/curl
-RUN_DEPENDS=	${LOCALBASE}/etc/rc.d/vboxnet:${PORTSDIR}/emulators/virtualbox-ose-kmod \
-		cdrecord:${PORTSDIR}/sysutils/cdrtools
+BUILD_DEPENDS=	yasm:devel/yasm \
+		xsltproc:textproc/libxslt \
+		kmk:devel/kBuild \
+		gtar:archivers/gtar \
+		cdrecord:sysutils/cdrtools
+LIB_DEPENDS=	libpng.so:graphics/png \
+		libxslt.so:textproc/libxslt \
+		libcurl.so:ftp/curl
+RUN_DEPENDS=	${LOCALBASE}/etc/rc.d/vboxnet:emulators/virtualbox-ose-kmod \
+		cdrecord:sysutils/cdrtools
 
 CPE_VENDOR=	oracle
 CPE_PRODUCT=	vm_virtualbox
 
 WRKSRC=		${WRKDIR}/VirtualBox-${PORTVERSION}
 ONLY_FOR_ARCHS=	i386 amd64
-USES=		compiler cpe iconv pkgconfig tar:bzip2
-USE_GNOME=	libidl
-USE_LDCONFIG=	${VBOX_DIR}
-USE_OPENSSL=	yes
+USES=		compiler cpe iconv pkgconfig ssl tar:bzip2
+USE_GNOME=	libidl libxml2
 
 HAS_CONFIGURE=	yes
-CONFIGURE_ARGS+=	--disable-java --passive-mesa
+CONFIGURE_ARGS=	--disable-java --passive-mesa
 CONFIGURE_ARGS+=	--with-gcc="${CC}" --with-g++="${CXX}"
 
-CONFLICTS_INSTALL=	virtualbox-ose-additions-4* \
+CONFLICTS_INSTALL=	virtualbox-ose-additions-[4,5]* \
 			virtualbox-ose-additions-devel-4* \
 			virtualbox-ose-devel-4* \
 			virtualbox-ose-legacy-4*
+
+.if defined(LITE)
+CONFIGURE_ARGS+=	--disable-alsa --disable-dbus --disable-docs \
+			--disable-pulse --disable-qt4 --disable-libvpx \
+			--build-headless
+CONFLICTS_INSTALL+=	${PORTNAME}-[4,5]*
+PKGNAMESUFFIX=		-lite
+PLIST_SUB=		GUESTADDITIONS="@comment " MANUAL="@comment " \
+			NLS="@comment " QT4="@comment " X11="@comment "
+.else
+CONFLICTS_INSTALL+=	${PORTNAME}-lite-[4,5]*
+.endif
 
 VBOXUSER?=	vboxusers
 VBOXWSUSER?=	vboxusers
@@ -55,44 +62,51 @@ GROUPS=		${VBOXGROUP}
 VBOX_DIR=	${PREFIX}/lib/virtualbox
 VBOX_LINKS=	VBoxVRDP
 VBOX_PROGS=	VBoxAutostart VBoxBalloonCtrl VBoxHeadless VBoxManage
-VBOX_UTILS=	VBoxExtPackHelperApp VBoxNetAdpCtl VBoxNetDHCP VBoxSVC \
-		VBoxXPCOMIPCD
+VBOX_UTILS=	VBoxExtPackHelperApp VBoxNetAdpCtl VBoxNetDHCP VBoxNetNAT \
+		VBoxSVC VBoxXPCOMIPCD
 
-VBOX_GUEST_VER=	${PORTVERSION}
-
-OPTIONS_DEFINE=	DBUS DEBUG GUESTADDITIONS MANUAL NLS PULSEAUDIO PYTHON \
-		QT4 UDPTUNNEL VDE VNC VPX WEBSERVICE X11
-OPTIONS_DEFAULT=	DBUS PYTHON QT4 UDPTUNNEL VNC WEBSERVICE X11
+OPTIONS_DEFINE=		PYTHON R0LOGGING UDPTUNNEL VDE VNC WEBSERVICE
+OPTIONS_DEFAULT=	UDPTUNNEL VNC
+.if !defined(LITE)
+OPTIONS_DEFINE+=	ALSA DBUS DEBUG GUESTADDITIONS MANUAL NLS PULSEAUDIO
+OPTIONS_DEFINE+=	QT4 VPX X11
+OPTIONS_DEFAULT+=	DBUS PYTHON QT4 WEBSERVICE X11
+.endif
 OPTIONS_SUB=	yes
 
 DEBUG_DESC=	Debug symbols, additional logs and assertions
 GUESTADDITIONS_DESC=	Build with Guest Additions
 MANUAL_DESC=	Build with user manual
 QT4_DESC=	Build with QT4 Frontend
+R0LOGGING_DESC=	Enable R0 logging
 UDPTUNNEL_DESC=	Build with UDP tunnel support
 VDE_DESC=	Build with VDE support
 VNC_DESC=	Build with VNC support
 VPX_DESC=	Use vpx for video capturing
 WEBSERVICE_DESC=	Build Webservice
 
-DBUS_LIB_DEPENDS=	libdbus-1.so:${PORTSDIR}/devel/dbus
-PULSEAUDIO_LIB_DEPENDS=	libpulse.so:${PORTSDIR}/audio/pulseaudio
-VNC_LIB_DEPENDS=	libvncserver.so:${PORTSDIR}/net/libvncserver
-VPX_LIB_DEPENDS=	libvpx.so:${PORTSDIR}/multimedia/libvpx
+MANUAL_BUILD_DEPENDS=	${LOCALBASE}/share/xml/docbook/4.4/docbookx.dtd:textproc/docbook-xml
+PYTHON_CONFIGURE_OFF=	--disable-python
+UDPTUNNEL_CONFIGURE_OFF=	--disable-udptunnel
+VDE_CONFIGURE_ON=	--enable-vde
+VDE_RUN_DEPENDS=	vde_switch:net/vde2
+VNC_CONFIGURE_ON=	--enable-vnc
+VNC_LIB_DEPENDS=	libvncserver.so:net/libvncserver
 
-VDE_RUN_DEPENDS=	vde_switch:${PORTSDIR}/net/vde2
-
+.if !defined(LITE)
+ALSA_CONFIGURE_OFF=	--disable-alsa
+ALSA_LIB_DEPENDS=	libasound.so:audio/alsa-lib
 DBUS_CONFIGURE_OFF=	--disable-dbus
+DBUS_LIB_DEPENDS=	libdbus-1.so:devel/dbus
 DEBUG_CONFIGURE_ON=	--build-debug
 MANUAL_CONFIGURE_OFF=	--disable-docs
 PULSEAUDIO_CONFIGURE_OFF=	--disable-pulse
-PYTHON_CONFIGURE_OFF=	--disable-python
+PULSEAUDIO_LIB_DEPENDS=	libpulse.so:audio/pulseaudio
 QT4_CONFIGURE_OFF=	--disable-qt4
-UDPTUNNEL_CONFIGURE_OFF=	--disable-udptunnel
-VDE_CONFIGURE_ON=	--enable-vde
-VNC_CONFIGURE_ON=	--enable-vnc
 VPX_CONFIGURE_OFF=	--disable-libvpx
+VPX_LIB_DEPENDS=	libvpx.so:multimedia/libvpx
 X11_CONFIGURE_OFF=	--build-headless
+.endif
 
 # bmake doesn't know about unsetenv=true
 .if defined(.PARSEDIR)
@@ -102,7 +116,7 @@ ENV=
 .SHELL:		path="/bin/sh" unsetenv=true
 .endif
 
-PLIST_SUB+=	GUEST_VER=${VBOX_GUEST_VER} \
+PLIST_SUB+=	GUEST_VER=${PORTVERSION} \
 		PYTHON_VER=${PYTHON_VER} \
 		PYTHON_VERU=${PYTHON_VER:S/./_/} \
 		VBOXGROUP=${VBOXGROUP}
@@ -114,28 +128,34 @@ USE_RC_SUBR+=	vboxheadless vboxwatchdog
 
 .include <bsd.port.options.mk>
 
-.if empty(PORT_OPTIONS:MQT4) && !empty(PORT_OPTIONS:MNLS)
+.if ${PORT_OPTIONS:MNLS} && empty(PORT_OPTIONS:MQT4) && !defined(LITE)
 BROKEN=		NLS support requires QT4 frontend. Run 'make config' again!
 .endif
 
-.if empty(PORT_OPTIONS:MX11) && !empty(PORT_OPTIONS:MQT4)
+.if ${PORT_OPTIONS:MQT4} && empty(PORT_OPTIONS:MX11)
 BROKEN=		QT4 frontend requires X11 support. Run 'make config' again!
 .endif
 
 .if ${PORT_OPTIONS:MDEBUG}
 KMK_BUILDTYPE=	debug
+KMK_FLAGS+=	BUILD_TYPE=debug
 .else
 KMK_BUILDTYPE=	release
 .endif
 
+.if ${PORT_OPTIONS:MR0LOGGING} && empty(PORT_OPTIONS:MDEBUG)
+BROKEN=		R0 logging requires debug build
+.endif
+
 .if ${PORT_OPTIONS:MGUESTADDITIONS}
-GUESTADDITIONS=	VBoxGuestAdditions_${VBOX_GUEST_VER}.iso
-GADISTFILES=	${GUESTADDITIONS}:guestadditions
+GUESTADDITIONS=	VBoxGuestAdditions_${PORTVERSION}.iso
 RESTRICTED=	for personal use only
 RESTRICTED_FILES=	${GUESTADDITIONS}
 .endif
 
 .if ${PORT_OPTIONS:MMANUAL}
+DBKXMLDIR=	${LOCALBASE}/share/xml/docbook/4.4
+DBKXSLDIR=	${LOCALBASE}/share/xsl/docbook
 USE_TEX=	dvipsk:build formats:build
 .endif
 
@@ -150,8 +170,9 @@ USES+=		python:build
 
 .if ${PORT_OPTIONS:MQT4}
 QT_NONSTANDARD=	yes
-USE_QT4=	linguist_build moc_build rcc_build uic_build
-USE_QT4+=	gui network opengl
+USE_GL=		gl
+USE_QT4=	corelib gui linguist_build moc_build network
+USE_QT4+=	opengl rcc_build uic_build
 INSTALLS_ICONS=	yes
 VBOX_PROGS+=	VirtualBox
 VBOX_UTILS+=	VBoxTestOGL
@@ -161,7 +182,7 @@ VBOX_WITH_QT4=
 .endif
 
 .if ${PORT_OPTIONS:MWEBSERVICE}
-BUILD_DEPENDS+=	soapcpp2:${PORTSDIR}/devel/gsoap
+BUILD_DEPENDS+=	soapcpp2:devel/gsoap
 USE_RC_SUBR+=	vboxwebsrv
 VBOX_LINKS+=	vboxwebsrv
 VBOX_UTILS+=	vboxwebsrv webtest
@@ -169,7 +190,7 @@ VBOX_UTILS+=	vboxwebsrv webtest
 
 .if ${PORT_OPTIONS:MX11}
 USE_SDL=	sdl
-USE_XORG=	xcursor xmu inputproto xinerama
+USE_XORG=	inputproto x11 xcursor xext xinerama xmu xt
 VBOX_PROGS+=	VBoxSDL
 .endif
 
@@ -191,20 +212,19 @@ PLIST_SUB+=	ARCH="${KMK_ARCH}"
 
 KMK_BUILDDIR=	${WRKSRC}/out/${KMK_ARCH}/${KMK_BUILDTYPE}
 KMK_CONFIG=	VBOX_LIBPATH_X11=${LOCALBASE} VBOX_FREEBSD_SRC=${SRC_BASE}/sys
-KMK_FLAGS=	-j${MAKE_JOBS_NUMBER}
+KMK_FLAGS+=	-j${MAKE_JOBS_NUMBER}
 
 .include <bsd.port.pre.mk>
 
-.if ${OSVERSION} < 900000
-EXTRA_PATCHES+=	${PATCHDIR}/extrapatch-src-VBox-Devices-PC-vbox.dsl \
-		${PATCHDIR}/extrapatch-src-VBox-Main-src-server-generic-NetIf-generic.cpp
-.endif
-
 .if ${COMPILER_TYPE} == clang
-PATCH_DEPENDS+=	${LOCALBASE}/share/kBuild/tools/GXX3.kmk:${PORTSDIR}/devel/kBuild
+PATCH_DEPENDS+=	${LOCALBASE}/share/kBuild/tools/GXX3.kmk:devel/kBuild
 EXTRA_PATCHES+=	${PATCHDIR}/extrapatch-Config.kmk \
 		${PATCHDIR}/extrapatch-src-VBox-Devices-PC-ipxe-Makefile.kmk \
 		${PATCHDIR}/extrapatch-src-recompiler-Makefile.kmk
+.endif
+
+.if ${SSL_DEFAULT} != base
+CONFIGURE_ARGS+=	--with-openssl-dir="${OPENSSLBASE}"
 .endif
 
 pre-everything::
@@ -217,7 +237,12 @@ pre-everything::
 .endif
 
 post-patch:
-	@${ECHO} 'VBOX_PATH_APP_PRIVATE_ARCH = ${VBOX_DIR}' > \
+	@${ECHO} 'TOOL_QT4_BIN_SUFF = -qt4' > ${WRKSRC}/LocalConfig.kmk
+	@${ECHO} 'VBOX_PATH_APP_PRIVATE_ARCH = ${VBOX_DIR}' >> \
+	    ${WRKSRC}/LocalConfig.kmk
+	@${ECHO} 'VBOX_PATH_DOCBOOK = ${DBKXSLDIR}' >> \
+	    ${WRKSRC}/LocalConfig.kmk
+	@${ECHO} 'VBOX_PATH_DOCBOOK_DTD = ${DBKXMLDIR}' >> \
 	    ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_PATH_SHARED_LIBS = ${VBOX_DIR}' >> \
 	    ${WRKSRC}/LocalConfig.kmk
@@ -225,6 +250,7 @@ post-patch:
 	    ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_PATH_APP_PRIVATE = ${DATADIR}' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_PATH_APP_DOCS = ${DOCSDIR}' >> ${WRKSRC}/LocalConfig.kmk
+	@${ECHO} 'VBOX_WITH_EXTPACK_VBOXDTRACE =' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_WITH_INSTALLER = 1' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_WITH_VBOXDRV =' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_WITH_TESTCASES =' >> ${WRKSRC}/LocalConfig.kmk
@@ -232,6 +258,8 @@ post-patch:
 	@${ECHO} 'SDK_VBOX_LIBPNG_LIBS = png' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_WITH_ADDITIONS =' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_WITH_DRAG_AND_DROP = ${VBOX_WITH_QT4}' >> ${WRKSRC}/LocalConfig.kmk
+	@${ECHO} 'VBOX_WITH_DRAG_AND_DROP_GH = ${VBOX_WITH_QT4}' >> ${WRKSRC}/LocalConfig.kmk
+	@${ECHO} 'VBOX_WITH_VALIDATIONKIT =' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_WITH_X11_ADDITIONS =' >> ${WRKSRC}/LocalConfig.kmk
 .if ${PORT_OPTIONS:MWEBSERVICE}
 	@${ECHO} 'VBOX_WITH_WEBSERVICES = 1' >> ${WRKSRC}/LocalConfig.kmk
@@ -239,7 +267,10 @@ post-patch:
 	@${ECHO} 'VBOX_PATH_GSOAP = ${PREFIX}/lib/gsoap' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_PATH_GSOAP_BIN = ${PREFIX}/bin' >> ${WRKSRC}/LocalConfig.kmk
 	@${ECHO} 'VBOX_PATH_GSOAP_IMPORT = ${PREFIX}/share/gsoap/import' >> ${WRKSRC}/LocalConfig.kmk
-	@${ECHO} 'VBOX_GCC_PEDANTIC_CXX = -Wshadow $(VBOX_GCC_WARN) -Wno-long-long' >> ${WRKSRC}/LocalConfig.kmk
+	@${ECHO} 'VBOX_GCC_PEDANTIC_CXX = -Wshadow $$(VBOX_GCC_WARN) -Wno-long-long' >> ${WRKSRC}/LocalConfig.kmk
+.endif
+.if ${PORT_OPTIONS:MR0LOGGING}
+	@${ECHO} 'VBOX_WITH_R0_LOGGING = 1' >> ${WRKSRC}/LocalConfig.kmk
 .endif
 .if ${COMPILER_TYPE} == clang
 	@${REINPLACE_CMD} -e 's| -finline-limit=8000||' \
@@ -256,7 +287,8 @@ post-patch:
 		${WRKSRC}/src/libs/xpcom18a4/python/gen_python_deps.py
 	@${REINPLACE_CMD} -e 's|\$$KBUILDDIR_BIN/kmk_sed|${LOCALBASE}/bin/kmk_sed|g' ${WRKSRC}/configure
 .if empty(ICONV_LIB)
-	@${REINPLACE_CMD} -e 's|iconv||' ${WRKSRC}/Config.kmk ${WRKSRC}/src/VBox/Runtime/Makefile.kmk
+	@${REINPLACE_CMD} -e 's|iconv||' ${WRKSRC}/Config.kmk \
+	    ${WRKSRC}/src/VBox/Runtime/Makefile.kmk
 	@${ECHO} 'VBOX_ICONV_DEFS = LIBICONV_PLUG' >> ${WRKSRC}/LocalConfig.kmk
 .endif
 	@${REINPLACE_CMD} -e 's|/usr/local/lib/virtualbox|${VBOX_DIR}|' \
@@ -265,7 +297,7 @@ post-patch:
 
 do-build:
 	cd ${WRKSRC} && \
-	    ${SH} -c '. env.sh && ${KMK_CONFIG} ${LOCALBASE}/bin/kmk ${KMK_FLAGS}'
+	    ${SH} -c '. ${WRKSRC}/env.sh && ${KMK_CONFIG} ${LOCALBASE}/bin/kmk ${KMK_FLAGS}'
 .if ${PORT_OPTIONS:MPYTHON}
 	${PYTHON_CMD} -mcompileall ${KMK_BUILDDIR}/bin/sdk/bindings/xpcom/python/xpcom
 .endif
@@ -279,7 +311,7 @@ do-install:
 
 	${MKDIR} ${STAGEDIR}${VBOX_DIR}
 	cd ${KMK_BUILDDIR}/bin && ${COPYTREE_SHARE} \
-	    "*.so *.gc *.r0 *.fd components" ${STAGEDIR}${VBOX_DIR}
+	    "*.fd *.r0 *.rc *.so components" ${STAGEDIR}${VBOX_DIR}
 	${LN} -sf ${DATADIR}/sdk ${STAGEDIR}${VBOX_DIR}
 
 	${INSTALL_SCRIPT} ${WRKSRC}/src/VBox/Installer/freebsd/VBox.sh \
@@ -307,7 +339,7 @@ do-install:
 	${INSTALL_DATA} ${KMK_BUILDDIR}/bin/UserManual*.pdf ${STAGEDIR}${DOCSDIR}
 .endif
 
-.if ${PORT_OPTIONS:MNLS}
+.if ${PORT_OPTIONS:MNLS} && !defined(LITE)
 	cd ${KMK_BUILDDIR}/obj/VirtualBox/qtnls && ${COPYTREE_SHARE} "*.qm" ${STAGEDIR}${DATADIR}/nls
 .endif
 
