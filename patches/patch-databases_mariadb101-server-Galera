@@ -1,0 +1,37 @@
+Index: databases/mariadb101-server/Makefile
+===================================================================
+--- databases/mariadb101-server/Makefile	(revision 419208)
++++ databases/mariadb101-server/Makefile	(working copy)
+@@ -2,6 +2,7 @@
+ 
+ PORTNAME?=	mariadb
+ PORTVERSION=	10.1.16
++PORTREVISION?=	1
+ CATEGORIES=	databases ipv6
+ MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
+ 		http://mirrors.supportex.net/${SITESDIR}/ \
+@@ -42,13 +43,14 @@
+ 
+ .if !defined(CLIENT_ONLY)
+ # MySQL-Server options
+-OPTIONS_DEFINE+=	MAXKEY
+-OPTIONS_DEFAULT+=	MAXKEY SPHINX SPIDER
++OPTIONS_DEFINE+=	GALERA MAXKEY
++OPTIONS_DEFAULT+=	GALERA MAXKEY SPHINX SPIDER
+ OPTIONS_GROUP=		ENGINES
+ OPTIONS_GROUP_ENGINES=	INNOBASE MROONGA OQGRAPH SPHINX SPIDER TOKUDB
+ OPTIONS_EXCLUDE_i386=	TOKUDB
+ 
+ ENGINES_DESC=	Optional MariaDB storage engines
++GALERA_DESC=	Build with Galera Clust (WSREP) support
+ INNOBASE_DESC=	Build InnoDB engine next to XtraDB
+ MAXKEY_DESC=	Change max key length from 1000 to 4000
+ MROONGA_DESC=	Mroonga Full Text Search engine
+@@ -121,6 +123,7 @@
+ .endfor
+ 
+ GSSAPI_NONE_CMAKE_ON=	-DPLUGIN_AUTH_GSSAPI=NO
++GALERA_CFLAGS_ON=	-DWITH_WSREP=ON -DWITH_INNODB_DISALLOW_WRITES=1
+ MAXKEY_EXTRA_PATCHES+=	${FILESDIR}/extra-patch-include_my__compare.h
+ MROONGA_LIB_DEPENDS=	liblz4.so:archivers/liblz4
+ OQGRAPH_LIB_DEPENDS=	libboost_system.so:devel/boost-libs \
