@@ -1,19 +1,5 @@
 --- Makefile.org.orig	2016-05-03 15:46:42.000000000 +0200
 +++ Makefile.org	2016-07-08 21:25:06.481163577 +0200
-@@ -275,10 +275,10 @@ sub_all: build_all
- 
- build_all: build_libs build_apps build_tests build_tools
- 
--build_libs: build_libcrypto build_libssl openssl.pc
-+build_libs: build_libcrypto build_libssl
- 
--build_libcrypto: build_crypto build_engines libcrypto.pc
--build_libssl: build_ssl libssl.pc
-+build_libcrypto: build_crypto build_engines
-+build_libssl: build_ssl
- 
- build_crypto:
- 	@dir=crypto; target=all; $(BUILD_ONE_CMD)
 @@ -530,7 +530,7 @@ dist:   
  	@$(MAKE) SDIRS='$(SDIRS)' clean
  	@$(MAKE) TAR='$(TAR)' TARFLAGS='$(TARFLAGS)' $(DISTTARVARS) tar
@@ -23,16 +9,3 @@
  
  install_sw:
  	@$(PERL) $(TOP)/util/mkdir-p.pl $(INSTALL_PREFIX)$(INSTALLTOP)/bin \
-@@ -598,12 +598,6 @@ install_sw:
- 			sed -e '1,/^$$/d' doc/openssl-shared.txt; \
- 		fi; \
- 	fi
--	cp libcrypto.pc $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig
--	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/libcrypto.pc
--	cp libssl.pc $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig
--	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/libssl.pc
--	cp openssl.pc $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig
--	chmod 644 $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/pkgconfig/openssl.pc
- 
- install_html_docs:
- 	here="`pwd`"; \

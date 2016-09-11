@@ -1,15 +1,6 @@
---- apps/Makefile.orig	2016-05-03 15:46:40.000000000 +0200
-+++ apps/Makefile	2016-07-08 21:58:53.655024404 +0200
-@@ -31,7 +31,7 @@ LIBSSL=-L.. -lssl
- 
- PROGRAM= openssl
- 
--SCRIPTS=CA.sh CA.pl tsget
-+SCRIPTS=
- 
- EXE= $(PROGRAM)$(EXE_EXT)
- 
-@@ -118,7 +118,7 @@ install:
+--- apps/Makefile.orig	Tue Aug 10 11:09:07 2004
++++ apps/Makefile	Tue Oct 26 07:00:51 2004
+@@ -112,7 +112,7 @@
  	 done
  	@cp openssl.cnf $(INSTALL_PREFIX)$(OPENSSLDIR)/openssl.cnf.new; \
  	chmod 644 $(INSTALL_PREFIX)$(OPENSSLDIR)/openssl.cnf.new; \
