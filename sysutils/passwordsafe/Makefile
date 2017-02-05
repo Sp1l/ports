@@ -24,7 +24,6 @@ GH_ACCOUNT=	pwsafe
 GH_PROJECT=	${GH_ACCOUNT}
 
 WX_COMP=	wx
-WX_UNICODE=	yes
 WANT_WX_VER=	3.0
 
 ALL_TARGET=	unicoderelease
