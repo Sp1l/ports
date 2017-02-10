@@ -22,7 +22,8 @@ GNU_CONFIGURE=	yes
 OPTIONS_DEFINE=	PHP
 PHP_DESC=	Build PHP components
 
-CONFIGURE_ARGS=	--with-mapi-configdir=${PREFIX}/etc/mapi
+CONFIGURE_ARGS=	--with-mapi-configdir=${PREFIX}/etc/mapi \
+		ac_cv_header_wchar_h=no
 
 # To make cURL detection work in configure
 LDFLAGS+=	-L/usr/local/lib
