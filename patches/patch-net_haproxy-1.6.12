@@ -1,0 +1,62 @@
+Index: net/haproxy/Makefile
+===================================================================
+--- net/haproxy/Makefile	(revision 438256)
++++ net/haproxy/Makefile	(working copy)
+@@ -2,7 +2,7 @@
+ # $FreeBSD$
+ 
+ PORTNAME=	haproxy
+-PORTVERSION=	1.7.5
++PORTVERSION=	1.6.12
+ CATEGORIES=	net www
+ MASTER_SITES=	http://www.haproxy.org/download/1.7/src/
+ DISTFILES=	${PORTNAME}-${DISTVERSION}${EXTRACT_SUFX}
+Index: net/haproxy/distinfo
+===================================================================
+--- net/haproxy/distinfo	(revision 438256)
++++ net/haproxy/distinfo	(working copy)
+@@ -1,5 +1,3 @@
+-TIMESTAMP = 1491209100
+-SHA256 (haproxy-1.7.5.tar.gz) = b04d7db6383c662eb0a421a95af7becac6d9744a1abf0df6b0280c1e61416121
+-SIZE (haproxy-1.7.5.tar.gz) = 1743979
+-SHA256 (deviceatlas-enterprise-c-2.1.2_1.tgz) = 984e1ae3147459a4ed0a8d5053d83dd05ce8c5127cd3cb055be35a74e9217372
+-SIZE (deviceatlas-enterprise-c-2.1.2_1.tgz) = 184432
++TIMESTAMP = 1491993967
++SHA256 (haproxy-1.6.12.tar.gz) = 9bdf2bf855991dc4e0bf9b1ba2b1a322fc23f188aab1c8f0162131c32d699ee2
++SIZE (haproxy-1.6.12.tar.gz) = 1580114
+Index: net/haproxy/pkg-plist
+===================================================================
+--- net/haproxy/pkg-plist	(revision 438256)
++++ net/haproxy/pkg-plist	(working copy)
+@@ -1,10 +1,6 @@
+ man/man1/haproxy.1.gz
+ sbin/halog
+ sbin/haproxy
+-%%PORTDOCS%%%%DOCSDIR%%/51Degrees-device-detection.txt
+-%%PORTDOCS%%%%DOCSDIR%%/DeviceAtlas-device-detection.txt
+-%%PORTDOCS%%%%DOCSDIR%%/SPOE.txt
+-%%PORTDOCS%%%%DOCSDIR%%/WURFL-device-detection.txt
+ %%PORTDOCS%%%%DOCSDIR%%/acl.fig
+ %%PORTDOCS%%%%DOCSDIR%%/architecture.txt
+ %%PORTDOCS%%%%DOCSDIR%%/close-options.txt
+@@ -41,7 +37,6 @@
+ %%PORTDOCS%%%%DOCSDIR%%/internals/entities.pdf
+ %%PORTDOCS%%%%DOCSDIR%%/internals/entities.svg
+ %%PORTDOCS%%%%DOCSDIR%%/internals/entities.txt
+-%%PORTDOCS%%%%DOCSDIR%%/internals/filters.txt
+ %%PORTDOCS%%%%DOCSDIR%%/internals/hashing.txt
+ %%PORTDOCS%%%%DOCSDIR%%/internals/header-parser-speed.txt
+ %%PORTDOCS%%%%DOCSDIR%%/internals/header-tree.txt
+@@ -69,7 +64,6 @@
+ %%PORTDOCS%%%%DOCSDIR%%/lua-api/index.rst
+ %%PORTDOCS%%%%DOCSDIR%%/lua.txt
+ %%PORTDOCS%%%%DOCSDIR%%/management.txt
+-%%PORTDOCS%%%%DOCSDIR%%/netscaler-client-ip-insertion-protocol.txt
+ %%PORTDOCS%%%%DOCSDIR%%/network-namespaces.txt
+ %%PORTDOCS%%%%DOCSDIR%%/proxy-protocol.txt
+ %%PORTDOCS%%%%DOCSDIR%%/queuing.fig
+@@ -98,4 +92,3 @@
+ %%PORTEXAMPLES%%%%EXAMPLESDIR%%/ssl.cfg
+ %%PORTEXAMPLES%%%%EXAMPLESDIR%%/stats_haproxy.sh
+ %%PORTEXAMPLES%%%%EXAMPLESDIR%%/transparent_proxy.cfg
+-%%PORTEXAMPLES%%%%EXAMPLESDIR%%/wurfl-example.cfg
