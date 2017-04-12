@@ -1,30 +1,21 @@
-$OpenBSD: patch-src_ssl_sock_c,v 1.2 2015/08/25 17:51:52 jca Exp $
-
-Committed upstream
-
-  https://github.com/haproxy/haproxy/commit/17c3f6284cf605e47f6525c077bc644c45272849
-
---- src/ssl_sock.c.orig	Sat Jul 18 09:40:46 2015
-+++ src/ssl_sock.c	Sat Jul 18 09:42:45 2015
-@@ -1405,8 +1405,10 @@ int ssl_sock_prepare_ctx(struct bind_conf *bind_conf, 
- 		ssloptions |= SSL_OP_NO_TLSv1_2;
- 	if (bind_conf->ssl_options & BC_SSL_O_NO_TLS_TICKETS)
- 		ssloptions |= SSL_OP_NO_TICKET;
-+#ifndef OPENSSL_NO_SSL3
- 	if (bind_conf->ssl_options & BC_SSL_O_USE_SSLV3)
- 		SSL_CTX_set_ssl_version(ctx, SSLv3_server_method());
-+#endif
- 	if (bind_conf->ssl_options & BC_SSL_O_USE_TLSV10)
- 		SSL_CTX_set_ssl_version(ctx, TLSv1_server_method());
- #if SSL_OP_NO_TLSv1_1
-@@ -1750,8 +1752,10 @@ int ssl_sock_prepare_srv_ctx(struct server *srv, struc
- 		options |= SSL_OP_NO_TLSv1_2;
- 	if (srv->ssl_ctx.options & SRV_SSL_O_NO_TLS_TICKETS)
- 		options |= SSL_OP_NO_TICKET;
-+#ifndef OPENSSL_NO_SSL3
- 	if (srv->ssl_ctx.options & SRV_SSL_O_USE_SSLV3)
- 		SSL_CTX_set_ssl_version(srv->ssl_ctx.ctx, SSLv3_client_method());
-+#endif
- 	if (srv->ssl_ctx.options & SRV_SSL_O_USE_TLSV10)
- 		SSL_CTX_set_ssl_version(srv->ssl_ctx.ctx, TLSv1_client_method());
- #if SSL_OP_NO_TLSv1_1
+$OpenBSD: patch-src_ssl_sock_c,v 1.6 2017/02/01 15:49:34 naddy Exp $
+--- src/ssl_sock.c.orig	2017-04-04 09:21:44 UTC
++++ src/ssl_sock.c
+@@ -2810,7 +2810,7 @@ int ssl_sock_handshake(struct connection
+ 				if (!errno && conn->flags & CO_FL_WAIT_L4_CONN)
+ 					conn->flags &= ~CO_FL_WAIT_L4_CONN;
+ 				if (!conn->err_code) {
+-					if (!((SSL *)conn->xprt_ctx)->packet_length) {
++					if (SSL_state((SSL *)conn->xprt_ctx) == SSL_ST_BEFORE) {
+ 						if (!errno) {
+ 							if (conn->xprt_st & SSL_SOCK_RECV_HEARTBEAT)
+ 								conn->err_code = CO_ER_SSL_HANDSHAKE_HB;
+@@ -2877,7 +2877,7 @@ int ssl_sock_handshake(struct connection
+ 			if (!errno && conn->flags & CO_FL_WAIT_L4_CONN)
+ 				conn->flags &= ~CO_FL_WAIT_L4_CONN;
+ 
+-			if (!((SSL *)conn->xprt_ctx)->packet_length) {
++			if (SSL_state((SSL *)conn->xprt_ctx) == SSL_ST_BEFORE) {
+ 				if (!errno) {
+ 					if (conn->xprt_st & SSL_SOCK_RECV_HEARTBEAT)
+ 						conn->err_code = CO_ER_SSL_HANDSHAKE_HB;
