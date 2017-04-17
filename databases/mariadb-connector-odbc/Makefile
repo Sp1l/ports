@@ -27,13 +27,13 @@ CONFLICTS_INSTALL=	mariadb[0-9]*-client-* \
 
 USES=		cmake
 USE_LDCONFIG=	${PREFIX}/lib/mariadbconnector-odbc
-SITESDIR=	${PORTNAME}/${PKGNAMESUFFIX}-${PORTVERSION}/source
+SITESDIR=	${PORTNAME}/connector-odbc-${PORTVERSION}/source
 DOCSDIR=	${PREFIX}/share/doc/mysql
 
 BUILD_DEPENDS=  unixODBC>=2.2.14_1:databases/unixODBC \
-		mariadb-connector-c>=2.3.0:databases/mariadb-connector-c
+		mariadbconnector-c>=2.3.0:databases/mariadb-connector-c
 LIB_DEPENDS=    libodbc.so:databases/unixODBC
-RUN_DEPENDS=	mariadb-connector-c>=2.3.0:databases/mariadb-connector-c
+RUN_DEPENDS=	mariadbconnector-c>=2.3.0:databases/mariadb-connector-c
 
 CMAKE_ARGS+=	-DCOMPILATION_COMMENT="FreeBSD Ports"
 
