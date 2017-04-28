@@ -1,0 +1,44 @@
+Index: Makefile
+===================================================================
+--- Makefile	(revision 439344)
++++ Makefile	(working copy)
+@@ -10,6 +10,8 @@
+ MAINTAINER=	zeising@FreeBSD.org
+ COMMENT?=	Nagios Remote Plugin Executor
+ 
++LICENSE=	GPLv2
++
+ CONFLICTS=	nrpe-ssl-2.*
+ 
+ USES=		perl5
+Index: files/patch-configure
+===================================================================
+--- files/patch-configure	(nonexistent)
++++ files/patch-configure	(working copy)
+@@ -0,0 +1,11 @@
++--- configure.orig	2017-04-28 11:19:00 UTC
+++++ configure
++@@ -6745,7 +6745,7 @@ _ACEOF
++ 				sslbin=$ssldir/bin/openssl
++ 			fi
++ 			# awk to strip off meta data at bottom of dhparam output
++-			$sslbin dhparam -C 512 | awk '/^-----/ {exit} {print}' > include/dh.h
+++			$sslbin dhparam -C 2048 | awk '/^-----/ {exit} {print}' > include/dh.h
++ 		fi
++ 	fi
++ 
+
+Property changes on: files/patch-configure
+___________________________________________________________________
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
