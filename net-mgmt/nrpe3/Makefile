@@ -2,15 +2,19 @@
 # $FreeBSD: head/net-mgmt/nrpe/Makefile 436248 2017-03-15 14:45:54Z mat $
 
 PORTNAME=	nrpe
-DISTVERSION=	2.15
-PORTREVISION=	6
+DISTVERSION=	3.1.0
+PORTREVISION?=	0
 CATEGORIES=	net-mgmt
-MASTER_SITES=	SF/nagios/${PORTNAME}-2.x/${PORTNAME}-${PORTVERSION}
 
 MAINTAINER=	zeising@FreeBSD.org
 COMMENT?=	Nagios Remote Plugin Executor
 
-CONFLICTS=	nrpe-ssl-2.*
+CONFLICTS=	nrpe-ssl-3.*
+
+USE_GITHUB=	yes
+GH_ACCOUNT=	NagiosEnterprises
+#GH_PROJECT=	nrpe
+GH_TAGNAME=	release-${DISTVERSION}
 
 USES=		perl5
 USE_PERL5=	build
