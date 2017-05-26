@@ -1,0 +1,188 @@
+diff --git a/include/ma_global.h b/include/ma_global.h
+index e506cad..84f35f5 100644
+--- a/include/ma_global.h
++++ b/include/ma_global.h
+@@ -185,9 +185,6 @@ double my_ulonglong2double(unsigned long long A);
+ #ifdef HAVE_FCNTL_H
+ #include <fcntl.h>
+ #endif
+-#ifdef HAVE_SYS_TIMEB_H
+-#include <sys/timeb.h>				/* Avoid warnings on SCO */
+-#endif
+ #if TIME_WITH_SYS_TIME
+ # include <sys/time.h>
+ # include <time.h>
+diff --git a/include/mariadb/ma_io.h b/include/mariadb/ma_io.h
+index b988183..6636bc8 100644
+--- a/include/mariadb/ma_io.h
++++ b/include/mariadb/ma_io.h
+@@ -37,11 +37,11 @@ typedef struct
+ 
+ #ifdef HAVE_REMOTEIO
+ struct st_rio_methods {
+-  MA_FILE *(*open)(const char *url, const char *mode);
+-  int (*close)(MA_FILE *ptr);
+-  int (*feof)(MA_FILE *file);
+-  size_t (*read)(void *ptr, size_t size, size_t nmemb, MA_FILE *file);
+-  char * (*gets)(char *ptr, size_t size, MA_FILE *file);
++  MA_FILE *(*mopen)(const char *url, const char *mode);
++  int (*mclose)(MA_FILE *ptr);
++  int (*mfeof)(MA_FILE *file);
++  size_t (*mread)(void *ptr, size_t size, size_t nmemb, MA_FILE *file);
++  char * (*mgets)(char *ptr, size_t size, MA_FILE *file);
+ };
+ #endif
+ 
+diff --git a/libmariadb/ma_io.c b/libmariadb/ma_io.c
+index a84e883..ddf903c 100644
+--- a/libmariadb/ma_io.c
++++ b/libmariadb/ma_io.c
+@@ -123,7 +123,7 @@ remote:
+     MYSQL mysql;
+     if (rio_plugin ||(rio_plugin= (struct st_mysql_client_plugin_REMOTEIO *)
+                       mysql_client_find_plugin(&mysql, NULL, MARIADB_CLIENT_REMOTEIO_PLUGIN)))
+-      return rio_plugin->methods->open(location, mode);
++      return rio_plugin->methods->mopen(location, mode);
+     return NULL;
+   }
+ #endif
+@@ -144,7 +144,7 @@ int ma_close(MA_FILE *file)
+     break;
+ #ifdef HAVE_REMOTEIO
+   case MA_FILE_REMOTE:
+-    rc= rio_plugin->methods->close(file);
++    rc= rio_plugin->methods->mclose(file);
+     break;
+ #endif
+   default:
+@@ -154,6 +154,7 @@ int ma_close(MA_FILE *file)
+ }
+ /* }}} */
+ 
++
+ /* {{{ ma_feof */
+ int ma_feof(MA_FILE *file)
+ {
+@@ -166,7 +167,7 @@ int ma_feof(MA_FILE *file)
+     break;
+ #ifdef HAVE_REMOTEIO
+   case MA_FILE_REMOTE:
+-    return rio_plugin->methods->feof(file);
++    return rio_plugin->methods->mfeof(file);
+     break;
+ #endif
+   default:
+@@ -189,7 +190,7 @@ size_t ma_read(void *ptr, size_t size, size_t nmemb, MA_FILE *file)
+     break;
+ #ifdef HAVE_REMOTEIO
+   case MA_FILE_REMOTE:
+-    return rio_plugin->methods->read(ptr, size, nmemb, file);
++    return rio_plugin->methods->mread(ptr, size, nmemb, file);
+     break;
+ #endif
+   default:
+@@ -210,7 +211,7 @@ char *ma_gets(char *ptr, size_t size, MA_FILE *file)
+     break;
+ #ifdef HAVE_REMOTEIO
+   case MA_FILE_REMOTE:
+-    return rio_plugin->methods->gets(ptr, size, file);
++    return rio_plugin->methods->mgets(ptr, size, file);
+     break;
+ #endif
+   default:
+diff --git a/libmariadb/secure/openssl.c b/libmariadb/secure/openssl.c
+index 3697234..a5599bf 100644
+--- a/libmariadb/secure/openssl.c
++++ b/libmariadb/secure/openssl.c
+@@ -53,7 +53,7 @@ extern unsigned int mariadb_deinitialize_ssl;
+ #define MAX_SSL_ERR_LEN 100
+ 
+ static pthread_mutex_t LOCK_openssl_config;
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+ static pthread_mutex_t *LOCK_crypto= NULL;
+ #endif
+ #if OPENSSL_USE_BIOMETHOD
+@@ -85,14 +85,13 @@ static void ma_tls_set_error(MYSQL *mysql)
+   return;
+ }
+ 
+-
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+ /* 
+    thread safe callbacks for OpenSSL 
+    Crypto call back functions will be
+    set during ssl_initialization
+  */
+-#if OPENSSL_VERSION_NUMBER < 0x10000000L
++#if OPENSSL_VERSION_NUMBER < 0x10000000L || defined(LIBRESSL_VERSION_NUMBER)
+ static unsigned long my_cb_threadid(void)
+ {
+   /* cast pthread_t to unsigned long */
+@@ -209,7 +208,7 @@ static void ma_tls_remove_session_cb(SSL_CTX* ctx __attribute__((unused)),
+ }
+ #endif
+ 
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+ static void my_cb_locking(int mode, int n, 
+                           const char *file __attribute__((unused)),
+                           int line __attribute__((unused)))
+@@ -287,7 +286,7 @@ int ma_tls_start(char *errmsg __attribute__((unused)), size_t errmsg_len __attri
+   /* lock mutex to prevent multiple initialization */
+   pthread_mutex_init(&LOCK_openssl_config, NULL);
+   pthread_mutex_lock(&LOCK_openssl_config);
+-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
++#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+   if (!OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG, NULL))
+     goto end;
+ #else
+@@ -669,7 +668,7 @@ int ma_tls_verify_server_cert(MARIADB_TLS *ctls)
+   if (!(cn_asn1 = X509_NAME_ENTRY_get_data(cn_entry)))
+     goto error;
+ 
+-#if OPENSSL_VERSION_NUMBER < 0x10100000L
++#if OPENSSL_VERSION_NUMBER < 0x10100000L || defined(LIBRESSL_VERSION_NUMBER)
+   cn_str = (char *)ASN1_STRING_data(cn_asn1);
+ #else
+   cn_str = (char *)ASN1_STRING_get0_data(cn_asn1);
+diff --git a/plugins/auth/gssapi_errmsg.c b/plugins/auth/gssapi_errmsg.c
+index 6731fbe..fa279b2 100644
+--- a/plugins/auth/gssapi_errmsg.c
++++ b/plugins/auth/gssapi_errmsg.c
+@@ -26,7 +26,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+ */
+ 
+-#include <gssapi.h>
++#include <gssapi/gssapi.h>
+ #include <string.h>
+ void gssapi_errmsg(OM_uint32 major, OM_uint32 minor, char *buf, size_t size)
+ {
+diff --git a/plugins/io/remote_io.c b/plugins/io/remote_io.c
+index 925c833..2a942c7 100644
+--- a/plugins/io/remote_io.c
++++ b/plugins/io/remote_io.c
+@@ -156,7 +156,7 @@ static size_t rio_write_callback(char *buffer,
+       size= free_bytes;
+     else {
+       curl_file->length+= size - free_bytes;
+-      curl_file->buffer= tmp;
++      curl_file->buffer= (unsigned char *)tmp;
+     }
+   }
+ 
+diff --git a/plugins/pvio/pvio_socket.c b/plugins/pvio/pvio_socket.c
+index 2234187..251d7eb 100644
+--- a/plugins/pvio/pvio_socket.c
++++ b/plugins/pvio/pvio_socket.c
+@@ -48,6 +48,7 @@
+ #include <fcntl.h>
+ #endif
+ #include <netinet/in_systm.h>
++#include <netinet/in.h>
+ #include <netinet/ip.h>
+ #include <netdb.h>
+ #include <netinet/tcp.h>
+

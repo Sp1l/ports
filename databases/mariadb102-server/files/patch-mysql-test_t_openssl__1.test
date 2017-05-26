@@ -1,0 +1,11 @@
+--- mysql-test/t/openssl_1.test.orig	2017-02-16 08:28:06 UTC
++++ mysql-test/t/openssl_1.test
+@@ -225,7 +225,7 @@ DROP TABLE t1;
+ 
+ # Common ciphers to openssl and yassl
+ --exec $MYSQL --host=localhost -e "SHOW STATUS LIKE 'Ssl_cipher';" --ssl-cipher=AES256-SHA
+---exec $MYSQL --host=localhost -e "SHOW STATUS LIKE 'Ssl_cipher';" --ssl-cipher=DES-CBC3-SHA
++--exec $MYSQL --host=localhost -e "SHOW STATUS LIKE 'Ssl_cipher';" --ssl-cipher=AES128-SHA
+ --disable_query_log
+ --disable_result_log
+ 
