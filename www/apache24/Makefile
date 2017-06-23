@@ -1,7 +1,7 @@
-# $FreeBSD: head/www/apache24/Makefile 400752 2015-11-04 18:38:58Z ohauer $
+# $FreeBSD: head/www/apache24/Makefile 444108 2017-06-22 11:04:01Z mat $
 
 PORTNAME=	apache24
-PORTVERSION=	2.4.18
+PORTVERSION=	2.4.26
 CATEGORIES=	www ipv6
 MASTER_SITES=	APACHE_HTTPD
 DISTNAME=	httpd-${PORTVERSION}
@@ -10,9 +10,12 @@ DIST_SUBDIR=	apache24
 MAINTAINER=	apache@FreeBSD.org
 COMMENT=	Version 2.4.x of Apache web server
 
-LIB_DEPENDS=	libexpat.so:${PORTSDIR}/textproc/expat2 \
-		libapr-1.so:${PORTSDIR}/devel/apr1 \
-		libpcre.so:${PORTSDIR}/devel/pcre
+LICENSE=	APACHE20
+LICENSE_FILE=	${WRKSRC}/LICENSE
+
+LIB_DEPENDS=	libexpat.so:textproc/expat2 \
+		libapr-1.so:devel/apr1 \
+		libpcre.so:devel/pcre
 
 CONFLICTS_INSTALL=	caudium14-1.* \
 			apache-*-2.2.* apache22-*
@@ -49,8 +52,24 @@ APACHEDIR=	${MASTERDIR}
 WITH_HTTP_PORT?=	80
 WITH_SSL_PORT?=		443
 
+.if !defined(WITH_DEBUG)
+EXTRA_PATCHES+=	${FILESDIR}/extra-patch-server_buildmark.c
+.endif
+
 .include "${APACHEDIR}/Makefile.options"
 .include "${APACHEDIR}/Makefile.options.desc"
+
+# IMPLIES
+AUTHN_DBD_IMPLIES=		DBD
+HEARTBEAT_IMPLIES=		WATCHDOG STATUS
+HEARTMONITOR_IMPLIES=		WATCHDOG STATUS
+LBMETHOD_HEARTBEAT_IMPLIES=	WATCHDOG STATUS HEARTMONITOR
+PROXY_HCHECK_IMPLIES=		WATCHDOG
+
+# MPM
+MPM_PREFORK_CONFIGURE_ON=	--with-mpm=prefork
+MPM_WORKER_CONFIGURE_ON=	--with-mpm=worker
+MPM_EVENT_CONFIGURE_ON=		--with-mpm=event
 
 AUTHNZ_LDAP_CONFIGURE_ON=	--enable-authnz-ldap
 
@@ -59,14 +78,17 @@ IPV4_MAPPED_CONFIGURE_ENABLE=	v4-mapped
 
 LDAP_CONFIGURE_ON=		--enable-ldap=shared
 
+BROTLI_CONFIGURE_ON=		--with-brotli=${LOCALBASE}
+BROTLI_LIB_DEPENDS=		libbrotlicommon.so:archivers/brotli
 HTTP2_CONFIGURE_ON=		--with-nghttp2=${LOCALBASE}
-HTTP2_LIB_DEPENDS=		libnghttp2.so:${PORTSDIR}/www/nghttp2
-LUAJIT_LIB_DEPENDS=		libluajit-5.1.so:${PORTSDIR}/lang/luajit
+HTTP2_LIB_DEPENDS=		libnghttp2.so:www/libnghttp2
+LUAJIT_LIB_DEPENDS=		libluajit-5.1.so:lang/luajit
 LUA_CONFIGURE_WITH=		lua
 LUA_USES=			lua
-
+PROXY_HTTP2_CONFIGURE_ON=	--with-nghttp2=${LOCALBASE}
+PROXY_HTTP2_LIB_DEPENDS=	libnghttp2.so:www/libnghttp2
 SOCACHE_DC_CONFIGURE_ON=	--with-distcache=${LOCALBASE}
-SOCACHE_DC_LIB_DEPENDS=		libdistcache.so:${PORTSDIR}/security/distcache
+SOCACHE_DC_LIB_DEPENDS=		libdistcache.so:security/distcache
 
 # Note:
 # OpenSSL version (base/ports) depends how devel/apr1 was build
@@ -74,10 +96,9 @@ SOCACHE_DC_LIB_DEPENDS=		libdistcache.so:${PORTSDIR}/security/distcache
 SSL_CFLAGS=			-I${OPENSSLINC}
 SSL_CONFIGURE_ON=		--with-ssl=${OPENSSLBASE}
 SSL_LDFLAGS=			-L${OPENSSLLIB}
-SSL_USE=			OPENSSL=yes
+SSL_USES=			ssl
 
 .include <bsd.port.options.mk>
-
 ETC_SUBDIRS=		Includes envvars.d extra modules.d
 
 APR_CONFIG?=		${LOCALBASE}/bin/apr-1-config
@@ -104,8 +125,7 @@ CONFIGURE_ARGS+=--prefix=${PREFIX_RELDEST} \
 		--enable-http \
 		--with-pcre=${LOCALBASE} \
 		--with-apr=${APR_CONFIG} \
-		--with-apr-util=${APU_CONFIG} \
-		--enable-silent-rules
+		--with-apr-util=${APU_CONFIG}
 
 CONFIGURE_ENV=	LOCALBASE="${LOCALBASE}" \
 		CONFIG_SHELL="${SH}"
@@ -113,9 +133,6 @@ CONFIGURE_ENV=	LOCALBASE="${LOCALBASE}" \
 MAKE_ENV+=	EXPR_COMPAT=yes \
 		INSTALL_MAN="${INSTALL_MAN}" \
 		DATADIR=${DATADIR}
-
-# remove CFLAGS before commit
-CFLAGS+=	-Wall
 
 #=====================================================
 # CONFIGURE_ARGS will be handled in Makefile.modules,
@@ -133,9 +150,14 @@ USE_GNOME=	libxml2
 .include <bsd.port.pre.mk>
 .include "${APACHEDIR}/Makefile.modules"
 
+.if ${OPSYS} == FreeBSD && ${OSVERSION} < 1100085 &&\
+	${PORT_OPTIONS:MHTTP2} && ${OPENSSLBASE} == /usr
+SUB_FILES+=    pkg-message
+.endif
+
 post-extract:
 # remove possible leftover .svn directories in the sources
-	@${FIND} ${WRKSRC} -type d -name .svn -print | ${XARGS} ${RM} -rf
+	@${FIND} ${WRKSRC} -type d -name .svn -print | ${XARGS} ${RM} -r
 # limit grep results ...
 	@${FIND} ${WRKSRC} -type f \( -name 'NWGNU*' -o -name '*.ds?' -o -name '*.dep' -o -name '*.mak' -o -name '*.win' -o -name '*.vbs' -o -name '*.wsf' \) -delete
 # make sure the configure script contains our patches, preserve the original script for comparsion
@@ -153,7 +175,7 @@ post-patch:
 		${WRKSRC}/include/httpd.h
 	${REINPLACE_CMD} -e 's|perlbin=.*|perlbin=${PERL}|' \
 		${WRKSRC}/configure.in
-	${RM} -f ${WRKSRC}/docs/docroot/*.bak
+	${RM} ${WRKSRC}/docs/docroot/*.bak
 	${INSTALL_DATA} ${WRKSRC}/NOTICE ${WRKSRC}/docs/manual
 
 pre-configure::
@@ -181,15 +203,14 @@ post-install:
 	-${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/*
 	-${STRIP_CMD} ${STAGEDIR}${PREFIX}/libexec/apache24/mod_*.so
 
-.if ${PORT_OPTIONS:MLOG_FORENSIC}
+post-install-LOG_FORENSIC-on:
 	${INSTALL_SCRIPT} ${WRKSRC}/support/check_forensic ${STAGEDIR}${PREFIX}/sbin
-.endif
 
 # maintainer only, check for new modules
 modlist: extract
 	@${AWK} '/: checking whether to enable mod_/ \
 		{printf "%%%%%s%%%%libexec/apache24/%s.so\n", \
-		toupper($$8), $$8}' ${WRKSRC}/configure \
+		toupper($$8), $$8}' ${WRKSRC}/configure.upstream \
 		| ${TR} -d '"' \
 		| ${SORT} -u \
 		| ${GREP} -E -v '^%%MOD_(HTTP|ISAPI|LOG_CONFIG|PRIVILEGES|SO|UNIXD)%%'
