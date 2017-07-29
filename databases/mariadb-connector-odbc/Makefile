@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	mariadb
-PORTVERSION=	2.0.14
+PORTVERSION=	3.0.0
 CATEGORIES=	databases ipv6
 MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
 		http://mirrors.supportex.net/${SITESDIR}/ \
@@ -12,7 +12,7 @@ MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
 		http://mirror.layerjet.com/${SITESDIR}/ \
 		http://mirror.switch.ch/mirror/${SITESDIR}/
 PKGNAMESUFFIX=	-connector-odbc
-DISTNAME=	${PORTNAME}${PKGNAMESUFFIX}-${PORTVERSION}-ga-src
+DISTNAME=	${PORTNAME}${PKGNAMESUFFIX}-${PORTVERSION}-alpha-src
 
 MAINTAINER=	brnrd@FreeBSD.org
 COMMENT=	MariaDB database connector for C
@@ -27,13 +27,13 @@ CONFLICTS_INSTALL=	mariadb[0-9]*-client-* \
 
 USES=		cmake
 USE_LDCONFIG=	${PREFIX}/lib/mariadbconnector-odbc
-SITESDIR=	${PORTNAME}/connector-odbc-${PORTVERSION}/source
+SITESDIR=	${PORTNAME}/connector-odbc-${PORTVERSION}
 DOCSDIR=	${PREFIX}/share/doc/mysql
 
 BUILD_DEPENDS=  unixODBC>=2.2.14_1:databases/unixODBC \
-		mariadbconnector-c>=2.3.0:databases/mariadb-connector-c
+		mariadb-connector-c>=3.0.2:databases/mariadb-connector-c
 LIB_DEPENDS=    libodbc.so:databases/unixODBC
-RUN_DEPENDS=	mariadbconnector-c>=2.3.0:databases/mariadb-connector-c
+RUN_DEPENDS=	mariadb-connector-c>=3.0.2:databases/mariadb-connector-c
 
 CMAKE_ARGS+=	-DCOMPILATION_COMMENT="FreeBSD Ports"
 
