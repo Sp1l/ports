@@ -25,7 +25,7 @@ CONFLICTS_INSTALL=	mariadb[0-9]*-client-* \
 			mysql[0-9]*-client-* \
 			percona[0-9]*-client-*
 
-USES=		cmake
+USES=		cmake ssl
 USE_LDCONFIG=	${PREFIX}/lib/mariadbconnector-odbc
 SITESDIR=	${PORTNAME}/connector-odbc-${PORTVERSION}
 DOCSDIR=	${PREFIX}/share/doc/mysql
@@ -35,7 +35,8 @@ BUILD_DEPENDS=  unixODBC>=2.2.14_1:databases/unixODBC \
 LIB_DEPENDS=    libodbc.so:databases/unixODBC
 RUN_DEPENDS=	mariadb-connector-c>=3.0.2:databases/mariadb-connector-c
 
-CMAKE_ARGS+=	-DCOMPILATION_COMMENT="FreeBSD Ports"
+CMAKE_ARGS+=	-DCOMPILATION_COMMENT="FreeBSD Ports" \
+				-DWITH_OPENSSL="YES"
 
 PLIST_FILES=	lib/libmaodbc.so
 
