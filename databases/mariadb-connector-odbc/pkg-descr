@@ -4,4 +4,3 @@ used as a drop-in replacement for MySQL Connector/ODBC, and it supports
 both Unicode and ANSI modes.
 
 WWW: https://mariadb.com/kb/en/mariadb/mariadb-connector-odbc/
-
