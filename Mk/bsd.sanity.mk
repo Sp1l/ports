@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/bsd.sanity.mk 399023 2015-10-10 21:24:22Z bapt $
+# $FreeBSD: head/Mk/bsd.sanity.mk 446704 2017-07-26 23:58:05Z dbaio $
 #
 # MAINTAINER: portmgr@FreeBSD.org
 #
@@ -25,10 +25,6 @@ DEV_WARNING+=	"Not validating first entry in CATEGORIES due to being outside of 
 
 #.if defined(WITHOUT_X11)
 #WARNING+=	"WITHOUT_X11 is deprecated use X11 option instead"
-#.endif
-
-#.if !defined(LICENSE)
-#DEV_WARNING+=	"No license is defined consider adding one"
 #.endif
 
 .if defined(USE_PERL5) && ${USE_PERL5} == yes
@@ -116,6 +112,11 @@ DEV_ERROR+=	"USE_DOS2UNIX is no longer supported, please use USES=dos2unix"
 .if ${LICENSE:MBSD}
 DEV_WARNING+=	"LICENSE must not contain BSD, instead use BSD[234]CLAUSE"
 .endif
+.if ${LICENSE:MMPL}
+DEV_WARNING+=	"LICENSE must not contain MPL, instead use MPL[10|11|20]"
+.endif
+.else
+DEV_WARNING+=	"Please set LICENSE for this port"
 .endif
 
 .if defined(USE_PYDISTUTILS) && ${USE_PYDISTUTILS} == "easy_install"
@@ -153,6 +154,22 @@ DEV_WARNING+=	"PYDISTUTILS_INSTALLNOSINGLE is deprecated, please do not use it a
 DEV_ERROR+=	"INSTALLS_EGGINFO is no longer supported, please add the entry directly to the plist"
 .endif
 
+.if defined(WANT_SDL)
+DEV_ERROR+=	"WANT_SDL is no longer supported. If you need SDL, use USE_SDL, if you need optional dependency, use options"
+.endif
+
+.if defined(USE_RC_SUBR) && ${USE_RC_SUBR:tu} == YES
+DEV_ERROR+=	"USE_RC_SUBR=yes has not been supported for a long time, remove it."
+.endif
+
+.if defined(USE_RUBYGEMS) && !defined(RUBYGEM_AUTOPLIST)
+DEV_ERROR+=	"USE_RUBYGEMS is no longer supported, please use USES=gem:noautoplist"
+.endif
+
+.if defined(RUBYGEM_AUTOPLIST)
+DEV_ERROR+=	"RUBYGEM_AUTOPLIST is no longer supported, please use USES=gem"
+.endif
+
 SANITY_UNSUPPORTED=	USE_OPENAL USE_FAM USE_MAKESELF USE_ZIP USE_LHA USE_CMAKE \
 		USE_READLINE USE_ICONV PERL_CONFIGURE PERL_MODBUILD \
 		USE_PERL5_BUILD USE_PERL5_RUN USE_DISPLAY USE_FUSE \
@@ -160,9 +177,14 @@ SANITY_UNSUPPORTED=	USE_OPENAL USE_FAM USE_MAKESELF USE_ZIP USE_LHA USE_CMAKE \
 		INSTALLS_SHLIB USE_PYDISTUTILS PYTHON_CONCURRENT_INSTALL \
 		PYDISTUTILS_AUTOPLIST PYTHON_PY3K_PLIST_HACK PYDISTUTILS_NOEGGINFO \
 		USE_PYTHON_PREFIX USE_BZIP2 USE_XZ USE_PGSQL NEED_ROOT \
-		UNIQUENAME LATEST_LINK
-SANITY_DEPRECATED=	PYTHON_PKGNAMESUFFIX USE_AUTOTOOLS PLIST_DIRSTRY
-SANITY_NOTNEEDED=	WX_UNICODE
+		UNIQUENAME LATEST_LINK USE_SQLITE USE_FIREBIRD USE_PHPEXT \
+		USE_ZENDEXT USE_PHP_BUILD USE_BDB PLIST_DIRSTRY USE_RCORDER \
+		USE_OPENSSL APACHE_PORT
+SANITY_DEPRECATED=	PYTHON_PKGNAMESUFFIX USE_AUTOTOOLS \
+			USE_MYSQL WANT_MYSQL_VER USE_PHPIZE WANT_PHP_CLI \
+			WANT_PHP_CGI WANT_PHP_MOD WANT_PHP_WEB WANT_PHP_EMB \
+			USE_APACHE USE_APACHE_BUILD USE_APACHE_RUN
+SANITY_NOTNEEDED=	CMAKE_NINJA WX_UNICODE
 
 USE_AUTOTOOLS_ALT=	USES=autoreconf and GNU_CONFIGURE=yes
 USE_OPENAL_ALT=		USES=openal
@@ -198,8 +220,29 @@ PYTHON_PKGNAMESUFFIX_ALT=	PYTHON_PKGNAMEPREFIX
 NO_INSTALL_MANPAGES_ALT=	USES=imake:noman
 UNIQUENAME_ALT=		PKGBASE
 LATEST_LINK_ALT=	PKGBASE
+CMAKE_NINJA_REASON=	Now the ninja generator is the default
 WX_UNICODE_REASON=	Now no-op as only unicode is supported now
 PLIST_DIRSTRY_ALT=	PLIST_DIRS
+USE_SQLITE_ALT=		USES=sqlite
+USE_FIREBIRD_ALT=	USES=firebird
+USE_BDB_ALT=		USES=bdb:${USE_BDB}
+USE_MYSQL_ALT=		USES=mysql:${USE_MYSQL}
+WANT_MYSQL_VER_ALT=	USES=mysql:${WANT_MYSQL_VER}
+USE_OPENSSL_ALT=	USES=ssl
+USE_PHPIZE_ALT=		USES=php:phpize
+USE_PHPEXT_ALT=		USES=php:ext
+USE_ZENDEXT_ALT=	USES=php:zend
+USE_PHP_BUILD_ALT=	USES=php:build
+WANT_PHP_CLI_ALT=	USES=php:cli
+WANT_PHP_CGI_ALT=	USES=php:cgi
+WANT_PHP_MOD_ALT=	USES=php:mod
+WANT_PHP_WEB_ALT=	USES=php:web
+WANT_PHP_EMB_ALT=	USES=php:embed
+USE_RCORDER_ALT=	USE_RC_SUBR=${USE_RCORDER}
+USE_APACHE_ALT=		USES=apache:${USE_APACHE:S/2/2./}
+USE_APACHE_BUILD_ALT=	USES=apache:build,${USE_APACHE_BUILD:S/2/2./}
+USE_APACHE_RUN_ALT=	USES=apache:run,${USE_APACHE_RUN:S/2/2./}
+APACHE_PORT_ALT=	DEFAULT_VERSIONS+=apache=${APACHE_PORT:S/www\/apache//:S/2/2./}
 
 .for a in ${SANITY_DEPRECATED}
 .if defined(${a})
