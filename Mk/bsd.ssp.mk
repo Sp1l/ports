@@ -1,20 +1,7 @@
-# $FreeBSD: head/Mk/bsd.ssp.mk 372086 2014-11-02 20:01:31Z bdrewery $
+# $FreeBSD: head/Mk/bsd.ssp.mk 430441 2017-01-03 07:24:49Z rene $
 # SSP Support
 
 SSP_Include_MAINTAINER=	portmgr@FreeBSD.org
-
-# See: http://svnweb.freebsd.org/base/head/lib/libc/libc.ldscript?revision=251668&view=markup
-.if ${OSVERSION} < 1000036 && ${ARCH} == i386
-
-# Disabled on i386 for now on releases without the ldscript as too many ports
-# do not respect LDFLAGS and fail to build due to not adding in -lssp_nonshared when needed
-# despite dependencies working fine, which breaks a lot. Can enable once LDFLAGS is more
-# supported. XXX
-SSP_UNSAFE=		yes
-
-# i386 needs -lssp_nonshared, see svn link above for more information
-SSP_NEED_NONSHARED=	yes
-.endif
 
 .if !defined(SSP_UNSAFE) && \
     (${ARCH} == i386 || ${ARCH} == amd64)

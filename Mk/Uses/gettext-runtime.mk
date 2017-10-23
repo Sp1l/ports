@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/gettext-runtime.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/gettext-runtime.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # Handle dependency on the gettext-runtime (libintl) port
 #
@@ -16,13 +16,13 @@ gettext-runtime_ARGS=	lib
 .endif
 
 .if ${gettext-runtime_ARGS:Mlib}
-LIB_DEPENDS+=	libintl.so:${PORTSDIR}/devel/gettext-runtime
+LIB_DEPENDS+=	libintl.so:devel/gettext-runtime
 .endif
 .if ${gettext-runtime_ARGS:Mbuild}
-BUILD_DEPENDS+=	gettext:${PORTSDIR}/devel/gettext-runtime
+BUILD_DEPENDS+=	gettext:devel/gettext-runtime
 .endif
 .if ${gettext-runtime_ARGS:Mrun}
-RUN_DEPENDS+=	gettext:${PORTSDIR}/devel/gettext-runtime
+RUN_DEPENDS+=	gettext:devel/gettext-runtime
 .endif
 
 .endif

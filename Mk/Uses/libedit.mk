@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/libedit.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/libedit.mk 423014 2016-09-30 19:24:30Z tijl $
 #
 # handle dependency on the libedit port
 #
@@ -10,7 +10,7 @@
 
 .if !defined(_INCLUDE_USES_LIBEDIT_MK)
 _INCLUDE_USES_LIBEDIT_MK=	yes
-.include "${USESDIR}/localbase.mk"
+_USES_POST+=	localbase
 
-LIB_DEPENDS+=	libedit.so.0:${PORTSDIR}/devel/libedit
+LIB_DEPENDS+=	libedit.so.0:devel/libedit
 .endif

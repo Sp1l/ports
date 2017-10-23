@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/fam.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/fam.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # MAINTAINER: portmgr@FreeBSD.org
 #
@@ -15,8 +15,8 @@
 .if !defined(_INCLUDE_USES_FAM_MK)
 _INCLUDE_USES_FAM_MK=	yes
 
-_fam_DEPENDS=	libfam.so.0:${PORTSDIR}/devel/fam
-_gamin_DEPENDS=	libfam.so.0:${PORTSDIR}/devel/gamin
+_fam_DEPENDS=	libfam.so.0:devel/fam
+_gamin_DEPENDS=	libfam.so.0:devel/gamin
 
 _FAM_SYSTEMS=	fam gamin
 _DEFAULT_FAM=	gamin

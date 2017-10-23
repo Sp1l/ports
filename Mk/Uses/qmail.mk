@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/qmail.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/qmail.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # Feature:	qmail
 # Usage:	USES=qmail or USES=qmail:ARGS
@@ -53,9 +53,9 @@ IGNORE=	Invalid QMAIL_SLAVEPORT value. Only one can be set, valid values are: ${
 .  endif
 
 .  if defined(QMAIL_SLAVEPORT)
-_QMAIL_DEPENDS=	${QMAIL_PREFIX}/bin/qmail-send:${PORTSDIR}/mail/qmail-${QMAIL_SLAVEPORT:tl}
+_QMAIL_DEPENDS=	${QMAIL_PREFIX}/bin/qmail-send:mail/qmail-${QMAIL_SLAVEPORT:tl}
 .  else
-_QMAIL_DEPENDS=	${QMAIL_PREFIX}/bin/qmail-send:${PORTSDIR}/mail/qmail
+_QMAIL_DEPENDS=	${QMAIL_PREFIX}/bin/qmail-send:mail/qmail
 .  endif
 
 .endif

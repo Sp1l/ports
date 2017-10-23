@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/tcl.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/tcl.mk 449664 2017-09-11 18:32:17Z antoine $
 #
 # vim: ts=8 noexpandtab
 #
@@ -27,7 +27,7 @@
 #
 # Usage:
 #
-# USES+=	PORT[:(VERSION|wrapper),build,run]
+# USES+=	PORT[:(VERSION|wrapper),build,run,tea]
 #
 # where PORT is one of:
 #
@@ -40,11 +40,11 @@
 #   			  is installed, bring in the default version. See
 #   			  ${_TCLTK_DEFAULT_VERSION} below.
 #
-# - 84, 85, 86		- Depend on a specific version series of PORT. Multiple
+# - 84, 85, 86, 87	- Depend on a specific version series of PORT. Multiple
 #   			  values are OK. The highest version available is
 #   			  picked.
 #
-# - 84+, 85+, 86+	- Depend on any installed version greater or equal to
+# - 84+, 85+, 86+, 87+	- Depend on any installed version greater or equal to
 #   			  the specified version.
 #
 # If wrapper is specified, an additional dependency on tcl-wrapper or
@@ -52,6 +52,9 @@
 # Tcl/Tk when using the wrapper.
 #
 # Build-time / Run-time only dependencies can be specified with build or run.
+#
+# Tea can be used for Tcl/Tk extensions that use the Tcl Extension Architecture
+# [http://www.tcl.tk/doc/tea] and allows to set common autoconf parameters.
 #
 # MAINTAINER: tcltk@FreeBSD.org
 
@@ -67,13 +70,14 @@ _INCLUDE_USES_TCL_MK=	yes
 #
 # List the currently available versions.
 #
-_TCLTK_VALID_VERSIONS=	84 85 86
+# When adding a version, please keep the comment in
+# Mk/bsd.default-versions.mk in sync.
+_TCLTK_VALID_VERSIONS=	84 85 86 87
 
 #
 # Bring in the default and check that the specified version is in the list of
 # valid versions.
 #
-.include "${PORTSDIR}/Mk/bsd.default-versions.mk"
 _TCLTK_DEFAULT_VERSION=	${TCLTK_DEFAULT:S/.//}
 .if ! ${_TCLTK_VALID_VERSIONS:M${_TCLTK_DEFAULT_VERSION}}
 IGNORE=	Invalid tcltk version ${TCLTK_DEFAULT}
@@ -96,8 +100,8 @@ _TCLTK_WANTED_VERSIONS:=${_TCLTK_DEFAULT_VERSION}
 #
 # Parse one or more ver arguments.
 #
-.if ${tcl_ARGS:M8[4-6]}
-_TCLTK_WANTED_VERSIONS:=${tcl_ARGS:M8[4-6]}
+.if ${tcl_ARGS:M8[4-7]}
+_TCLTK_WANTED_VERSIONS:=${tcl_ARGS:M8[4-7]}
 .endif
 
 #
@@ -140,9 +144,13 @@ _TCLTK_WANTED_VERSION:=	${_v}
 .endfor
 
 #
-# If we couldn't find any wanted version installed, depend on the highest one.
+# If we couldn't find any wanted version installed, depend on the default or the highest one.
 .if !defined(_TCLTK_WANTED_VERSION)
+.  if ${_TCLTK_WANTED_VERSIONS:M${_TCLTK_DEFAULT_VERSION}}
+_TCLTK_WANTED_VERSION:=	${_TCLTK_DEFAULT_VERSION}
+.  else
 _TCLTK_WANTED_VERSION:= ${_TCLTK_HIGHEST_VERSION}
+.  endif
 .endif
 
 #
@@ -172,19 +180,20 @@ _TCLTK_LIB_DEPENDS=
 # Construct the correct dependency lines (wrapper)
 .if ${tcl_ARGS:Mwrapper}
 .  if ${_TCLTK_PORT} == "tcl"
-_TCLTK_WRAPPER_PORT=	tclsh:${PORTSDIR}/lang/tcl-wrapper
+_TCLTK_WRAPPER_PORT=	tclsh:lang/tcl-wrapper
 .  elif ${_TCLTK_PORT} == "tk"
-_TCLTK_WRAPPER_PORT=	wish:${PORTSDIR}/x11-toolkits/tk-wrapper
+_TCLTK_WRAPPER_PORT=	wish:x11-toolkits/tk-wrapper
 .  endif
 .endif
 
 # Construct the correct dependency lines (Tcl/Tk)
-.  if ${_TCLTK_PORT} == "tcl"
-_TCLTK_EXE_LINE=	tclsh${TCL_VER}:${PORTSDIR}/lang/tcl${_TCLTK_WANTED_VERSION}
-_TCLTK_LIB_LINE=	libtcl${TCL_SHLIB_VER}.so:${PORTSDIR}/lang/tcl${_TCLTK_WANTED_VERSION}
-.  elif ${_TCLTK_PORT} == "tk"
-_TCLTK_EXE_LINE=	wish${TK_VER}:${PORTSDIR}/x11-toolkits/tk${_TCLTK_WANTED_VERSION}
-_TCLTK_LIB_LINE=	libtk${TK_SHLIB_VER}.so:${PORTSDIR}/x11-toolkits/tk${_TCLTK_WANTED_VERSION}
+.if ${_TCLTK_PORT} == "tcl"
+_TCLTK_EXE_LINE=	tclsh${TCL_VER}:lang/tcl${_TCLTK_WANTED_VERSION}
+_TCLTK_LIB_LINE=	libtcl${TCL_SHLIB_VER}.so:lang/tcl${_TCLTK_WANTED_VERSION}
+.elif ${_TCLTK_PORT} == "tk"
+_TCLTK_EXE_LINE=	wish${TK_VER}:x11-toolkits/tk${_TCLTK_WANTED_VERSION}
+_TCLTK_LIB_LINE=	libtk${TK_SHLIB_VER}.so:x11-toolkits/tk${_TCLTK_WANTED_VERSION} \
+			libtcl${TCL_SHLIB_VER}.so:lang/tcl${_TCLTK_WANTED_VERSION}
 .endif
 
 .if ${tcl_ARGS:Mbuild}
@@ -196,6 +205,19 @@ RUN_DEPENDS+=	${_TCLTK_WRAPPER_PORT} \
 .else
 RUN_DEPENDS+=	${_TCLTK_WRAPPER_PORT}
 LIB_DEPENDS+=	${_TCLTK_LIB_LINE}
+.endif
+
+# Setup TEA stuff
+.if ${tcl_ARGS:Mtea}
+GNU_CONFIGURE=	yes
+TCL_PKG?=	${PORTNAME:C/^tcl(-?)//:C/(-?)tcl\$//}${PORTVERSION}
+PLIST_SUB+=	TCL_PKG=${TCL_PKG}
+CONFIGURE_ARGS+=--exec-prefix=${PREFIX} \
+		--with-tcl=${TCL_LIBDIR} \
+		--with-tclinclude=${TCL_INCLUDEDIR}
+.  if ${_TCLTK_PORT} == "tk"
+CONFIGURE_ARGS+=--with-tk=${TK_LIBDIR} --with-tkinclude=${TK_INCLUDEDIR}
+.  endif
 .endif
 
 .endif # defined(_INCLUDE_USES_TCL_MK)

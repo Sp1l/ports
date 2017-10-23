@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/erlang.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/erlang.mk 424411 2016-10-21 12:51:40Z mat $
 #
 # Handle Erlang related ports
 #
@@ -38,23 +38,23 @@ ERL_DOCS?=		README*
 # VERSION is used in every Erlang pkg-plist
 PLIST_SUB+=		VERSION="${PORTVERSION}"
 
-BUILD_DEPENDS+=	erl:${PORTSDIR}/lang/erlang
-RUN_DEPENDS+=	erl:${PORTSDIR}/lang/erlang
+BUILD_DEPENDS+=	erl:lang/erlang
+RUN_DEPENDS+=	erl:lang/erlang
 
 .if ${erlang_ARGS:Mrebar}
-BUILD_DEPENDS+=	rebar>=0:${PORTSDIR}/devel/rebar
+BUILD_DEPENDS+=	rebar>=0:devel/rebar
 .endif
 
 .if ${erlang_ARGS:Mrebar3}
-BUILD_DEPENDS+=	rebar3>=0:${PORTSDIR}/devel/rebar3
+BUILD_DEPENDS+=	rebar3>=0:devel/rebar3
 .endif
 
 .for depend in ${ERL_BUILD_DEPS}
-BUILD_DEPENDS+=	${depend:T}>=0:${PORTSDIR}/${depend}
+BUILD_DEPENDS+=	${depend:T}>=0:${depend}
 .endfor
 
 .for depend in ${ERL_RUN_DEPS}
-RUN_DEPENDS+=	${depend:T}>=0:${PORTSDIR}/${depend}
+RUN_DEPENDS+=	${depend:T}>=0:${depend}
 .endfor
 
 .if ${erlang_ARGS:Mrebar}
@@ -86,16 +86,16 @@ post-patch-erlang:
 		${REINPLACE_CMD} -i '' -e "s@\./rebar3@${REBAR3_CMD}@; s@\./rebar@${REBAR_CMD}@" \
 			${WRKSRC}/rebar.config; \
 	fi
-	@${RM} -f ${WRKSRC}/src/*.orig ${WRKSRC}/include/*.orig
+	@${RM} ${WRKSRC}/src/*.orig ${WRKSRC}/include/*.orig
 
 .if !target(do-build)
 do-build:
 # This will cause calls to local rebar and rebar3 to fail; makes it easier to spot them
-	@${RM} -f ${WRKSRC}/rebar ${WRKSRC}/rebar3
+	@${RM} ${WRKSRC}/rebar ${WRKSRC}/rebar3
 .for target in ${REBAR_TARGETS}
 # Remove rebar.lock every time - it can be created again after each run of rebar3
 	@${RM} ${WRKSRC}/rebar.lock
-	@cd ${WRKSRC} && REBAR_PROFILE=${REBAR_PROFILE} ${ERLANG_COMPILE} ${target}
+	@cd ${WRKSRC} && ${SETENV} ${MAKE_ENV} REBAR_PROFILE=${REBAR_PROFILE} ${ERLANG_COMPILE} ${target}
 .endfor
 .endif # !target(do-build)
 

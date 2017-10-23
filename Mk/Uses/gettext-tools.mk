@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/gettext-tools.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/gettext-tools.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # Handle dependency on the gettext-tools port
 #
@@ -16,10 +16,10 @@ gettext-tools_ARGS=	build
 .endif
 
 .if ${gettext-tools_ARGS:Mbuild}
-BUILD_DEPENDS+=	msgfmt:${PORTSDIR}/devel/gettext-tools
+BUILD_DEPENDS+=	msgfmt:devel/gettext-tools
 .endif
 .if ${gettext-tools_ARGS:Mrun}
-RUN_DEPENDS+=	msgfmt:${PORTSDIR}/devel/gettext-tools
+RUN_DEPENDS+=	msgfmt:devel/gettext-tools
 .endif
 
 .endif

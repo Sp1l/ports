@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/shebangfix.mk 399976 2015-10-22 13:36:05Z amdmi3 $
+# $FreeBSD: head/Mk/Uses/shebangfix.mk 447527 2017-08-08 01:10:57Z feld $
 #
 # Replace #! interpreters in scripts by what we actually have.
 #
@@ -7,6 +7,10 @@
 #
 # Feature:	shebangfix
 # Usage:	USES=shebangfix
+#
+#   SHEBANG_REGEX	a regular expression to match files that needs to be converted
+#   SHEBANG_FILES	list of files or glob pattern relative to ${WRKSRC}
+#   SHEBANG_GLOB	list of glob pattern find(1) will match with
 #
 # To specify that ${WRKSRC}/path1/file and all .pl files in ${WRKSRC}/path2
 # should be processed:
@@ -58,6 +62,7 @@ ${lang}_CMD?= ${LOCALBASE}/bin/${lang}
 ${lang}_OLD_CMD+= "/usr/bin/env ${lang}"
 ${lang}_OLD_CMD+= /bin/${lang}
 ${lang}_OLD_CMD+= /usr/bin/${lang}
+${lang}_OLD_CMD+= /usr/local/bin/${lang}
 .endfor
 
 .for lang in ${SHEBANG_LANG}
@@ -75,7 +80,22 @@ _SHEBANG_REINPLACE_ARGS+=	-e "1s|^\#![[:space:]]*${old_cmd:C/\"//g}$$|\#!${${lan
 
 _USES_patch+=	210:fix-shebang
 fix-shebang:
+.if defined(SHEBANG_REGEX)
 	@cd ${WRKSRC}; \
-		${ECHO_CMD} ${SHEBANG_FILES} | ${XARGS} ${SED} -i '' ${_SHEBANG_REINPLACE_ARGS}
+		${FIND} -E . -type f -iregex '${SHEBANG_REGEX}' \
+		-exec ${SED} -i '' ${_SHEBANG_REINPLACE_ARGS} {} +
+.endif
+.if defined(SHEBANG_GLOB)
+.  for f in ${SHEBANG_GLOB}
+	@cd ${WRKSRC}; \
+		${FIND} . -type f -name '${f}' \
+		-exec ${SED} -i '' ${_SHEBANG_REINPLACE_ARGS} {} +
+.  endfor
+.endif
+.if defined(SHEBANG_FILES)
+	@cd ${WRKSRC}; \
+		${FIND} ${SHEBANG_FILES} -type f \
+		-exec ${SED} -i '' ${_SHEBANG_REINPLACE_ARGS} {} +
+.endif
 
 .endif

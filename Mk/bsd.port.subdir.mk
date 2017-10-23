@@ -1,5 +1,5 @@
 #	from: @(#)bsd.subdir.mk	5.9 (Berkeley) 2/1/91
-# $FreeBSD: head/Mk/bsd.port.subdir.mk 399163 2015-10-12 22:42:57Z bdrewery $
+# $FreeBSD: head/Mk/bsd.port.subdir.mk 424411 2016-10-21 12:51:40Z mat $
 #
 # The include file <bsd.port.subdir.mk> contains the default targets
 # for building ports subdirectories.
@@ -303,7 +303,7 @@ readmes: readme
 
 .if !target(readme)
 readme:
-	@${RM} -f README.html
+	@${RM} README.html
 	@${MAKE} README.html
 .endif
 
@@ -345,7 +345,7 @@ README.html:
 			-e '/%%SUBDIR%%/r$@.tmp2' \
 			-e '/%%SUBDIR%%/d' \
 		> $@
-	@${RM} -f $@.tmp $@.tmp2 $@.tmp3 $@.tmp4
+	@${RM} $@.tmp $@.tmp2 $@.tmp3 $@.tmp4
 
 # Pass in the cached invariant variables to child makes.
 .if !defined(NOPRECIOUSMAKEVARS)
@@ -481,7 +481,7 @@ _PORTSEARCH=	\
 	        -v icase="$${icase:-${PORTSEARCH_IGNORECASE}}" \
 	    'BEGIN { \
 	        if (icase) { \
-	    	if (length(name))  name = tolower(name);  if (length(xname))  xname = tolower(xname); \
+		if (length(name))  name = tolower(name);  if (length(xname))  xname = tolower(xname); \
 	        } \
 	        fields["name"]  = 1;  names[1]  = "Port"; \
 	        fields["destination"]  = 2;  names[2]  = "Moved"; \
@@ -494,9 +494,9 @@ _PORTSEARCH=	\
 		sub(".*\/", "", oldname);  newname = sub(".*\/", "", newname); \
 	        if (((icase ? tolower(oldname) : oldname) ~ name) || \
 		  ((icase ? tolower(newname) : newname) ~ name)) { \
-	    	    for (i = 1; i <= 4; i++) { \
-	    		printf("%s:\t%s\n", names[i], $$i); \
-	    	    } \
+		    for (i = 1; i <= 4; i++) { \
+			printf("%s:\t%s\n", names[i], $$i); \
+		    } \
 	        print(""); \
 	        } \
 	    }' ${MOVEDDIR}/${MOVEDFILE}; \

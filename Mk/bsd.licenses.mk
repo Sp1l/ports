@@ -1,7 +1,7 @@
 #-*- tab-width: 4; -*-
 # ex:ts=4
 #
-# $FreeBSD: head/Mk/bsd.licenses.mk 369052 2014-09-23 12:42:00Z bapt $
+# $FreeBSD: head/Mk/bsd.licenses.mk 451432 2017-10-07 09:12:31Z sunpoet $
 
 # ** Please run changes to this file by eadler@ first **
 
@@ -296,6 +296,13 @@ _LICENSE_DISTFILES=	${LICENSE_DISTFILES}
 .	endfor
 
 .else
+
+.	if defined(LICENSE_FILE)
+.		for lic in ${_LICENSE}
+LICENSE_FILE_${lic}?=	${LICENSE_FILE}
+.		endfor
+.	endif
+
 .	for lic in ${_LICENSE}
 # Defaults to empty
 _LICENSE_GROUPS_${lic}?=#
@@ -611,25 +618,17 @@ ${_LICENSE_COOKIE}:
 .	if !defined(NO_LICENSES_DIALOGS)
 # Dialog interface
 .		if ${_LICENSE_COMB} == "single"
-	@trap '${RM} -f $$tmpfile' EXIT INT TERM; \
-	tmpfile=$$(mktemp -t portlicenses); \
-	while true; do \
-		${DIALOG} --menu "License for ${PKGNAME} (${_LICENSE})" 21 70 15 accept "Accept license" reject "Reject license" view "View license" 2>"$${tmpfile}"; \
-		result=`${CAT} $${tmpfile}`; \
-		case $${result} in \
-		accept) break ;; \
-		reject) exit 1;; \
-		view)   ${DIALOG} --textbox "${_LICENSE_FILE}" 21 75 ;; \
-		esac; \
-	done
+	@${DIALOG} --title "License for ${PKGNAME} (${_LICENSE})" \
+		--yes-label Accept --no-label Reject --yesno \
+		"$$(${CAT} ${_LICENSE_FILE})" 21 76
 
 .		elif ${_LICENSE_COMB} == "dual"
-	@${RM} -f ${_LICENSE_ASK_DATA}
+	@${RM} ${_LICENSE_ASK_DATA}
 .			for lic in ${_LICENSE_TO_ASK}
 	@${ECHO_CMD} "${lic}:${_LICENSE_FILE_${lic}}" >> ${_LICENSE_ASK_DATA}
 .			endfor
 	@menu_cmd="${DIALOG} --hline \"This port requires you to accept at least one license\" --menu \"License for ${PKGNAME} (dual)\" 21 70 15"; \
-	trap '${RM} -f $$tmpfile' EXIT INT TERM; \
+	trap '${RM} $$tmpfile' EXIT INT TERM; \
 	tmpfile=$$(mktemp -t portlicenses); \
 	for lic in ${_LICENSE_TO_ASK}; do \
 		menu_cmd="$${menu_cmd} VIEW_$${lic} \"View the license $${lic}\" USE_$${lic} \"Accept the license $${lic}\""; \
@@ -650,12 +649,12 @@ ${_LICENSE_COOKIE}:
 	done
 
 .		elif ${_LICENSE_COMB} == "multi"
-	@${RM} -f ${_LICENSE_ASK_DATA}
+	@${RM} ${_LICENSE_ASK_DATA}
 .			for lic in ${_LICENSE_TO_ASK}
 	@${ECHO_CMD} "${lic}:${_LICENSE_FILE_${lic}}" >> ${_LICENSE_ASK_DATA}
 .			endfor
 	@menu_cmd="${DIALOG} --hline \"This port requires you to accept all mentioned licenses\" --menu \"License for ${PKGNAME} (multi)\" 21 70 15"; \
-	trap '${RM} -f $$tmpfile' EXIT INT TERM; \
+	trap '${RM} $$tmpfile' EXIT INT TERM; \
 	tmpfile=$$(mktemp -t portlicenses); \
 	for lic in ${_LICENSE_TO_ASK}; do \
 		menu_cmd="$${menu_cmd} VIEW_$${lic} \"View the license $${lic}\""; \
@@ -701,12 +700,12 @@ ${_LICENSE_COOKIE}:
 	@${ECHO_MSG}
 	@exit 1
 .	endif
-	@${RM} -f ${_LICENSE_ASK_DATA}
+	@${RM} ${_LICENSE_ASK_DATA}
 .endif
 
 # Create report and catalog
 .if !defined(NO_LICENSES_INSTALL)
-	@${RM} -f ${_LICENSE_CATALOG_TMP} ${_LICENSE_REPORT_TMP}
+	@${RM} ${_LICENSE_CATALOG_TMP} ${_LICENSE_REPORT_TMP}
 .	if ${_LICENSE_COMB} == "single"
 # Catalog
 .		for var in _LICENSE _LICENSE_NAME _LICENSE_PERMS _LICENSE_GROUPS _LICENSE_DISTFILES
@@ -724,7 +723,7 @@ ${_LICENSE_COOKIE}:
 .		endif
 .		for lic in ${_LICENSE}
 .			for var in NAME PERMS GROUPS DISTFILES
-	@${ECHO_CMD} "_LICENSE_${var}_${lic}=${_LICENSE_${var}_${lic}:C/^[[:blank:]]*//}" >> ${_LICENSE_CATALOG_TMP}
+	@${ECHO_CMD} "_LICENSE_${var}_${lic} =${_LICENSE_${var}_${lic}:C/^[[:blank:]]*//}" >> ${_LICENSE_CATALOG_TMP}
 .			endfor
 .		endfor
 # Report

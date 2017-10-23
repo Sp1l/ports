@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/python.mk 407844 2016-02-02 20:21:47Z rm $
+# $FreeBSD: head/Mk/Uses/python.mk 449198 2017-09-03 10:36:15Z rene $
 #
 # Provide support for Python related ports. This includes detecting Python
 # interpreters, ports providing package and modules for python as well as
@@ -193,10 +193,16 @@
 #	PYTHON_INCLUDEDIR=${PYTHONPREFIX_INCLUDEDIR:S;${PREFIX}/;;}
 #	PYTHON_LIBDIR=${PYTHONPREFIX_LIBDIR:S;${PREFIX}/;;}
 #	PYTHON_PLATFORM=${PYTHON_PLATFORM}
+#	PYTHON_PYOEXTENSION=${PYTHON_PYOEXTENSION}
 #	PYTHON_SITELIBDIR=${PYTHONPREFIX_SITELIBDIR:S;${PREFIX}/;;}
+#	PYTHON_SUFFIX=${PYTHON_SUFFIX}
 #	PYTHON_VER=${PYTHON_VER}
 #	PYTHON_VERSION=${PYTHON_VERSION}
 #
+# and PYTHON2 and PYTHON3 will be set according to the Python version:
+#
+#	PYTHON2="" PYTHON3="@comment " for Python 2.x
+#	PYTHON2="@comment " PYTHON3="" for Python 3.x
 #
 # Deprecated variables, which exist for compatibility and will be removed
 # soon:
@@ -220,10 +226,12 @@
 _INCLUDE_USES_PYTHON_MK=	yes
 
 # What Python version and what Python interpreters are currently supported?
-_PYTHON_VERSIONS=		2.7 3.4 3.5 3.3	# preferred first
+# When adding a version, please keep the comment in
+# Mk/bsd.default-versions.mk in sync.
+_PYTHON_VERSIONS=		2.7 3.6 3.5 3.4	# preferred first
 _PYTHON_PORTBRANCH=		2.7		# ${_PYTHON_VERSIONS:[1]}
 _PYTHON_BASECMD=		${LOCALBASE}/bin/python
-_PYTHON_RELPORTDIR=		${PORTSDIR}/lang/python
+_PYTHON_RELPORTDIR=		lang/python
 
 # Make each individual feature available as _PYTHON_FEATURE_<FEATURENAME>
 .for var in ${USE_PYTHON}
@@ -257,9 +265,6 @@ _PYTHON_BUILD_DEP=	yes
 _PYTHON_RUN_DEP=	yes
 _PYTHON_TEST_DEP=	yes
 .endif
-
-# Determine version number of Python to use
-.include "${PORTSDIR}/Mk/bsd.default-versions.mk"
 
 .if defined(PYTHON_DEFAULT_VERSION)
 WARNING+=	"PYTHON_DEFAULT_VERSION is defined, consider using DEFAULT_VERSIONS=python=${PYTHON_DEFAULT_VERSION:S/^python//} instead"
@@ -349,7 +354,7 @@ _PYTHON_VERSION_NONSUPPORTED=	${_PYTHON_VERSION_MAXIMUM} at most
 .if defined(_PYTHON_VERSION_NONSUPPORTED)
 .if defined(PYTHON_VERSION) || defined(PYTHON_CMD)
 _PV:=		${_PYTHON_VERSION}	# preserve the specified python version
-WARNING+=	"needs Python ${_PYTHON_VERSION_NONSUPPORTED}. But a port depending on this one specified ${_PV}"
+IGNORE=		needs Python ${_PYTHON_VERSION_NONSUPPORTED}, but ${_PV} was specified
 .endif # defined(PYTHON_VERSION) || defined(PYTHON_CMD)
 .undef _PYTHON_VERSION
 .for ver in ${PYTHON2_DEFAULT} ${PYTHON3_DEFAULT} ${_PYTHON_VERSIONS}
@@ -372,7 +377,10 @@ IGNORE=		needs an unsupported version of Python
 # try to find a different one, if the passed version fits into
 # the supported version range.
 PYTHON_VERSION?=	python${_PYTHON_VERSION}
+.if !defined(PYTHON_NO_DEPENDS) && \
+    ${PYTHON_VERSION} != ${PYTHON_DEFAULT_VERSION}
 DEPENDS_ARGS+=		PYTHON_VERSION=${PYTHON_VERSION}
+.endif
 
 # NOTE:
 #
@@ -392,8 +400,8 @@ PYTHON_REL=		# empty
 PYTHON_ABIVER=		# empty
 PYTHON_PORTSDIR=	${_PYTHON_RELPORTDIR}${PYTHON_SUFFIX}
 # Protect partial checkouts from Mk/Scripts/functions.sh:export_ports_env().
-.if !defined(_PORTS_ENV_CHECK) || exists(${PYTHON_PORTSDIR})
-.include "${PYTHON_PORTSDIR}/Makefile.version"
+.if !defined(_PORTS_ENV_CHECK) || exists(${PORTSDIR}/${PYTHON_PORTSDIR})
+.include "${PORTSDIR}/${PYTHON_PORTSDIR}/Makefile.version"
 .endif
 # Create a 4 integer version string, prefixing 0 to the last token if
 # it's a single character. Only use the the first 3 tokens of
@@ -403,8 +411,13 @@ PYTHON_REL=	${PYTHON_PORTVERSION:C/^([0-9]+\.[0-9]+\.[0-9]+).*/\1/:C/\.([0-9]+)$
 
 # Might be overridden by calling ports
 PYTHON_CMD?=		${_PYTHON_BASECMD}${_PYTHON_VERSION}
-.if exists(${PYTHON_CMD}-config) && ${PYTHON_VER} != 2.7
+.if ${PYTHON_VER} != 2.7
+.if exists(${PYTHON_CMD}-config)
 PYTHON_ABIVER!=		${PYTHON_CMD}-config --abiflags
+.else
+# Default ABI flags for lang/python3x ports
+PYTHON_ABIVER=		m
+.endif
 .endif
 
 .if !defined(PYTHONBASE)
@@ -426,6 +439,13 @@ PYTHONPREFIX_SITELIBDIR=	${PYTHON_SITELIBDIR:S;${PYTHONBASE};${PREFIX};}
 
 # Used for recording the installed files.
 _PYTHONPKGLIST=	${WRKDIR}/.PLIST.pymodtmp
+
+# PEP 0488 (https://www.python.org/dev/peps/pep-0488/)
+.if ${PYTHON_REL} < 3500
+PYTHON_PYOEXTENSION=	pyo
+.else
+PYTHON_PYOEXTENSION=	opt-1.pyc
+.endif
 
 # Ports bound to a certain python version SHOULD
 # - use the PYTHON_PKGNAMEPREFIX
@@ -453,18 +473,18 @@ UNIQUE_SUFFIX=		-${PYTHON_VER}
 .if defined(_PYTHON_FEATURE_AUTOPLIST)
 UNIQUE_FIND_SUFFIX_FILES=	\
 	${SED} -e 's|^${PREFIX}/||' ${_PYTHONPKGLIST} ${TMPPLIST} | \
-	${GREP} -e '^bin/.*$$\|^sbin/.*$$\|^libexec/.*$$'
+	${EGREP} -e '^bin/.*$$|^sbin/.*$$|^libexec/.*$$'
 .else
 UNIQUE_FIND_SUFFIX_FILES=	\
-	${GREP} -he '^bin/.*$$\|^sbin/.*$$\|^libexec/.*$$' ${TMPPLIST} 2>/dev/null
+	${EGREP} -he '^bin/.*$$|^sbin/.*$$|^libexec/.*$$' ${TMPPLIST} 2>/dev/null
 .endif
 .endif # defined(_PYTHON_FEATURE_CONCURRENT)
 
 _CURRENTPORT:=	${PKGNAMEPREFIX}${PORTNAME}${PKGNAMESUFFIX}
 .if defined(_PYTHON_FEATURE_DISTUTILS) && \
-	${_CURRENTPORT:S/${PYTHON_SUFFIX}$//} != ${PYTHON_PKGNAMEPREFIX}setuptools
-BUILD_DEPENDS+=		${PYTHON_PKGNAMEPREFIX}setuptools${PYTHON_SUFFIX}>0:${PORTSDIR}/devel/py-setuptools${PYTHON_SUFFIX}
-RUN_DEPENDS+=		${PYTHON_PKGNAMEPREFIX}setuptools${PYTHON_SUFFIX}>0:${PORTSDIR}/devel/py-setuptools${PYTHON_SUFFIX}
+	${_CURRENTPORT} != ${PYTHON_PKGNAMEPREFIX}setuptools
+BUILD_DEPENDS+=		${PYTHON_PKGNAMEPREFIX}setuptools>0:devel/${PYTHON_PKGNAMEPREFIX}setuptools
+RUN_DEPENDS+=		${PYTHON_PKGNAMEPREFIX}setuptools>0:devel/${PYTHON_PKGNAMEPREFIX}setuptools
 .endif
 
 # distutils support
@@ -490,11 +510,12 @@ PYDISTUTILS_PKGVERSION?=${PORTVERSION}
 PYDISTUTILS_EGGINFO?=	${PYDISTUTILS_PKGNAME:C/[^A-Za-z0-9.]+/_/g}-${PYDISTUTILS_PKGVERSION:C/[^A-Za-z0-9.]+/_/g}-py${PYTHON_VER}.egg-info
 PYDISTUTILS_EGGINFODIR?=${STAGEDIR}${PYTHONPREFIX_SITELIBDIR}
 
-add-plist-egginfo:
 .if !defined(_PYTHON_FEATURE_NOEGGINFO) && \
 	!defined(_PYTHON_FEATURE_AUTOPLIST) && \
 	defined(_PYTHON_FEATURE_DISTUTILS) && \
 	defined(PYTHON_REL)
+_USES_stage+=	933:add-plist-egginfo
+add-plist-egginfo:
 . for egginfo in ${PYDISTUTILS_EGGINFO}
 	if [ -d "${PYDISTUTILS_EGGINFODIR}/${egginfo}" ]; then \
 		${LS} ${PYDISTUTILS_EGGINFODIR}/${egginfo} | while read f; do \
@@ -502,15 +523,13 @@ add-plist-egginfo:
 		done; \
 	fi;
 . endfor
-.else
-	@${DO_NADA}
 .endif
 
 .if defined(_PYTHON_FEATURE_AUTOPLIST) && defined(_PYTHON_FEATURE_DISTUTILS)
 _RELSITELIBDIR=	${PYTHONPREFIX_SITELIBDIR:S;${PREFIX}/;;}
 _RELLIBDIR=		${PYTHONPREFIX_LIBDIR:S;${PREFIX}/;;}
 
-add-plist-post:	add-plist-pymod
+_USES_stage+=	934:add-plist-pymod
 add-plist-pymod:
 	@${SED} -e 's|^${STAGEDIR}${PREFIX}/||' \
 		-e 's|^${PREFIX}/||' \
@@ -524,19 +543,15 @@ add-plist-pymod:
 # of TMPPLIST that end with .py[co], so that they conform
 # to PEP 3147 (see http://www.python.org/dev/peps/pep-3147/)
 PYMAGICTAG=		${PYTHON_CMD} -c 'import imp; print(imp.get_tag())'
-.if ${PYTHON_REL} < 3500
-PYOEXTENSION=	pyo
-.else
-PYOEXTENSION=	opt-1.pyc
-.endif
-add-plist-post:
+_USES_stage+=	935:add-plist-python
+add-plist-python:
 	@${AWK} '\
 		/\.py[co]$$/ && !($$0 ~ "/" pc "/") {id = match($$0, /\/[^\/]+\.py[co]$$/); if (id != 0) {d = substr($$0, 1, RSTART - 1); dirs[d] = 1}; sub(/\.pyc$$/,  "." mt "&"); sub(/\.pyo$$/, "." mt "." pyo); sub(/[^\/]+\.py[co]$$/, pc "/&"); print; next} \
 		/^@dirrm / {d = substr($$0, 8); if (d in dirs) {print $$0 "/" pc}; print $$0; next} \
 		/^@dirrmtry / {d = substr($$0, 11); if (d in dirs) {print $$0 "/" pc}; print $$0; next} \
 		{print} \
 		' \
-		pc="__pycache__" mt="$$(${PYMAGICTAG})" pyo="${PYOEXTENSION}" \
+		pc="__pycache__" mt="$$(${PYMAGICTAG})" pyo="${PYTHON_PYOEXTENSION}" \
 		${TMPPLIST} > ${TMPPLIST}.pyc_tmp
 	@${MV} ${TMPPLIST}.pyc_tmp ${TMPPLIST}
 .endif # ${PYTHON_REL} >= 3200 && defined(_PYTHON_FEATURE_PY3KPLIST)
@@ -550,9 +565,9 @@ CONFIGURE_ENV+=	PYTHON="${PYTHON_CMD}"
 CMAKE_ARGS+=	-DPython_ADDITIONAL_VERSIONS=${PYTHON_VER}
 
 # Python 3rd-party modules
-PYGAME=		${PYTHON_PKGNAMEPREFIX}game>0:${PORTSDIR}/devel/py-game
-PYNUMERIC=	${PYTHON_SITELIBDIR}/Numeric/Numeric.py:${PORTSDIR}/math/py-numeric
-PYNUMPY=	${PYTHON_SITELIBDIR}/numpy/core/numeric.py:${PORTSDIR}/math/py-numpy
+PYGAME=		${PYTHON_PKGNAMEPREFIX}game>0:devel/py-game
+PYNUMERIC=	${PYTHON_SITELIBDIR}/Numeric/Numeric.py:math/py-numeric
+PYNUMPY=	${PYTHON_SITELIBDIR}/numpy/core/numeric.py:math/py-numpy
 
 # dependencies
 .if defined(_PYTHON_BUILD_DEP)
@@ -585,9 +600,16 @@ PREFIX=		${PYTHONBASE}
 PLIST_SUB+=	PYTHON_INCLUDEDIR=${PYTHONPREFIX_INCLUDEDIR:S;${PREFIX}/;;} \
 		PYTHON_LIBDIR=${PYTHONPREFIX_LIBDIR:S;${PREFIX}/;;} \
 		PYTHON_PLATFORM=${PYTHON_PLATFORM} \
+		PYTHON_PYOEXTENSION=${PYTHON_PYOEXTENSION} \
 		PYTHON_SITELIBDIR=${PYTHONPREFIX_SITELIBDIR:S;${PREFIX}/;;} \
+		PYTHON_SUFFIX=${PYTHON_SUFFIX} \
 		PYTHON_VER=${PYTHON_VER} \
-		PYTHON_VERSION=python${_PYTHON_VERSION}
+		PYTHON_VERSION=${PYTHON_VERSION}
+.if ${PYTHON_REL} < 3000
+PLIST_SUB+=	PYTHON2="" PYTHON3="@comment "
+.else
+PLIST_SUB+=	PYTHON2="@comment " PYTHON3=""
+.endif
 
 _USES_POST+=	python
 .endif # _INCLUDE_USES_PYTHON_MK
@@ -618,7 +640,5 @@ do-build:
 do-install:
 	@(cd ${INSTALL_WRKSRC}; ${SETENV} ${MAKE_ENV} ${PYTHON_CMD} ${PYDISTUTILS_SETUP} ${PYDISTUTILS_INSTALL_TARGET} ${PYDISTUTILS_INSTALLARGS})
 .endif
-
-add-plist-post: add-plist-egginfo
 .endif # defined(_PYTHON_FEATURE_DISTUTILS)
 .endif # defined(_POSTMKINCLUDED) && !defined(_INCLUDE_USES_PYTHON_POST_MK)

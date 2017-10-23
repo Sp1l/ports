@@ -1,35 +1,23 @@
-# $FreeBSD: head/Mk/Uses/cran.mk 408802 2016-02-13 14:41:46Z dbn $
+# $FreeBSD: head/Mk/Uses/cran.mk 443845 2017-06-18 18:09:16Z dbn $
 #
 # Use the Comprehensive R Archive Network 
 #
 # Feature:	cran
 # Usage:	USES=cran or USES=cran:ARGS
-# Valid ARGS:	auto-plist
+# Valid ARGS:	auto-plist, compiles
 #
-# auto-plist	The pkg-plist can be automatically compiled
+# auto-plist	The pkg-plist is to be automatically generated
+# compiles	The port has code that needs to be compiled
 #
-# MAINTAINER=	wen@FreeBSD.org
+# MAINTAINER=	dbn@FreeBSD.org
 
 .if !defined(_INCLUDE_USES_CRAN_MK)
 _INCLUDE_USES_CRAN_MK=	yes
 
-MASTER_SITE_CRAN+=	http://cran.ms.unimelb.edu.au/src/contrib/ \
-			http://mirror.its.dal.ca/cran/src/contrib/ \
-			http://mirrors.dotsrc.org/cran/src/contrib/ \
-			http://cran.univ-lyon1.fr/src/contrib/ \
-			http://ftp5.gwdg.de/pub/misc/cran/src/contrib/ \
-			http://cran.stat.unipd.it/src/contrib/ \
-			http://cran.md.tsukuba.ac.jp/src/contrib/ \
-			http://mirrors.ibiblio.org/pub/mirrors/CRAN/src/contrib/ \
-			http://cran.cnr.berkeley.edu/src/contrib/ \
-			http://cran.rakanu.com/src/contrib/ \
-			http://ftp.ctex.org/mirrors/CRAN/src/contrib/
-MASTER_SITE_CRAN_ARCHIVE+=	${MASTER_SITE_CRAN:S,$,Archive/${PORTNAME}/,}
+MASTER_SITES?=	CRAN/src/contrib CRAN_ARCHIVE/src/contrib
 
-MASTER_SITES?=	${MASTER_SITE_CRAN} ${MASTER_SITE_CRAN_ARCHIVE}
-
-BUILD_DEPENDS+=	${LOCALBASE}/bin/R:${PORTSDIR}/math/R
-RUN_DEPENDS+=	${LOCALBASE}/bin/R:${PORTSDIR}/math/R
+BUILD_DEPENDS+=	${LOCALBASE}/bin/R:math/R
+RUN_DEPENDS+=	${LOCALBASE}/bin/R:math/R
 
 PKGNAMEPREFIX?=	R-cran-
 
@@ -49,6 +37,7 @@ R_POSTCMD_CHECK_OPTIONS+=	--no-manual --no-build-vignettes
 .endif
 
 do-test:
+	@${FIND} ${WRKSRC} \( -name '*.o' -o -name '*.so' \) -delete
 	@cd ${WRKDIR} ; ${SETENV} ${MAKE_ENV} _R_CHECK_FORCE_SUGGESTS_=FALSE \
 	${R_COMMAND} ${R_PRECMD_CHECK_OPTIONS} CMD check \
 	${R_POSTCMD_CHECK_OPTIONS} ${PORTNAME}
@@ -74,6 +63,16 @@ _USES_install+=	750:cran-auto-plist
 cran-auto-plist:
 	@${FIND} -ds ${STAGEDIR}${PREFIX}/${R_MOD_DIR} \( -type f -or -type l \) -print | \
 		${SED} -E -e 's,^${STAGEDIR}${PREFIX}/?,,' >> ${TMPPLIST}
+.endif
+
+.if ${cran_ARGS:Mcompiles}
+_USES_install+= 755:cran-strip
+cran-strip:
+	${FIND} ${STAGEDIR}${PREFIX}/${R_MOD_DIR} -name '*.so' -exec ${STRIP_CMD} {} +
+.include "${PORTSDIR}/math/R/compiler.mk"
+.include "${USESDIR}/fortran.mk"
+.else
+NO_ARCH=	yes
 .endif
 
 .endif #_INCLUDE_USES_CRAN_MK

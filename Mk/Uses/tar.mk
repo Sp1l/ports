@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/tar.mk 369465 2014-09-28 16:36:31Z tijl $
+# $FreeBSD: head/Mk/Uses/tar.mk 410457 2016-03-06 12:29:51Z amdmi3 $
 #
 # handle tar archives
 #
@@ -22,6 +22,8 @@ EXTRACT_SUFX?=	.tar.bz2
 EXTRACT_SUFX?=	.tgz
 .elif ${tar_ARGS} == tbz
 EXTRACT_SUFX?=	.tbz
+.elif ${tar_ARGS} == tbz2
+EXTRACT_SUFX?=	.tbz2
 .elif ${tar_ARGS} == Z
 EXTRACT_SUFX?=	.tar.Z
 .elif empty(tar_ARGS)

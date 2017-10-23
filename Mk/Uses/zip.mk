@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/zip.mk 400846 2015-11-05 12:35:26Z mat $
+# $FreeBSD: head/Mk/Uses/zip.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # handle zip archives
 #
@@ -18,7 +18,7 @@ EXTRACT_AFTER_ARGS?=	-d ${EXTRACT_WRKDIR}
 .if empty(zip_ARGS)
 EXTRACT_CMD?=		${UNZIP_NATIVE_CMD}
 .elif ${zip_ARGS} == "infozip"
-EXTRACT_DEPENDS+=	${UNZIP_CMD}:${PORTSDIR}/archivers/unzip
+EXTRACT_DEPENDS+=	${UNZIP_CMD}:archivers/unzip
 EXTRACT_CMD?=		${UNZIP_CMD}
 .else
 IGNORE=	Incorrect 'USES+=zip:${zip_ARGS}' expecting 'USES+=zip[:infozip]'

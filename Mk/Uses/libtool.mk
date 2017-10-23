@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/libtool.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/libtool.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # Bring libtool scripts up to date.
 #
@@ -18,7 +18,7 @@ _INCLUDE_USES_LIBTOOL_MK=	yes
 _USES_POST+=	libtool
 
 .if ${libtool_ARGS:Mbuild}
-BUILD_DEPENDS+=	libtool:${PORTSDIR}/devel/libtool
+BUILD_DEPENDS+=	libtool:devel/libtool
 .endif
 .endif
 

@@ -16,23 +16,12 @@
 # the standard SDL and SDL_sound, use "USE_SDL=sdl sound" and the
 # required libraries are included in your LIB_DEPENDS.
 #
-# If you want to check for the availability for certain SDL ports, you
-# can set WANT_SDL and run it through bsd.port.pre.mk:
-#	WANT_SDL=	yes
-#	USE_SDL=	sdl
-#	.include <bsd.port.pre.mk>
-#	.if ${HAVE_SDL:Mgraphics}
-#	USE_SDL+=	graphics
-#	.endif
-#	.include <bsd.port.post.mk>
-# Run "make -V USE_SDL" to see which libs are asked for at the end.
-#
 
 #
-# $FreeBSD: head/Mk/bsd.sdl.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/bsd.sdl.mk 433963 2017-02-12 20:39:55Z rene $
 #
 
-SDL_Include_MAINTAINER=		mva@FreeBSD.org
+SDL_Include_MAINTAINER=		ports@FreeBSD.org
 
 #
 # These are the current supported SDL1.2 modules
@@ -132,26 +121,6 @@ _LIB_ttf2=	libSDL2_ttf.so
 _REQUIRES_ttf2=	sdl2
 
 #
-# If WANT_SDL is defined, check for the available libraries
-#
-.if !defined(AFTERPORTMK)
-.if !defined(SDL_Include_pre)
-
-SDL_Include_pre=	bsd.sdl.mk
-
-HAVE_SDL?=
-.if defined(WANT_SDL)
-.for component in ${_USE_SDL_ALL}
-.if exists(${LOCALBASE}/lib/lib${_LIB_${component}}.so)
-HAVE_SDL+=	${component}
-.endif
-.endfor
-.endif
-
-.endif
-.endif
-
-#
 # If USE_SDL is defined, make dependencies for the libraries
 #
 .if !defined(BEFOREPORTMK)
@@ -192,20 +161,20 @@ __USE_SDL+= ${component}
 # Finally make the list of libs required
 #
 .for component in ${__USE_SDL}
-LIB_DEPENDS+=	${_LIB_${component}}:${PORTSDIR}/${_SUBDIR_${component}}/${_PORTDIR_${component}}
+LIB_DEPENDS+=	${_LIB_${component}}:${_SUBDIR_${component}}/${_PORTDIR_${component}}
 .endfor
 
 #
 # "Normal" dependencies and variables
 #
 .if ${__USE_SDL:Msdl} != ""
-BUILD_DEPENDS+=	${SDL_CONFIG}:${PORTSDIR}/${_SUBDIR_sdl}/${_PORTDIR_sdl}
+BUILD_DEPENDS+=	${SDL_CONFIG}:${_SUBDIR_sdl}/${_PORTDIR_sdl}
 SDL_CONFIG?=	${LOCALBASE}/bin/sdl-config
 CONFIGURE_ENV+=	SDL_CONFIG=${SDL_CONFIG}
 MAKE_ENV+=		SDL_CONFIG=${SDL_CONFIG}
 .endif
 .if ${__USE_SDL:Msdl2} != ""
-BUILD_DEPENDS+=	${SDL2_CONFIG}:${PORTSDIR}/${_SUBDIR_sdl2}/${_PORTDIR_sdl2}
+BUILD_DEPENDS+=	${SDL2_CONFIG}:${_SUBDIR_sdl2}/${_PORTDIR_sdl2}
 SDL2_CONFIG?=	${LOCALBASE}/bin/sdl2-config
 CONFIGURE_ENV+=	SDL2_CONFIG=${SDL2_CONFIG}
 MAKE_ENV+=		SDL2_CONFIG=${SDL2_CONFIG}

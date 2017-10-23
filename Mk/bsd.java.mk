@@ -9,7 +9,7 @@
 # Please send all suggested changes to the maintainer instead of committing
 # them to svn yourself.
 #
-# $FreeBSD: head/Mk/bsd.java.mk 399693 2015-10-19 16:14:29Z swills $
+# $FreeBSD: head/Mk/bsd.java.mk 452076 2017-10-14 18:41:06Z glewis $
 #
 
 .if !defined(Java_Include)
@@ -159,7 +159,7 @@ SUB_LIST+=		JAVA_OS="${JAVA_OS}"
 .		endif
 
 # The complete list of Java versions, os and vendors supported.
-__JAVA_VERSION_LIST=	1.6 1.7 1.8
+__JAVA_VERSION_LIST=	1.6 1.7 1.8 1.9
 _JAVA_VERSION_LIST=		${__JAVA_VERSION_LIST} ${__JAVA_VERSION_LIST:S/$/+/}
 _JAVA_OS_LIST=			native linux
 _JAVA_VENDOR_LIST=		openjdk oracle sun
@@ -172,10 +172,10 @@ _JAVA_PORT_NATIVE_OPENJDK_JDK_1_7_INFO=		PORT=java/openjdk7			HOME=${LOCALBASE}/
 											VERSION=1.7.0	OS=native	VENDOR=openjdk
 _JAVA_PORT_NATIVE_OPENJDK_JDK_1_8_INFO=		PORT=java/openjdk8			HOME=${LOCALBASE}/openjdk8 \
 											VERSION=1.8.0	OS=native	VENDOR=openjdk
-_JAVA_PORT_LINUX_SUN_JDK_1_7_INFO=			PORT=java/linux-sun-jdk17	HOME=${LOCALBASE}/linux-sun-jdk1.7.0 \
-											VERSION=1.7.0	OS=linux	VENDOR=sun
 _JAVA_PORT_LINUX_ORACLE_JDK_1_8_INFO=		PORT=java/linux-oracle-jdk18	HOME=${LOCALBASE}/linux-oracle-jdk1.8.0 \
 											VERSION=1.8.0	OS=linux	VENDOR=oracle
+_JAVA_PORT_LINUX_ORACLE_JDK_1_9_INFO=		PORT=java/linux-oracle-jdk9	HOME=${LOCALBASE}/linux-oracle-jdk9 \
+											VERSION=1.9.0	OS=linux	VENDOR=oracle
 
 # Verbose description for each VENDOR
 _JAVA_VENDOR_openjdk=		"OpenJDK BSD Porting Team"
@@ -190,8 +190,8 @@ _JAVA_OS_linux=		Linux
 __JAVA_PORTS_ALL=	JAVA_PORT_NATIVE_OPENJDK_JDK_1_8 \
 					JAVA_PORT_NATIVE_OPENJDK_JDK_1_7 \
 					JAVA_PORT_NATIVE_OPENJDK_JDK_1_6 \
-					JAVA_PORT_LINUX_SUN_JDK_1_7 \
-					JAVA_PORT_LINUX_ORACLE_JDK_1_8
+					JAVA_PORT_LINUX_ORACLE_JDK_1_8 \
+					JAVA_PORT_LINUX_ORACLE_JDK_1_9
 _JAVA_PORTS_ALL=	${JAVA_PREFERRED_PORTS} \
 					${__JAVA_PORTS_ALL}
 
@@ -217,44 +217,30 @@ check-makevars::
 
 # Error checking: JAVA_VERSION
 .if !defined(_JAVA_VERSION_LIST_REGEXP)
-.	for v in ${_JAVA_VERSION_LIST}
-.		if defined(_JAVA_VERSION_LIST_REGEXP)
-_JAVA_VERSION_LIST_REGEXP:=		${_JAVA_VERSION_LIST_REGEXP}\|
-.		endif
-_JAVA_VERSION_LIST_REGEXP:=		${_JAVA_VERSION_LIST_REGEXP}$v
-.	endfor
+_JAVA_VERSION_LIST_REGEXP=	${_JAVA_VERSION_LIST:C/\+/\\+/:ts|}
 .endif
 
-
 check-makevars::
-	@test ! -z "${JAVA_VERSION}" && ( ${ECHO_CMD} "${JAVA_VERSION}" | ${TR} " " "\n" | ${GREP} -q "${_JAVA_VERSION_LIST_REGEXP}" || \
+	@test ! -z "${JAVA_VERSION}" && ( ${ECHO_CMD} "${JAVA_VERSION}" | ${TR} " " "\n" | ${GREP} -Eq "${_JAVA_VERSION_LIST_REGEXP}" || \
 	(${ECHO_CMD} "${PKGNAME}: Makefile error: \"${JAVA_VERSION}\" is not a valid value for JAVA_VERSION. It should be one or more of: ${__JAVA_VERSION_LIST} (with an optional \"+\" suffix.)"; ${FALSE})) || true
 
 # Error checking: JAVA_VENDOR
 .if !defined(_JAVA_VENDOR_LIST_REGEXP)
-.	for v in ${_JAVA_VENDOR_LIST}
-.		if defined(_JAVA_VENDOR_LIST_REGEXP)
-_JAVA_VENDOR_LIST_REGEXP:=		${_JAVA_VENDOR_LIST_REGEXP}\|
-.		endif
-_JAVA_VENDOR_LIST_REGEXP:=		${_JAVA_VENDOR_LIST_REGEXP}$v
-.	endfor
+_JAVA_VENDOR_LIST_REGEXP=	${_JAVA_VENDOR_LIST:ts|}
 .endif
+
 check-makevars::
-	@test ! -z "${JAVA_VENDOR}" && ( ${ECHO_CMD} "${JAVA_VENDOR}" | ${TR} " " "\n" | ${GREP} -q "${_JAVA_VENDOR_LIST_REGEXP}" || \
+	@test ! -z "${JAVA_VENDOR}" && ( ${ECHO_CMD} "${JAVA_VENDOR}" | ${TR} " " "\n" | ${GREP} -Eq "${_JAVA_VENDOR_LIST_REGEXP}" || \
 	(${ECHO_CMD} "${PKGNAME}: Makefile error: \"${JAVA_VENDOR}\" is not a valid value for JAVA_VENDOR. It should be one or more of: ${_JAVA_VENDOR_LIST}"; \
 	${FALSE})) || true
 
 # Error checking: JAVA_OS
 .if !defined(_JAVA_OS_LIST_REGEXP)
-.	for v in ${_JAVA_OS_LIST}
-.		if defined(_JAVA_OS_LIST_REGEXP)
-_JAVA_OS_LIST_REGEXP:=		${_JAVA_OS_LIST_REGEXP}\|
-.		endif
-_JAVA_OS_LIST_REGEXP:=		${_JAVA_OS_LIST_REGEXP}$v
-.	endfor
+_JAVA_OS_LIST_REGEXP=	${_JAVA_OS_LIST:ts|}
 .endif
+
 check-makevars::
-	@test ! -z "${JAVA_OS}" && ( ${ECHO_CMD} "${JAVA_OS}" | ${TR} " " "\n" | ${GREP} -q "${_JAVA_OS_LIST_REGEXP}" || \
+	@test ! -z "${JAVA_OS}" && ( ${ECHO_CMD} "${JAVA_OS}" | ${TR} " " "\n" | ${GREP} -Eq "${_JAVA_OS_LIST_REGEXP}" || \
 	(${ECHO_CMD} "${PKGNAME}: Makefile error: \"${JAVA_OS}\" is not a valid value for JAVA_OS. It should be one or more of: ${_JAVA_OS_LIST}"; \
 	${FALSE})) || true
 
@@ -272,7 +258,7 @@ JAVA_RUN=	jre
 .		undef _JAVA_PORTS_INSTALLED
 .		undef _JAVA_PORTS_POSSIBLE
 .		if defined(JAVA_VERSION)
-_JAVA_VERSION=	${JAVA_VERSION:S/1.6+/1.6 1.7+/:S/1.7+/1.7 1.8+/:S/1.8+/1.8/}
+_JAVA_VERSION=	${JAVA_VERSION:S/1.6+/1.6 1.7+/:S/1.7+/1.7 1.8+/:S/1.8+/1.8 1.9+/:S/1.9+/1.9/}
 .		else
 _JAVA_VERSION=	${__JAVA_VERSION_LIST}
 .		endif
@@ -368,7 +354,7 @@ JAVA_BUILD=		jdk
 .		endif
 
 # Add the JDK port to the dependencies
-DEPEND_JAVA=	${JAVA}:${PORTSDIR}/${JAVA_PORT}
+DEPEND_JAVA=	${JAVA}:${JAVA_PORT}
 .		if defined(JAVA_EXTRACT)
 EXTRACT_DEPENDS+=	${DEPEND_JAVA}
 .		endif
@@ -389,12 +375,19 @@ RUN_DEPENDS+=		${DEPEND_JAVA}
 DESTDIRNAME?=		-Dfreebsd.ports.destdir
 ANT?=				${LOCALBASE}/bin/ant
 MAKE_ENV+=			JAVA_HOME=${JAVA_HOME}
-BUILD_DEPENDS+=		${ANT}:${PORTSDIR}/devel/apache-ant
+BUILD_DEPENDS+=		${ANT}:devel/apache-ant
 ALL_TARGET?=
 .			if !target(do-build)
 do-build:
 					@(cd ${BUILD_WRKSRC}; \
 						${SETENV} ${MAKE_ENV} ${ANT} ${MAKE_ARGS} ${ALL_TARGET})
+.			endif
+.			if !target(do-test) && defined(TEST_TARGET)
+TEST_DEPENDS+=		${DEPEND_JAVA}
+TEST_DEPENDS+=		${ANT}:devel/apache-ant
+do-test:
+					@(cd ${TEST_WRKSRC}; \
+						${SETENV} ${MAKE_ENV} ${ANT} ${MAKE_ARGS} ${TEST_TARGET})
 .			endif
 .		endif
 

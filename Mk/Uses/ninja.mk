@@ -1,12 +1,9 @@
-# $FreeBSD: head/Mk/Uses/ninja.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/ninja.mk 421635 2016-09-09 19:42:46Z amdmi3 $
 #
 # Provide support to use Ninja
 #
 # Feature:		ninja
 # Usage:		USES=ninja
-#
-# User defined variables:
-# NINJA_VERBOSE		- Enable verbose output.
 #
 # MAINTAINER: portmgr@FreeBSD.org
 
@@ -17,11 +14,9 @@ _INCLUDE_USES_NINJA_MK=	yes
 IGNORE=	Incorrect 'USES+= ninja:${ninja_ARGS}' ninja takes no arguments
 .endif
 
-.if defined(NINJA_VERBOSE)
 MAKE_ARGS+=	-v
-.endif
 
-BUILD_DEPENDS+=	ninja:${PORTSDIR}/devel/ninja
+BUILD_DEPENDS+=	ninja:devel/ninja
 
 CMAKE_ARGS+=	-GNinja
 MAKEFILE=

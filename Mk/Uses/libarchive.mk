@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/libarchive.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/libarchive.mk 423014 2016-09-30 19:24:30Z tijl $
 #
 # handle dependency on the libarchive port
 #
@@ -10,7 +10,7 @@
 
 .if !defined(_INCLUDE_USES_LIBARCHIVE_MK)
 _INCLUDE_USES_LIBARCHIVE_MK=	yes
-.include "${USESDIR}/localbase.mk"
+_USES_POST+=	localbase
 
-LIB_DEPENDS+=	libarchive.so.13:${PORTSDIR}/archivers/libarchive
+LIB_DEPENDS+=	libarchive.so.13:archivers/libarchive
 .endif

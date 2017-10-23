@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/gperf.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/gperf.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # handle dependency on gperf
 #
@@ -11,7 +11,7 @@
 _INCLUDE_USES_GPERF_MK=	yes
 
 .if !exists(/usr/bin/gperf)
-BUILD_DEPENDS+=	${LOCALBASE}/bin/gperf:${PORTSDIR}/devel/gperf
+BUILD_DEPENDS+=	${LOCALBASE}/bin/gperf:devel/gperf
 GPERF=	${LOCALBASE}/bin/gperf
 .else
 _GPERF_VERSION!=	/usr/bin/gperf --version | head -1 || true
@@ -22,7 +22,7 @@ _GPERF_MAJ_VERSION=	0
 .endif
 
 .if ${_GPERF_MAJ_VERSION} < 3
-BUILD_DEPENDS+=	${LOCALBASE}/bin/gperf:${PORTSDIR}/devel/gperf
+BUILD_DEPENDS+=	${LOCALBASE}/bin/gperf:devel/gperf
 GPERF=	${LOCALBASE}/bin/gperf
 .else
 GPERF=	/usr/bin/gperf

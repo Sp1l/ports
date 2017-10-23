@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/makeself.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/makeself.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # handle makeself archives
 #
@@ -14,7 +14,7 @@ _INCLUDE_USES_MAKESELF_MK=	yes
 IGNORE=	Incorrect 'USES+= makeself:${makeself_ARGS}' makeself takes no arguments
 .endif
 
-EXTRACT_DEPENDS+=	${UNMAKESELF_CMD}:${PORTSDIR}/archivers/unmakeself
+EXTRACT_DEPENDS+=	${UNMAKESELF_CMD}:archivers/unmakeself
 
 EXTRACT_CMD=	${UNMAKESELF_CMD}
 EXTRACT_BEFORE_ARGS=

@@ -1,5 +1,5 @@
 #!/bin/sh
-# $FreeBSD: head/Mk/Scripts/do-depends.sh 395910 2015-09-02 21:23:47Z bapt $
+# $FreeBSD: head/Mk/Scripts/do-depends.sh 450663 2017-09-26 14:14:44Z mat $
 #
 # MAINTAINER: portmgr@FreeBSD.org
 
@@ -11,7 +11,9 @@ validate_env dp_RAWDEPENDS dp_DEPTYPE dp_DEPENDS_TARGET dp_DEPENDS_PRECLEAN \
 	dp_DEPENDS_CLEAN dp_DEPENDS_ARGS dp_USE_PACKAGE_DEPENDS \
 	dp_USE_PACKAGE_DEPENDS_ONLY dp_PKG_ADD dp_PKG_INFO dp_WRKDIR \
 	dp_PKGNAME dp_STRICT_DEPENDS dp_LOCALBASE dp_LIB_DIRS dp_SH \
-	dp_SCRIPTSDIR dp_PORTSDIR dp_MAKE
+	dp_SCRIPTSDIR PORTSDIR dp_MAKE
+
+[ -n "${DEBUG_MK_SCRIPTS}" -o -n "${DEBUG_MK_SCRIPTS_DO_DEPENDS}" ] && set -x
 
 set -u
 
@@ -25,12 +27,10 @@ install_depends()
 		return 0
 	fi
 
-	read pkgfile <<- EOF
-	$(${dp_MAKE} -C ${origin} -VPKGFILE)
-	EOF
-	read pkgbase <<- EOF
-	$(${dp_MAKE} -C ${origin} -VPKGBASE)
-	EOF
+	port_var_fetch "${origin}" "${depends_args}" \
+	    PKGFILE pkgfile \
+	    PKGBASE pkgbase
+
 	if [ -r "${pkgfile}" -a "${target}" = "${dp_DEPENDS_TARGET}" ]; then
 		echo "===>   Installing existing package ${pkgfile}"
 		if [ "${pkgbase}" = "pkg" ]; then
@@ -43,7 +43,7 @@ install_depends()
 		fi
 	elif [ -n "${dp_USE_PACKAGE_DEPENDS_ONLY}" -a "${target}" = "${dp_DEPENDS_TARGET}" ]; then
 		echo "===>   ${dp_PKGNAME} depends on package: ${pkgfile} - not found" >&2
-		echo "===>   dp_USE_PACKAGE_DEPENDS_ONLY set - not building missing dependency from source" >&2
+		echo "===>   USE_PACKAGE_DEPENDS_ONLY set - not building missing dependency from source" >&2
 		exit 1
 	else
 		${dp_MAKE} -C ${origin} -DINSTALLS_DEPENDS ${target} ${depends_args}
@@ -92,16 +92,20 @@ find_lib()
 }
 
 anynotfound=0
+err=0
 for _line in ${dp_RAWDEPENDS} ; do
+	# ensure we never leak flavors
+	unset FLAVOR
 	myifs=${IFS}
 	IFS=:
 	set -- ${_line}
 	IFS=${myifs}
 	if [ $# -lt 2 -o $# -gt 3 ]; then
 		echo "Error: bad dependency syntax in ${dp_DEPTYPE}" >&2
-		echo "expecting: pattern:origin[:target]" >&2
+		echo "expecting: pattern:origin[@flavour][:target]" >&2
 		echo "got: ${_line}" >&2
-		exit 1
+		err=1
+		continue
 	fi
 	pattern=$1
 	origin=$2
@@ -109,22 +113,27 @@ for _line in ${dp_RAWDEPENDS} ; do
 
 	if [ -z "${pattern}" ]; then
 		echo "Error: there is an empty port dependency in ${dp_DEPTYPE}" >&2
-		exit 1
+		err=1
+		continue
 	fi
 
 	if [ -z "${origin}" ]; then
 		echo "Error: a dependency has an empty origin in ${dp_DEPTYPE}" >&2
-		exit 1
+		err=1
+		continue
 	fi
 
 	case "${origin}" in
 	/*) ;;
-	*) origin="${dp_PORTSDIR}/${origin}" ;;
+	*) origin="${PORTSDIR}/${origin}" ;;
 	esac
-	if [ ! -f "${origin}/Makefile" ]; then
-		echo "Error a dependency refers to a non existing origin: ${origin} in ${dp_DEPTYPE}" >&2
-		exit 1
-	fi
+	case "${origin}" in
+	*@*/*) ;; # Ignore @ in the path which would not be a flavor
+	*@*)
+		export FLAVOR="${origin##*@}"
+		origin=${origin%@*}
+		;;
+	esac
 
 	depends_args="${dp_DEPENDS_ARGS}"
 	target=${dp_DEPENDS_TARGET}
@@ -132,11 +141,11 @@ for _line in ${dp_RAWDEPENDS} ; do
 		target=${last}
 		if [ -n "${dp_DEPENDS_PRECLEAN}" ]; then
 			target="clean ${target}"
-			depends_args="NOCLEANDEPENDS=yes"
+			depends_args="${depends_args:+${depends_args} }NOCLEANDEPENDS=yes"
 		fi
 		if [ -n "${dp_DEPENDS_CLEAN}" ]; then
 			target="${target} clean"
-			depends_args="NOCLEANDEPENDS=yes"
+			depends_args="${depends_args:+${depends_args} }NOCLEANDEPENDS=yes"
 		fi
 	fi
 
@@ -146,7 +155,9 @@ for _line in ${dp_RAWDEPENDS} ; do
 	      lib*.so*)      fct=find_lib ;;
 	      *)
 		echo "Error: pattern ${pattern} in LIB_DEPENDS is not valid"
-		exit 1 ;;
+		err=1
+		continue
+		;;
 	    esac ;;
 	  *)
 	    case ${pattern} in
@@ -161,12 +172,23 @@ for _line in ${dp_RAWDEPENDS} ; do
 	fi
 	[ ${pattern} = "/nonexistent" ] || anynotfound=1
 
+	if [ ! -f "${origin}/Makefile" ]; then
+		echo "Error a dependency refers to a non existing origin: ${origin} in ${dp_DEPTYPE}" >&2
+		err=1
+		continue
+	fi
+
 	# Now actually install the dependencies
 	install_depends "${origin}" "${target}" "${depends_args}"
 	# Recheck if the installed dependency validates the pattern except for /nonexistent
 	[ "${fct}" = "false" ] || ${fct} "${pattern}"
 	echo "===>   Returning to build of ${dp_PKGNAME}"
 done
+
+if [ $err -eq 1 ]; then
+	echo "Errors with dependencies."
+	exit 1
+fi
 
 if [ -n "${dp_STRICT_DEPENDS}" -a ${anynotfound} -eq 1 ]; then \
 	echo "===>   dp_STRICT_DEPENDS set - Not installing missing dependencies."

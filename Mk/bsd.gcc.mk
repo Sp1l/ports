@@ -21,30 +21,30 @@
 #   USE_GCC=	yes			# port requires a current version of GCC
 #							# as defined in bsd.default-versions.mk.
 #   USE_GCC=	any			# port requires GCC 4.2 or later.
-#   USE_GCC=	4.9+		# port requires GCC 4.9 or later.
+#   USE_GCC=	6+			# port requires GCC 6 or later.
 #   USE_GCC=	4.9			# port requires GCC 4.9.
 #
 # If you are wondering what your port exactly does, use "make test-gcc"
 # to see some debugging.
 #
-# $FreeBSD: head/Mk/bsd.gcc.mk 384521 2015-04-22 21:29:21Z gerald $
+# $FreeBSD: head/Mk/bsd.gcc.mk 447982 2017-08-15 12:44:16Z gerald $
 
 GCC_Include_MAINTAINER=		gerald@FreeBSD.org
 
-.include "${PORTSDIR}/Mk/bsd.default-versions.mk"
-
 # All GCC versions supported by the ports framework.  Keep them in
 # ascending order and in sync with the table below. 
-GCCVERSIONS=	040200 040600 040700 040800 040900 050000
+# When adding a version, please keep the comment in
+# Mk/bsd.default-versions.mk in sync.
+GCCVERSIONS=	040200 040800 040900 050000 060000 070000
 
 # The first field is the OSVERSION in which it disappeared from the base.
 # The second field is the version as USE_GCC would use.
 GCCVERSION_040200=	9999999 4.2
-GCCVERSION_040600=	      0 4.6
-GCCVERSION_040700=	      0 4.7
 GCCVERSION_040800=	      0 4.8
 GCCVERSION_040900=	      0 4.9
 GCCVERSION_050000=	      0 5
+GCCVERSION_060000=	      0 6
+GCCVERSION_070000=	      0 7
 
 # No configurable parts below this. ####################################
 #
@@ -144,11 +144,7 @@ _USE_GCC:=	${GCC_DEFAULT}
 .  if ${OSVERSION} > ${_GCCVERSION_${v}_R} || !exists(/usr/bin/gcc)
 V:=			${_GCCVERSION_${v}_V:S/.//}
 _GCC_PORT_DEPENDS:=	gcc${V}
-.   if ${_USE_GCC} == ${LANG_GCC_IS}
-_GCC_PORT:=		gcc
-.   else
 _GCC_PORT:=		gcc${V}
-.   endif
 CC:=			gcc${V}
 CXX:=			g++${V}
 CPP:=			cpp${V}
@@ -170,8 +166,8 @@ CPP:=			cpp
 .undef V
 
 .if defined(_GCC_PORT_DEPENDS)
-BUILD_DEPENDS+=	${_GCC_PORT_DEPENDS}:${PORTSDIR}/lang/${_GCC_PORT}
-RUN_DEPENDS+=	${_GCC_PORT_DEPENDS}:${PORTSDIR}/lang/${_GCC_PORT}
+BUILD_DEPENDS+=	${_GCC_PORT_DEPENDS}:lang/${_GCC_PORT}
+RUN_DEPENDS+=	${_GCC_PORT_DEPENDS}:lang/${_GCC_PORT}
 # Later GCC ports already depend on binutils; make sure whatever we
 # build leverages this as well.
 USE_BINUTILS=	yes

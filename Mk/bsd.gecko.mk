@@ -4,7 +4,7 @@
 # Date created:		12 Nov 2005
 # Whom:			Michael Johnson <ahze@FreeBSD.org>
 #
-# $FreeBSD: head/Mk/bsd.gecko.mk 395349 2015-08-26 06:38:32Z jbeich $
+# $FreeBSD: head/Mk/bsd.gecko.mk 452500 2017-10-20 05:27:19Z jbeich $
 #
 # 4 column tabs prevent hair loss and tooth decay!
 
@@ -68,8 +68,6 @@ Gecko_Pre_Include=	bsd.gecko.mk
 #
 # MOZ_EXTENSIONS		A list of extensions to build
 #
-# MOZ_PROTOCOLS			A list of protocols to build (http, ftp, etc.)
-#
 # PORT_MOZCONFIG		Defaults to ${FILESDIR}/mozconfig.in, but can be
 # 						set to a generic mozconfig included with the port
 #
@@ -85,14 +83,30 @@ MOZILLA_VER?=	${PORTVERSION}
 MOZILLA_BIN?=	${PORTNAME}-bin
 MOZILLA_EXEC_NAME?=${MOZILLA}
 MOZ_RPATH?=	${MOZILLA}
-USES+=		cpe compiler:c++11-lang gmake iconv perl5 pkgconfig \
+USES+=		cpe gmake iconv localbase perl5 pkgconfig \
 			python:2.7,build desktop-file-utils
 CPE_VENDOR?=mozilla
 USE_PERL5=	build
-USE_XORG=	xext xrender xt
+USE_XORG=	x11 xcomposite xdamage xext xfixes xrender xt
 
 .if ${MOZILLA} != "libxul"
 BUNDLE_LIBS=	yes
+.endif
+
+.if ${MOZILLA_VER:R:R} >= 49
+USES+=		compiler:c++14-lang
+CPPFLAGS+=	-D_GLIBCXX_USE_C99 -D_GLIBCXX_USE_C99_MATH_TR1 \
+			-D_DECLARE_C99_LDBL_MATH # XXX ports/193528
+.else
+USES+=		compiler:c++11-lang
+.endif
+
+.if ${MOZILLA_VER:R:R} >= 50
+USE_XORG+=	xcb
+.endif
+
+.if ${OPSYS} == FreeBSD && ${OSREL} == 11.1
+LLD_UNSAFE=	yes
 .endif
 
 MOZILLA_SUFX?=	none
@@ -100,7 +114,7 @@ MOZSRC?=	${WRKSRC}
 WRKSRC?=	${WRKDIR}/mozilla
 PLISTF?=	${WRKDIR}/plist_files
 
-MOZ_OBJDIR?=	${WRKSRC}/obj-${CONFIGURE_TARGET}
+MOZ_OBJDIR?=	${WRKSRC}/obj-${ARCH:C/amd64/x86_64/}-unknown-${OPSYS:tl}${OSREL}
 
 MOZ_PIS_DIR?=		lib/${MOZILLA}/init.d
 
@@ -119,30 +133,25 @@ MOZ_PKGCONFIG_FILES?=	${MOZILLA}-gtkmozembed ${MOZILLA}-js \
 
 ALL_TARGET?=	build
 
-CONFIGURE_TARGET:=${ARCH:C/amd64/x86_64/}-portbld-${OPSYS:tl}${OSREL}
 MOZ_EXPORT+=	${CONFIGURE_ENV} \
 				PERL="${PERL}"
-MOZ_OPTIONS+=	${CONFIGURE_TARGET} --prefix="${PREFIX}"
+MOZ_OPTIONS+=	--prefix="${PREFIX}"
 MOZ_MK_OPTIONS+=MOZ_OBJDIR="${MOZ_OBJDIR}"
 
-CPPFLAGS+=		-isystem${LOCALBASE}/include
-LDFLAGS+=		-L${LOCALBASE}/lib -Wl,-rpath,${PREFIX}/lib/${MOZILLA}
+LDFLAGS+=		-Wl,--as-needed
 
-.if ${OPSYS} != DragonFly # XXX xpcshell crash during install
-# use jemalloc 3.0.0 API for stats/tuning
-MOZ_EXPORT+=	MOZ_JEMALLOC3=1
-.if ${OPSYS} == FreeBSD && ${OSVERSION} >= 1100079
-. if ${MOZILLA_VER:R:R} < 43
-# system jemalloc 4.0.0 vs. bundled jemalloc 3.6.0-204-gb4acf73
-EXTRA_PATCHES+=	${FILESDIR}/extra-patch-bug1125514
-. endif
-.elif ${OPSYS} != FreeBSD || ${OSVERSION} < 1000012 || ${MOZILLA_VER:R:R} >= 37
+.if ${MOZILLA_VER:R:R} < 55 && ${OPSYS} == FreeBSD && ${OSVERSION} < 1200032
+# use jemalloc 3.0.0 (4.0 for firefox 43+) API for stats/tuning
+MOZ_EXPORT+=	MOZ_JEMALLOC4=1
+.if ${MOZILLA_VER:R:R} >= 48
+MOZ_OPTIONS+=	--enable-jemalloc=4
+.elif ${OSVERSION} < 1100079
 MOZ_OPTIONS+=	--enable-jemalloc
-.endif
-.endif # !DragonFly
+.endif # Mozilla >= 48
+.endif # Mozilla < 55
 
 # Standard depends
-_ALL_DEPENDS=	cairo event ffi graphite harfbuzz hunspell icu jpeg nspr nss opus png pixman soundtouch sqlite vpx
+_ALL_DEPENDS=	cairo event ffi graphite harfbuzz hunspell icu jpeg nspr nss png pixman soundtouch sqlite vpx
 
 .if ${PORT_OPTIONS:MINTEGER_SAMPLES}
 MOZ_EXPORT+=	MOZ_INTEGER_SAMPLES=1
@@ -152,84 +161,78 @@ _ALL_DEPENDS+=	vorbis
 .endif
 
 .if ! ${PORT_OPTIONS:MBUNDLED_CAIRO}
-cairo_LIB_DEPENDS=	libcairo.so:${PORTSDIR}/graphics/cairo
+cairo_BUILD_DEPENDS=cairo>=1.12.16_1,2:graphics/cairo
+cairo_LIB_DEPENDS=	libcairo.so:graphics/cairo
 cairo_MOZ_OPTIONS=	--enable-system-cairo
 .endif
 
-event_LIB_DEPENDS=	libevent.so:${PORTSDIR}/devel/libevent2
+event_LIB_DEPENDS=	libevent.so:devel/libevent
 event_MOZ_OPTIONS=	--with-system-libevent
 
-ffi_LIB_DEPENDS=	libffi.so:${PORTSDIR}/devel/libffi
+ffi_LIB_DEPENDS=	libffi.so:devel/libffi
 ffi_MOZ_OPTIONS=	--enable-system-ffi
 
 .if exists(${FILESDIR}/patch-bug847568)
-graphite_LIB_DEPENDS=	libgraphite2.so:${PORTSDIR}/graphics/graphite2
+graphite_LIB_DEPENDS=	libgraphite2.so:graphics/graphite2
 graphite_MOZ_OPTIONS=	--with-system-graphite2
 
-harfbuzz_LIB_DEPENDS=	libharfbuzz.so:${PORTSDIR}/print/harfbuzz
+harfbuzz_LIB_DEPENDS=	libharfbuzz.so:print/harfbuzz
 harfbuzz_MOZ_OPTIONS=	--with-system-harfbuzz
 .endif
 
-hunspell_LIB_DEPENDS=	libhunspell-1.3.so:${PORTSDIR}/textproc/hunspell
+hunspell_LIB_DEPENDS=	libhunspell-1.6.so:textproc/hunspell
 hunspell_MOZ_OPTIONS=	--enable-system-hunspell
 
-icu_LIB_DEPENDS=		libicui18n.so:${PORTSDIR}/devel/icu
+icu_LIB_DEPENDS=		libicui18n.so:devel/icu
 icu_MOZ_OPTIONS=		--with-system-icu --with-intl-api
 
--jpeg_BUILD_DEPENDS=yasm:${PORTSDIR}/devel/yasm
-# XXX JCS_EXTENSIONS API is currently disabled by r371283
+-jpeg_BUILD_DEPENDS=yasm:devel/yasm
 # XXX Remove files/patch-ijg-libjpeg once -turbo is default
 jpeg_USES=		jpeg
 jpeg_MOZ_OPTIONS=	--with-system-jpeg=${LOCALBASE}
 
-nspr_LIB_DEPENDS=	libnspr4.so:${PORTSDIR}/devel/nspr
+nspr_LIB_DEPENDS=	libnspr4.so:devel/nspr
 nspr_MOZ_OPTIONS=	--with-system-nspr
 
-nss_LIB_DEPENDS=	libnss3.so:${PORTSDIR}/security/nss
+nss_LIB_DEPENDS=	libnss3.so:security/nss
 nss_MOZ_OPTIONS=	--with-system-nss
 
-.if exists(${FILESDIR}/patch-z-bug517422)
-opus_LIB_DEPENDS=	libopus.so:${PORTSDIR}/audio/opus
-opus_MOZ_OPTIONS=	--with-system-opus
-.endif
-
-pixman_LIB_DEPENDS=	libpixman-1.so:${PORTSDIR}/x11/pixman
+pixman_LIB_DEPENDS=	libpixman-1.so:x11/pixman
 pixman_MOZ_OPTIONS=	--enable-system-pixman
 
-png_LIB_DEPENDS=	libpng.so:${PORTSDIR}/graphics/png
+png_LIB_DEPENDS=	libpng.so:graphics/png
 png_MOZ_OPTIONS=	--with-system-png=${LOCALBASE}
 
 .if exists(${FILESDIR}/patch-z-bug517422)
-soundtouch_LIB_DEPENDS=	libSoundTouch.so:${PORTSDIR}/audio/soundtouch
+soundtouch_LIB_DEPENDS=	libSoundTouch.so:audio/soundtouch
 soundtouch_MOZ_OPTIONS=	--with-system-soundtouch
-
-# XXX disabled: bug 913854 not yet upstreamed
-speex_LIB_DEPENDS=	libspeexdsp.so:${PORTSDIR}/audio/speex
-speex_MOZ_OPTIONS=	--with-system-speex
 .endif
 
-sqlite_LIB_DEPENDS=	libsqlite3.so:${PORTSDIR}/databases/sqlite3
+sqlite_LIB_DEPENDS=	libsqlite3.so:databases/sqlite3
 sqlite_MOZ_OPTIONS=	--enable-system-sqlite
 
 .if exists(${FILESDIR}/patch-z-bug517422)
 # XXX disabled: update to 1.2.x or review backported fixes
-theora_LIB_DEPENDS=	libtheora.so:${PORTSDIR}/multimedia/libtheora
+theora_LIB_DEPENDS=	libtheora.so:multimedia/libtheora
 theora_MOZ_OPTIONS=	--with-system-theora
 
-tremor_LIB_DEPENDS=	libvorbisidec.so:${PORTSDIR}/audio/libtremor
+tremor_LIB_DEPENDS=	libogg.so:audio/libogg libvorbisidec.so:audio/libtremor
 tremor_MOZ_OPTIONS=	--with-system-tremor --with-system-ogg
 
-vorbis_LIB_DEPENDS=	libvorbis.so:${PORTSDIR}/audio/libvorbis
+vorbis_LIB_DEPENDS=	libogg.so:audio/libogg libvorbis.so:audio/libvorbis
 vorbis_MOZ_OPTIONS=	--with-system-vorbis --with-system-ogg
 .endif
 
--vpx_BUILD_DEPENDS=	yasm:${PORTSDIR}/devel/yasm
-vpx_LIB_DEPENDS=	libvpx.so:${PORTSDIR}/multimedia/libvpx
+-vpx_BUILD_DEPENDS=	yasm:devel/yasm
+vpx_LIB_DEPENDS=	libvpx.so:multimedia/libvpx
 vpx_MOZ_OPTIONS=	--with-system-libvpx
 
 .for use in ${USE_MOZILLA}
 ${use:S/-/_WITHOUT_/}=	${TRUE}
 .endfor
+
+LIB_DEPENDS+=	libfontconfig.so:x11-fonts/fontconfig \
+		libfreetype.so:print/freetype2
 
 .for dep in ${_ALL_DEPENDS} ${USE_MOZILLA:M+*:S/+//}
 .if !defined(_WITHOUT_${dep})
@@ -245,10 +248,14 @@ BUILD_DEPENDS+=	${-${dep}_BUILD_DEPENDS}
 
 # Standard options
 MOZ_CHROME?=	omni
-MOZ_TOOLKIT?=	cairo-gtk2
+MOZ_TOOLKIT?=	cairo-gtk3
+MOZ_CHANNEL?=	${PKGNAMESUFFIX:Urelease:S/^-//}
 MOZ_OPTIONS+=	\
 		--enable-chrome-format=${MOZ_CHROME} \
 		--enable-default-toolkit=${MOZ_TOOLKIT} \
+		--enable-update-channel=${MOZ_CHANNEL} \
+		--disable-updater \
+		--enable-pie \
 		--with-pthreads
 # Configure options for install
 .if !defined(MOZ_EXTENSIONS)
@@ -256,49 +263,25 @@ MOZ_OPTIONS+=	--enable-extensions=default
 .else
 MOZ_OPTIONS+=	--enable-extensions=${MOZ_EXTENSIONS}
 .endif
-.if !defined(MOZ_PROTOCOLS)
-MOZ_OPTIONS+=	--enable-necko-protocols=default
-.else
-MOZ_OPTIONS+=	--enable-necko-protocols=${MOZ_PROTOCOLS}
-.endif
 # others
 MOZ_OPTIONS+=	--with-system-zlib		\
-		--with-system-bz2		\
-		--enable-unified-compilation	\
-		--disable-debug-symbols		\
-		--disable-glibtest		\
-		--disable-gtktest		\
-		--disable-freetypetest		\
-		--disable-installer		\
-		--disable-updater		\
-		--disable-pedantic
+		--with-system-bz2
 
 # API keys from www/chromium 
 # http://www.chromium.org/developers/how-tos/api-keys
 # Note: these are for FreeBSD use ONLY. For your own distribution,
 # please get your own set of keys.
-MOZ_EXPORT+=	MOZ_GOOGLE_API_KEY=AIzaSyBsp9n41JLW8jCokwn7vhoaMejDFRd1mp8 \
-				MOZ_GOOGLE_OAUTH_API_CLIENTID=996322985003.apps.googleusercontent.com \
-				MOZ_GOOGLE_OAUTH_API_KEY=IR1za9-1VK0zZ0f_O8MVFicn
+MOZ_EXPORT+=	MOZ_GOOGLE_API_KEY=AIzaSyBsp9n41JLW8jCokwn7vhoaMejDFRd1mp8
 
-.if ${PORT_OPTIONS:MGTK3}
-MOZ_TOOLKIT=	cairo-gtk3
+.if ${PORT_OPTIONS:MGTK2}
+MOZ_TOOLKIT=	cairo-gtk2
 .endif
 
-.if ${MOZ_TOOLKIT:Mcairo-qt}
-# don't use - transparent backgrounds (bug 521582),
-USE_MOZILLA+=	-cairo # ports/169343
-USE_DISPLAY=yes # install
-USE_GNOME+=	pango
-USE_QT5+=	qmake_build buildtools_build gui network quick printsupport
-MOZ_EXPORT+=	HOST_QMAKE="${QMAKE}" HOST_MOC="${MOC}" HOST_RCC="${RCC}"
-.elif ${MOZ_TOOLKIT:Mcairo-gtk3}
-USE_GNOME+=	gtk30
-. if ${MOZILLA_VER:R:R} >= 32
-USE_GNOME+= gtk20 # bug 624422
-. endif
+.if ${MOZ_TOOLKIT:Mcairo-gtk3}
+BUILD_DEPENDS+=	gtk3>=3.14.6:x11-toolkits/gtk30
+USE_GNOME+=	gdkpixbuf2 gtk20 gtk30
 .else # gtk2, cairo-gtk2
-USE_GNOME+=	gtk20
+USE_GNOME+=	gdkpixbuf2 gtk20
 .endif
 
 .if ${PORT_OPTIONS:MOPTIMIZED_CFLAGS}
@@ -310,22 +293,25 @@ MOZ_OPTIONS+=	--disable-optimize
 .endif
 
 .if ${PORT_OPTIONS:MCANBERRA}
-RUN_DEPENDS+=	libcanberra>0:${PORTSDIR}/audio/libcanberra
+RUN_DEPENDS+=	libcanberra>0:audio/libcanberra
 .endif
 
 .if ${PORT_OPTIONS:MDBUS}
-BUILD_DEPENDS+=	libnotify>0:${PORTSDIR}/devel/libnotify
-LIB_DEPENDS+=	libdbus-glib-1.so:${PORTSDIR}/devel/dbus-glib \
-				libstartup-notification-1.so:${PORTSDIR}/x11/startup-notification
+BUILD_DEPENDS+=	libnotify>0:devel/libnotify
+LIB_DEPENDS+=	libdbus-1.so:devel/dbus \
+				libdbus-glib-1.so:devel/dbus-glib \
+				libstartup-notification-1.so:x11/startup-notification
 MOZ_OPTIONS+=	--enable-startup-notification
 .else
-MOZ_OPTIONS+=	--disable-dbus --disable-libnotify
+MOZ_OPTIONS+=	--disable-dbus
 .endif
 
-.if ${PORT_OPTIONS:MGSTREAMER}
-USE_GSTREAMER1?=good libav
-MOZ_OPTIONS+=	--enable-gstreamer=1.0
-.else
+.if ${PORT_OPTIONS:MFFMPEG}
+# dom/media/platforms/ffmpeg/FFmpegRuntimeLinker.cpp
+RUN_DEPENDS+=	ffmpeg>=0.8,1:multimedia/ffmpeg
+.endif
+
+.if ${MOZILLA_VER:R:R} < 46
 MOZ_OPTIONS+=	--disable-gstreamer
 .endif
 
@@ -337,12 +323,7 @@ MOZ_OPTIONS+=	--enable-gconf
 MOZ_OPTIONS+=	--disable-gconf
 .endif
 
-.if ${PORT_OPTIONS:MGIO} && ! ${MOZ_TOOLKIT:Mcairo-qt}
-MOZ_OPTIONS+=	--enable-gio
-.else
-MOZ_OPTIONS+=	--disable-gio
-.endif
-
+.if ${MOZILLA_VER:R:R} < 55
 .if ${PORT_OPTIONS:MGNOMEUI}
 BUILD_DEPENDS+=	${libgnomeui_DETECT}:${libgnomeui_LIB_DEPENDS:C/.*://}
 USE_GNOME+=		libgnomeui:build
@@ -350,9 +331,10 @@ MOZ_OPTIONS+=	--enable-gnomeui
 .else
 MOZ_OPTIONS+=	--disable-gnomeui
 .endif
+.endif # Mozilla < 55
 
 .if ${PORT_OPTIONS:MLIBPROXY}
-LIB_DEPENDS+=	libproxy.so:${PORTSDIR}/net/libproxy
+LIB_DEPENDS+=	libproxy.so:net/libproxy
 MOZ_OPTIONS+=	--enable-libproxy
 .else
 MOZ_OPTIONS+=	--disable-libproxy
@@ -367,46 +349,72 @@ MOZ_EXPORT+=MOZ_OPTIMIZE_FLAGS="-Os" MOZ_PGO_OPTIMIZE_FLAGS="${CFLAGS:M-O*}"
 .endif
 
 .if ${PORT_OPTIONS:MALSA}
-LIB_DEPENDS+=	libasound.so:${PORTSDIR}/audio/alsa-lib
-RUN_DEPENDS+=	${LOCALBASE}/lib/alsa-lib/libasound_module_pcm_oss.so:${PORTSDIR}/audio/alsa-plugins
+LIB_DEPENDS+=	libasound.so:audio/alsa-lib
+RUN_DEPENDS+=	${LOCALBASE}/lib/alsa-lib/libasound_module_pcm_oss.so:audio/alsa-plugins
+RUN_DEPENDS+=	alsa-lib>=1.1.1_1:audio/alsa-lib
 MOZ_OPTIONS+=	--enable-alsa
 .endif
 
+.if ${PORT_OPTIONS:MJACK}
+BUILD_DEPENDS+=	${LOCALBASE}/include/jack/jack.h:audio/jack
+MOZ_OPTIONS+=	--enable-jack
+.endif
+
 .if ${PORT_OPTIONS:MPULSEAUDIO}
-. if ${PORT_OPTIONS:MALSA}
-BUILD_DEPENDS+=	pulseaudio>0:${PORTSDIR}/audio/pulseaudio
-. else
-# pull pulse package if we cannot fallback to another backend
-LIB_DEPENDS+=	libpulse.so:${PORTSDIR}/audio/pulseaudio
-. endif
+BUILD_DEPENDS+=	${LOCALBASE}/include/pulse/pulseaudio.h:audio/pulseaudio
 MOZ_OPTIONS+=	--enable-pulseaudio
 .else
 MOZ_OPTIONS+=	--disable-pulseaudio
+.endif
+
+.if ${PORT_OPTIONS:MSNDIO}
+LIB_DEPENDS+=	libsndio.so:audio/sndio
+post-patch-SNDIO-on:
+	@${REINPLACE_CMD} -e 's|OpenBSD|${OPSYS}|g' \
+		${MOZSRC}/media/libcubeb/src/moz.build \
+		${MOZSRC}/toolkit/library/moz.build
+. for tests in tests gtest
+	@if [ -f "${MOZSRC}/media/libcubeb/${tests}/moz.build" ]; then \
+		${REINPLACE_CMD} -e 's|OpenBSD|${OPSYS}|g' \
+			 ${MOZSRC}/media/libcubeb/${tests}/moz.build \
+	; fi
+. endfor
+	@${REINPLACE_CMD} -e 's|OS==\"openbsd\"|OS==\"${OPSYS:tl}\"|g' \
+		${MOZSRC}/media/webrtc/trunk/webrtc/build/common.gypi
+	@${ECHO} "OS_LIBS += ['sndio']" >> \
+		${MOZSRC}/media/webrtc/signaling/test/common.build
+.endif
+
+.if ${PORT_OPTIONS:MRUST} || ${MOZILLA_VER:R:R} >= 54
+BUILD_DEPENDS+=	${RUST_PORT:T}>=1.19.0_2:${RUST_PORT}
+RUST_PORT?=		lang/rust
+. if ${MOZILLA_VER:R:R} < 54
+MOZ_OPTIONS+=	--enable-rust
+. endif
+.else
+MOZ_OPTIONS+=	--disable-rust
 .endif
 
 .if ${PORT_OPTIONS:MDEBUG}
 MOZ_OPTIONS+=	--enable-debug --disable-release
 STRIP=	# ports/184285
 .else
-MOZ_OPTIONS+=	--disable-debug --enable-release
+MOZ_OPTIONS+=	--disable-debug --disable-debug-symbols --enable-release
+. if ${MOZILLA_VER:R:R} >= 56
+MOZ_OPTIONS+=	--enable-rust-simd
+. endif
 .endif
 
 .if ${PORT_OPTIONS:MDTRACE}
-MOZ_OPTIONS+=	--enable-dtrace
+MOZ_OPTIONS+=	--enable-dtrace \
+		--disable-gold
 . if ${OPSYS} == FreeBSD && ${OSVERSION} < 1100061
 LIBS+=			-lelf
 . endif
 STRIP=
+LLD_UNSAFE=		yes
 .else
 MOZ_OPTIONS+=	--disable-dtrace
-.endif
-
-.if ${MOZILLA_VER:R:R} < 40
-. if ${PORT_OPTIONS:MLOGGING} || ${PORT_OPTIONS:MDEBUG}
-MOZ_OPTIONS+=	--enable-logging
-. else
-MOZ_OPTIONS+=	--disable-logging
-. endif
 .endif
 
 .if ${PORT_OPTIONS:MPROFILE}
@@ -448,14 +456,14 @@ MOZ_SED_ARGS+=	-e's|@CPPFLAGS@|${CPPFLAGS}|g'		\
 		-e 's|@LDFLAGS@|${LDFLAGS}|g'		\
 		-e 's|@LIBS@|${LIBS}|g'			\
 		-e 's|@LOCALBASE@|${LOCALBASE}|g'	\
-		-e 's|@PERL@|${PERL5}|g'			\
+		-e 's|@PERL@|${PERL}|g'			\
 		-e 's|@MOZDIR@|${PREFIX}/lib/${MOZILLA}|g'	\
 		-e 's|%%PREFIX%%|${PREFIX}|g'		\
 		-e 's|%%CFLAGS%%|${CFLAGS}|g'		\
 		-e 's|%%LDFLAGS%%|${LDFLAGS}|g'		\
 		-e 's|%%LIBS%%|${LIBS}|g'		\
 		-e 's|%%LOCALBASE%%|${LOCALBASE}|g'	\
-		-e 's|%%PERL%%|${PERL5}|g'		\
+		-e 's|%%PERL%%|${PERL}|g'		\
 		-e 's|%%MOZILLA%%|${MOZILLA}|g'		\
 		-e 's|%%MOZILLA_BIN%%|${MOZILLA_BIN}|g'	\
 		-e 's|%%MOZDIR%%|${PREFIX}/lib/${MOZILLA}|g'
@@ -466,13 +474,8 @@ MOZCONFIG_SED?= ${SED} ${MOZ_SED_ARGS}
 USE_BINUTILS=	# intel-gcm.s
 CFLAGS+=	-B${LOCALBASE}/bin
 LDFLAGS+=	-B${LOCALBASE}/bin
-.  if ${OPSYS} == FreeBSD && ${OSVERSION} < 1000041 && \
-	exists(/usr/lib/libcxxrt.so) && ${CXXFLAGS:M-stdlib=libc++}
-LIBS+=		-lcxxrt
-.  endif
 . endif
 .elif ${ARCH:Mpowerpc*}
-USES:=		compiler:gcc-c++11-lib ${USES:Ncompiler*c++11*}
 . if ${ARCH} == "powerpc64"
 MOZ_EXPORT+=	UNAME_m="${ARCH}"
 CFLAGS+=	-mminimal-toc
@@ -495,7 +498,7 @@ gecko-pre-extract:
 	@${ECHO} "   build this port with an user who could access the X server!   "
 	@${ECHO} ""
 	@${ECHO} "During the build a ${MOZILLA} instance will start and run some test."
-	@${ECHO} "      Do not interrupt or close ${MOZILLA} during this tests!       "
+	@${ECHO} "      Do not interrupt or close ${MOZILLA} during these tests!       "
 	@${ECHO} "*****************************************************************"
 	@sleep 10
 .endif
@@ -509,7 +512,7 @@ gecko-post-patch:
 .if exists(${PKGDEINSTALL_INC})
 	@${MOZCONFIG_SED} < ${PKGDEINSTALL_INC} > ${PKGDEINSTALL}
 .endif
-	@${RM} -f ${MOZCONFIG}
+	@${RM} ${MOZCONFIG}
 .if !defined(NOMOZCONFIG)
 	@if [ -e ${PORT_MOZCONFIG} ] ; then \
 		${MOZCONFIG_SED} < ${PORT_MOZCONFIG} >> ${MOZCONFIG} ; \
@@ -533,7 +536,7 @@ gecko-post-patch:
 .if ${USE_MOZILLA:M-nspr}
 	@${ECHO_MSG} "===>  Applying NSPR patches"
 	@for i in ${.CURDIR}/../../devel/nspr/files/patch-*; do \
-		${PATCH} ${PATCH_ARGS} -d ${MOZSRC}/nsprpub/build < $$i; \
+		${PATCH} ${PATCH_ARGS} -d ${MOZSRC}/nsprpub < $$i; \
 	done
 .endif
 .if ${USE_MOZILLA:M-nss}
@@ -578,7 +581,7 @@ gecko-post-patch:
 		${MOZSRC}/xpcom/io/nsAppFileLocationProvider.cpp \
 		${MOZSRC}/toolkit/xre/nsXREDirProvider.cpp
 	@${REINPLACE_CMD} -e 's|%%LOCALBASE%%|${LOCALBASE}|g' \
-		${MOZSRC}/extensions/spellcheck/hunspell/src/mozHunspell.cpp
+		${MOZSRC}/extensions/spellcheck/hunspell/*/mozHunspell.cpp
 
 # handles mozilla pis scripts.
 gecko-moz-pis-patch:
@@ -591,23 +594,16 @@ do-configure: gecko-do-configure
 gecko-do-configure:
 		@(if ! ${CONFIGURE_ENV} ${DO_MAKE_BUILD} configure; then \
 			 ${ECHO_MSG} "===>  Script \"${CONFIGURE_SCRIPT}\" failed unexpectedly."; \
-			 (${ECHO_CMD} ${CONFIGURE_FAIL_MESSAGE}) | ${FMT} 75 79 ; \
+			 (${ECHO_CMD} ${CONFIGURE_FAIL_MESSAGE}) | ${FMT_80} ; \
 			 ${FALSE}; \
 		fi)
 
 pre-install: gecko-moz-pis-pre-install
 post-install-script: gecko-create-plist
 
-gecko-create-plist: port-post-install
-
-.if !target(port-post-install)
-port-post-install:
-		@${DO_NADA}
-.endif
-
 gecko-create-plist:
 # Create the plist
-	${RM} -f ${PLISTF}
+	${RM} ${PLISTF}
 .for dir in ${MOZILLA_PLIST_DIRS}
 	@cd ${STAGEDIR}${PREFIX}/${dir} && ${FIND} -H -s * ! -type d | \
 		${SED} -e 's|^|${dir}/|' >> ${PLISTF}

@@ -2,7 +2,7 @@
 #
 # Created by: Gabor Kovesdan <gabor@FreeBSD.org>
 #
-# $FreeBSD: head/Mk/bsd.commands.mk 381977 2015-03-23 04:03:00Z bdrewery $
+# $FreeBSD: head/Mk/bsd.commands.mk 438938 2017-04-20 11:13:32Z mat $
 #
 # DO NOT COMMIT CHANGES TO THIS FILE BY YOURSELF, EVEN IF YOU DID NOT GET
 # A RESPONSE FROM THE MAINTAINER(S) WITHIN A REASONABLE TIMEFRAME! ALL
@@ -42,6 +42,7 @@ FILE?=			/usr/bin/file
 FIND?=			/usr/bin/find
 FLEX?=			/usr/bin/flex
 FMT?=			/usr/bin/fmt
+FMT_80?=		${FMT} 75 79
 GMAKE?=			gmake
 GREP?=			/usr/bin/grep
 GUNZIP_CMD?=		/usr/bin/gunzip -f
@@ -72,7 +73,9 @@ PAX?=			/bin/pax
 PRINTF?=		/usr/bin/printf
 PS_CMD?=		/bin/ps
 PW?=			/usr/sbin/pw
+READELF?=		/usr/bin/readelf
 REALPATH?=		/bin/realpath
+RLN?=			${INSTALL} -l rs
 RM?=			/bin/rm -f
 RMDIR?=			/bin/rmdir
 SED?=			/usr/bin/sed
@@ -87,7 +90,7 @@ SU_CMD?=		/usr/bin/su root -c
 SYSCTL?=		/sbin/sysctl
 TAIL?=			/usr/bin/tail
 TEST?=			test	# Shell builtin
-TR?=			LANG=C /usr/bin/tr
+TR?=			/usr/bin/tr
 TRUE?=			true	# Shell builtin
 UMOUNT?=		/sbin/umount
 UNAME?=			/usr/bin/uname
@@ -122,7 +125,7 @@ ECHO_MSG?=		${ECHO_CMD}
 .elif !defined(_PKGTOOLSDEFINED)
 _PKGTOOLSDEFINED=	yes
 PKG_BIN?=		${LOCALBASE}/sbin/pkg-static
-PKG_CMD?=		${PKG_BIN} register
+PKG_REGISTER?=		${PKG_BIN} register
 PKG_DELETE?=		${PKG_BIN} delete -y
 PKG_INFO?=		${PKG_BIN} info -g
 PKG_VERSION?=		${PKG_BIN} version

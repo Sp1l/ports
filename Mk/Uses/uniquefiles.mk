@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/uniquefiles.mk 394503 2015-08-17 13:31:25Z mat $
+# $FreeBSD: head/Mk/Uses/uniquefiles.mk 438939 2017-04-20 11:13:37Z mat $
 #
 # Make files or directories 'unique', by adding a prefix or suffix.
 #
@@ -93,7 +93,7 @@ _UNIQUEPKGLIST=		${WRKDIR}/.PLIST.uniquefiles
 _DO_CONDITIONAL_SYMLINK=	\
 	if [ ! -e ${STAGEDIR}${PREFIX}/$${fname} -a ! -L ${STAGEDIR}${PREFIX}/$${fname} ]; then \
 		${ECHO_MSG} "Link: @$${fname} --> $${newf}"; \
-		${LN} -s ${PREFIX}/$${newf} ${STAGEDIR}${PREFIX}/$${fname}; \
+		${RLN} ${STAGEDIR}${PREFIX}/$${newf} ${STAGEDIR}${PREFIX}/$${fname}; \
 		${ECHO_CMD} LINKED:$${newf}:$${fname} >> ${_UNIQUEPKGLIST}; \
 	fi
 .else

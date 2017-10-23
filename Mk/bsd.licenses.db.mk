@@ -1,7 +1,7 @@
 #-*- tab-width: 4; -*-
 # ex:ts=4
 #
-# $FreeBSD: head/Mk/bsd.licenses.db.mk 399096 2015-10-11 17:52:00Z pi $
+# $FreeBSD: head/Mk/bsd.licenses.db.mk 446704 2017-07-26 23:58:05Z dbaio $
 
 # ** Please run changes to this file by eadler@ first **
 
@@ -20,6 +20,8 @@ Licenses_db_Include_MAINTAINER=         portmgr@FreeBSD.org
 #   https://spdx.org/licenses/
 #
 # See also:
+# - Copyfree Licenses
+#   http://copyfree.org/standard/licenses
 # - Wikipedia (article "Comparison of Free Software Licenses")
 #   http://en.wikipedia.org/wiki/Comparison_of_free_software_licences
 #
@@ -39,12 +41,44 @@ Licenses_db_Include_MAINTAINER=         portmgr@FreeBSD.org
 # _LICENSE_LIST_GROUPS	- List of defined license groups
 #
 
-_LICENSE_LIST= 	AGPLv3 APACHE10 APACHE11 APACHE20 ART10 ARTPERL10 ART20 \
-				BSD BSD2CLAUSE BSD3CLAUSE BSD4CLAUSE BSL CC0-1.0 CDDL ClArtistic CPAL-1.0 EPL GFDL \
-				GMGPL GPLv1 GPLv2 GPLv3 GPLv3RLE ISCL LGPL20 LGPL21 LGPL3 \
-				LPPL10 LPPL11 LPPL12 LPPL13 LPPL13a LPPL13b LPPL13c MIT \
-				MPL OpenSSL OFL10 OFL11 OWL PostgreSQL PHP202 PHP30 PHP301 PSFL RUBY \
-				ZLIB ZPL21
+_LICENSE_LIST= 	BSL CDDL CPAL-1.0 ClArtistic EPL GFDL GMGPL \
+				ISCL MIT NCSA OFL10 OFL11 OWL OpenSSL PD PSFL PostgreSQL \
+				RUBY UNLICENSE WTFPL1 WTFPL ZLIB ZPL21
+
+# GNU family
+_LICENSE_LIST+= AGPLv3 GPLv1 GPLv2 GPLv3 GPLv3RLE LGPL20 LGPL21 LGPL3
+_LICENSE_LIST+= AGPLv3+ GPLv1+ GPLv2+ GPLv3+ GPLv3RLE+ LGPL20+ LGPL21+ \
+				LGPL3+
+
+# BSD family
+_LICENSE_LIST+= BSD BSD2CLAUSE BSD3CLAUSE BSD4CLAUSE
+
+# LaTeX family
+_LICENSE_LIST+= LPPL10 LPPL11 LPPL12 LPPL13 LPPL13a LPPL13b LPPL13c
+
+# Apache family
+_LICENSE_LIST+= APACHE10 APACHE11 APACHE20
+
+# Artistic family
+_LICENSE_LIST+= ART10 ARTPERL10 ART20
+
+# PHP family
+_LICENSE_LIST+= PHP202 PHP30 PHP301
+
+# Creative Commons family
+_LICENSE_LIST+=	CC0-1.0 \
+				CC-BY-1.0 CC-BY-2.0 CC-BY-2.5 CC-BY-3.0 CC-BY-4.0 \
+				CC-BY-ND-1.0 CC-BY-ND-2.0 CC-BY-ND-2.5 CC-BY-ND-3.0 CC-BY-ND-4.0 \
+				CC-BY-NC-1.0 CC-BY-NC-2.0 CC-BY-NC-2.5 CC-BY-NC-3.0 CC-BY-NC-4.0 \
+				CC-BY-NC-ND-1.0 CC-BY-NC-ND-2.0 CC-BY-NC-ND-2.5 CC-BY-NC-ND-3.0 CC-BY-NC-ND-4.0 \
+				CC-BY-NC-SA-1.0 CC-BY-NC-SA-2.0 CC-BY-NC-SA-2.5 CC-BY-NC-SA-3.0 CC-BY-NC-SA-4.0 \
+				CC-BY-SA-1.0 CC-BY-SA-2.0 CC-BY-SA-2.5 CC-BY-SA-3.0 CC-BY-SA-4.0
+
+# MPL family
+_LICENSE_LIST+= MPL MPL10 MPL11 MPL20
+
+# Others
+_LICENSE_LIST+= NONE
 
 # List of groups (only names must be present)
 
@@ -54,7 +88,7 @@ _LICENSE_NAME_GPL=	GPL Compatible
 
 _LICENSE_NAME_OSI=	OSI Approved
 
-_LICENSE_NAME_COPYFREE= Comply with Copyfree Standard Definition.
+_LICENSE_NAME_COPYFREE= Complies with Copyfree Standard Definition
 
 _LICENSE_NAME_FONTS=	Font licenses
 
@@ -73,9 +107,14 @@ _LICENSE_PERMS_DEFAULT=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 # - General permissions from groups are added to each license, if not defined.
 #
 
-
 _LICENSE_NAME_AGPLv3=	GNU Affero General Public License version 3
 _LICENSE_GROUPS_AGPLv3=	FSF GPL OSI
+
+# Note that though plus is allowed in a variable (and this license) name it
+# needs an extra space before following equals sign for them not to be parsed
+# as a single += operator
+_LICENSE_NAME_AGPLv3+ =	${_LICENSE_NAME_AGPLv3} (or later)
+_LICENSE_GROUPS_AGPLv3+ =	${_LICENSE_GROUPS_AGPLv3}
 
 _LICENSE_NAME_APACHE10=	Apache License 1.0
 _LICENSE_GROUPS_APACHE10=	FSF
@@ -94,7 +133,7 @@ _LICENSE_GROUPS_ARTPERL10=	OSI
 
 _LICENSE_NAME_ART20=	Artistic License version 2.0
 _LICENSE_GROUPS_ART20=	FSF GPL OSI
- 
+
 _LICENSE_NAME_BSD=	BSD license Generic Version (deprecated)
 _LICENSE_GROUPS_BSD=	FSF OSI COPYFREE
 
@@ -103,7 +142,7 @@ _LICENSE_GROUPS_BSD2CLAUSE=	FSF OSI COPYFREE
 
 _LICENSE_NAME_BSD3CLAUSE=	BSD 3-clause "New" or "Revised" License
 _LICENSE_GROUPS_BSD3CLAUSE=	FSF OSI COPYFREE
-	
+
 _LICENSE_NAME_BSD4CLAUSE=	BSD 4-clause "Original" or "Old" License
 _LICENSE_GROUPS_BSD4CLAUSE=	FSF
 
@@ -112,6 +151,111 @@ _LICENSE_GROUPS_BSL=	FSF OSI COPYFREE
 
 _LICENSE_NAME_CC0-1.0=		Creative Commons Zero v1.0 Universal
 _LICENSE_GROUPS_CC0-1.0=	FSF GPL COPYFREE
+
+_LICENSE_NAME_CC-BY-1.0=	Creative Commons Attribution 1.0
+_LICENSE_GROUPS_CC-BY-1.0=	# empty
+
+_LICENSE_NAME_CC-BY-2.0=	Creative Commons Attribution 2.0
+_LICENSE_GROUPS_CC-BY-2.0=	# empty
+
+_LICENSE_NAME_CC-BY-2.5=	Creative Commons Attribution 2.5
+_LICENSE_GROUPS_CC-BY-2.5=	# empty
+
+_LICENSE_NAME_CC-BY-3.0=	Creative Commons Attribution 3.0
+_LICENSE_GROUPS_CC-BY-3.0=	# empty
+
+_LICENSE_NAME_CC-BY-4.0=	Creative Commons Attribution 4.0
+_LICENSE_GROUPS_CC-BY-4.0=	# empty
+
+_LICENSE_NAME_CC-BY-ND-1.0=	Creative Commons Attribution No Derivatives 1.0
+_LICENSE_GROUPS_CC-BY-ND-1.0=	# empty
+
+_LICENSE_NAME_CC-BY-ND-2.0=	Creative Commons Attribution No Derivatives 2.0
+_LICENSE_GROUPS_CC-BY-ND-2.0=	# empty
+
+_LICENSE_NAME_CC-BY-ND-2.5=	Creative Commons Attribution No Derivatives 2.5
+_LICENSE_GROUPS_CC-BY-ND-2.5=	# empty
+
+_LICENSE_NAME_CC-BY-ND-3.0=	Creative Commons Attribution No Derivatives 3.0
+_LICENSE_GROUPS_CC-BY-ND-3.0=	# empty
+
+_LICENSE_NAME_CC-BY-ND-4.0=	Creative Commons Attribution No Derivatives 4.0
+_LICENSE_GROUPS_CC-BY-ND-4.0=	# empty
+
+_LICENSE_NAME_CC-BY-NC-1.0=	Creative Commons Attribution Non Commercial 1.0
+_LICENSE_GROUPS_CC-BY-NC-1.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-1.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-2.0=	Creative Commons Attribution Non Commercial 2.0
+_LICENSE_GROUPS_CC-BY-NC-2.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-2.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-2.5=	Creative Commons Attribution Non Commercial 2.5
+_LICENSE_GROUPS_CC-BY-NC-2.5=	# empty
+_LICENSE_PERMS_CC-BY-NC-2.5=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-3.0=	Creative Commons Attribution Non Commercial 3.0
+_LICENSE_GROUPS_CC-BY-NC-3.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-3.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-4.0=	Creative Commons Attribution Non Commercial 4.0
+_LICENSE_GROUPS_CC-BY-NC-4.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-4.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-ND-1.0=	Creative Commons Attribution Non Commercial No Derivatives 1.0
+_LICENSE_GROUPS_CC-BY-NC-ND-1.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-ND-1.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-ND-2.0=	Creative Commons Attribution Non Commercial No Derivatives 2.0
+_LICENSE_GROUPS_CC-BY-NC-ND-2.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-ND-2.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-ND-2.5=	Creative Commons Attribution Non Commercial No Derivatives 2.5
+_LICENSE_GROUPS_CC-BY-NC-ND-2.5=	# empty
+_LICENSE_PERMS_CC-BY-NC-ND-2.5=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-ND-3.0=	Creative Commons Attribution Non Commercial No Derivatives 3.0
+_LICENSE_GROUPS_CC-BY-NC-ND-3.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-ND-3.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-ND-4.0=	Creative Commons Attribution Non Commercial No Derivatives 4.0
+_LICENSE_GROUPS_CC-BY-NC-ND-4.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-ND-4.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-SA-1.0=	Creative Commons Attribution Non Commercial Share Alike 1.0
+_LICENSE_GROUPS_CC-BY-NC-SA-1.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-SA-1.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-SA-2.0=	Creative Commons Attribution Non Commercial Share Alike 2.0
+_LICENSE_GROUPS_CC-BY-NC-SA-2.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-SA-2.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-SA-2.5=	Creative Commons Attribution Non Commercial Share Alike 2.5
+_LICENSE_GROUPS_CC-BY-NC-SA-2.5=	# empty
+_LICENSE_PERMS_CC-BY-NC-SA-2.5=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-SA-3.0=	Creative Commons Attribution Non Commercial Share Alike 3.0
+_LICENSE_GROUPS_CC-BY-NC-SA-3.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-SA-3.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-NC-SA-4.0=	Creative Commons Attribution Non Commercial Share Alike 4.0
+_LICENSE_GROUPS_CC-BY-NC-SA-4.0=	# empty
+_LICENSE_PERMS_CC-BY-NC-SA-4.0=	dist-mirror pkg-mirror auto-accept
+
+_LICENSE_NAME_CC-BY-SA-1.0=	Creative Commons Attribution Share Alike 1.0
+_LICENSE_GROUPS_CC-BY-SA-1.0=	# empty
+
+_LICENSE_NAME_CC-BY-SA-2.0=	Creative Commons Attribution Share Alike 2.0
+_LICENSE_GROUPS_CC-BY-SA-2.0=	# empty
+
+_LICENSE_NAME_CC-BY-SA-2.5=	Creative Commons Attribution Share Alike 2.5
+_LICENSE_GROUPS_CC-BY-SA-2.5=	# empty
+
+_LICENSE_NAME_CC-BY-SA-3.0=	Creative Commons Attribution Share Alike 3.0
+_LICENSE_GROUPS_CC-BY-SA-3.0=	# empty
+
+_LICENSE_NAME_CC-BY-SA-4.0=	Creative Commons Attribution Share Alike 4.0
+_LICENSE_GROUPS_CC-BY-SA-4.0=	# empty
 
 _LICENSE_NAME_CDDL=	Common Development and Distribution License
 _LICENSE_GROUPS_CDDL=	FSF OSI
@@ -134,14 +278,26 @@ _LICENSE_GROUPS_GMGPL=	FSF GPL OSI
 _LICENSE_NAME_GPLv1=	GNU General Public License version 1
 _LICENSE_GROUPS_GPLv1=	FSF GPL OSI
 
+_LICENSE_NAME_GPLv1+ =	${_LICENSE_NAME_GPLv1} (or later)
+_LICENSE_GROUPS_GPLv1+ =	${_LICENSE_GROUPS_GPLv1}
+
 _LICENSE_NAME_GPLv2=	GNU General Public License version 2
 _LICENSE_GROUPS_GPLv2=	FSF GPL OSI
+
+_LICENSE_NAME_GPLv2+ =	${_LICENSE_NAME_GPLv2} (or later)
+_LICENSE_GROUPS_GPLv2+ =	${_LICENSE_GROUPS_GPLv2}
 
 _LICENSE_NAME_GPLv3=	GNU General Public License version 3
 _LICENSE_GROUPS_GPLv3=	FSF GPL OSI
 
+_LICENSE_NAME_GPLv3+ =	${_LICENSE_NAME_GPLv3} (or later)
+_LICENSE_GROUPS_GPLv3+ =	${_LICENSE_GROUPS_GPLv3}
+
 _LICENSE_NAME_GPLv3RLE=	GNU GPL version 3 Runtime Library Exception
 _LICENSE_GROUPS_GPLv3RLE=	FSF GPL OSI
+
+_LICENSE_NAME_GPLv3RLE+ =	${_LICENSE_NAME_GPLv3RLE} (or later)
+_LICENSE_GROUPS_GPLv3RLE+ =	${_LICENSE_GROUPS_GPLv3RLE}
 
 _LICENSE_NAME_ISCL=	Internet Systems Consortium License
 _LICENSE_GROUPS_ISCL=	FSF GPL OSI COPYFREE
@@ -149,11 +305,20 @@ _LICENSE_GROUPS_ISCL=	FSF GPL OSI COPYFREE
 _LICENSE_NAME_LGPL20=	GNU Library General Public License version 2.0
 _LICENSE_GROUPS_LGPL20=	FSF GPL OSI
 
+_LICENSE_NAME_LGPL20+ =	${_LICENSE_NAME_LGPL20} (or later)
+_LICENSE_GROUPS_LGPL20+ =	${_LICENSE_GROUPS_LGPL20}
+
 _LICENSE_NAME_LGPL21=	GNU Lesser General Public License version 2.1
 _LICENSE_GROUPS_LGPL21=	FSF GPL OSI
 
+_LICENSE_NAME_LGPL21+ =	${_LICENSE_NAME_LGPL21} (or later)
+_LICENSE_GROUPS_LGPL21+ =	${_LICENSE_GROUPS_LGPL21}
+
 _LICENSE_NAME_LGPL3=	GNU Lesser General Public License version 3
 _LICENSE_GROUPS_LGPL3=	FSF GPL OSI
+
+_LICENSE_NAME_LGPL3+ =	${_LICENSE_NAME_LGPL3} (or later)
+_LICENSE_GROUPS_LGPL3+ =	${_LICENSE_GROUPS_LGPL3}
 
 _LICENSE_NAME_LPPL10=	LaTeX Project Public License version 1.0
 _LICENSE_GROUPS_LPPL10=	FSF OSI
@@ -184,10 +349,22 @@ _LICENSE_GROUPS_LPPL13c=	FSF OSI
 _LICENSE_PERMS_LPPL13c=	dist-mirror dist-sell
 
 _LICENSE_NAME_MIT=	MIT license / X11 license
-_LICENSE_GROUPS_MIT=	FSF GPL OSI COPYFREE
+_LICENSE_GROUPS_MIT=	COPYFREE FSF GPL OSI
 
 _LICENSE_NAME_MPL=	Mozilla Public License
 _LICENSE_GROUPS_MPL=	FSF OSI
+
+_LICENSE_NAME_MPL10=	Mozilla Public License version 1.0
+_LICENSE_GROUPS_MPL10=	FSF OSI
+
+_LICENSE_NAME_MPL11=	Mozilla Public License version 1.1
+_LICENSE_GROUPS_MPL11=	FSF OSI
+
+_LICENSE_NAME_MPL20=	Mozilla Public License version 2.0
+_LICENSE_GROUPS_MPL20=	FSF OSI
+
+_LICENSE_NAME_NCSA=	University of Illinois/NCSA Open Source License
+_LICENSE_GROUPS_NCSA=	COPYFREE FSF GPL OSI
 
 _LICENSE_NAME_OFL10=	SIL Open Font License version 1.0 (http://scripts.sil.org/OFL)
 _LICENSE_GROUPS_OFL10=	FONTS
@@ -204,6 +381,9 @@ _LICENSE_GROUPS_OWL=	COPYFREE
 _LICENSE_NAME_PostgreSQL=	PostgreSQL Licence
 _LICENSE_GROUPS_PostgreSQL=	FSF GPL OSI COPYFREE
 
+_LICENSE_NAME_PD=		Public Domain
+_LICENSE_GROUPS_PD=		GPL COPYFREE
+
 _LICENSE_NAME_PHP202=	PHP License version 2.02
 _LICENSE_GROUPS_PHP202=	FSF OSI
 
@@ -218,6 +398,19 @@ _LICENSE_GROUPS_PSFL=	FSF GPL OSI
 
 _LICENSE_NAME_RUBY=	Ruby License
 _LICENSE_GROUPS_RUBY=	FSF
+
+_LICENSE_NAME_NONE=	No license specified
+_LICENSE_GROUPS_NONE=	# empty
+_LICENSE_PERMS_NONE=	none
+
+_LICENSE_NAME_UNLICENSE=	The Unlicense
+_LICENSE_GROUPS_UNLICENSE=	COPYFREE FSF GPL
+
+_LICENSE_NAME_WTFPL1=	Do What the Fuck You Want To Public License version 1
+_LICENSE_GROUPS_WTFPL1=	GPL FSF COPYFREE
+
+_LICENSE_NAME_WTFPL=	Do What the Fuck You Want To Public License version 2
+_LICENSE_GROUPS_WTFPL=	GPL FSF COPYFREE
 
 _LICENSE_NAME_ZLIB=		zlib License
 _LICENSE_GROUPS_ZLIB=	GPL FSF OSI

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/drupal.mk 405770 2016-01-11 08:51:49Z marino $
+# $FreeBSD: head/Mk/Uses/drupal.mk 417053 2016-06-18 08:22:11Z rene $
 #
 # Support for Drupal ports and modules.
 #
@@ -13,17 +13,17 @@
 .if !defined(_INCLUDE_USES_DRUPAL_Mk)
 _INCLUDE_USES_DRUPAL_Mk=	yes
 
-.if ${drupal_ARGS:M[67]}
-_DRUPAL_VERSION=	${drupal_ARGS:M[67]}
+.if ${drupal_ARGS:M[7]}
+_DRUPAL_VERSION=	${drupal_ARGS:M[7]}
 .endif
 
-VALID_VERSIONS=	6 7
+VALID_VERSIONS=	7
 
-.if ${drupal_ARGS:N[67]:Ntheme:Nmodule}
-IGNORE=	Unknown argument for USES=drupal: ${drupal_ARGS:N[67]:Ntheme:Nmodule}
+.if ${drupal_ARGS:N[7]:Ntheme:Nmodule}
+IGNORE=	Unknown argument for USES=drupal: ${drupal_ARGS:N[7]:Ntheme:Nmodule}
 .endif
 
-_DRUPAL_COMP=	${drupal_ARGS:N[67]}
+_DRUPAL_COMP=	${drupal_ARGS:N[7]}
 
 .if !defined(_DRUPAL_VERSION) || ! ${VALID_VERSIONS:M${_DRUPAL_VERSION}}
 IGNORE=	Missing or invalid argument for USES=drupal, a version must be provided: ${VALID_VERSIONS}
@@ -78,7 +78,7 @@ DIST_SUBDIR=	drupal
 NO_BUILD?=	yes
 
 WRKSRC?=	${WRKDIR}/${PORTNAME}
-RUN_DEPENDS+=	${LOCALBASE}/${DRUPAL_BASE}/index.php:${PORTSDIR}/${DRUPAL_BASE}
+RUN_DEPENDS+=	${LOCALBASE}/${DRUPAL_BASE}/index.php:${DRUPAL_BASE}
 
 PLIST_SUB+=	DRUPAL_MODDIR=${DRUPAL_MODDIR}
 PLIST_FILES+=	"@owner www" \

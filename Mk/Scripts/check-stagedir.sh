@@ -1,6 +1,6 @@
 #!/bin/sh
 # ports/Mk/Scripts/check-stagedir.sh - called from ports/Mk/bsd.stage.mk
-# $FreeBSD: head/Mk/Scripts/check-stagedir.sh 399701 2015-10-19 17:04:33Z bdrewery $
+# $FreeBSD: head/Mk/Scripts/check-stagedir.sh 446238 2017-07-19 22:29:54Z gerald $
 #
 # MAINTAINER: portmgr@FreeBSD.org
 #
@@ -12,7 +12,6 @@
 #  c. Files in plist which are owned by dependencies/MTREEs
 
 set -e
-export LC_ALL=C
 
 . ${SCRIPTSDIR}/functions.sh
 
@@ -153,7 +152,7 @@ check_orphans_from_plist() {
 		*/.svn/*|'@dir '*/.svn) ;;
 		*/.svnignore) ;;
 		*/CVS/*|'@dir '*/CVS) ;;
-		*/info/dir|info/dir) ;;
+		*/info/dir|info/dir|info/*/dir) ;;
 		share/fonts/*/fonts.dir) ;;
 		share/fonts/*/fonts.scale) ;;
 		share/applications/mimeinfo.cache) ;;
@@ -228,6 +227,8 @@ esac
 # validate environment
 validate_env STAGEDIR PREFIX LOCALBASE WRKDIR WRKSRC MTREE_FILE \
     TMPPLIST PLIST_SUB_SED SCRIPTSDIR PORT_OPTIONS NO_PREFIX_RMDIR
+
+[ -n "${DEBUG_MK_SCRIPTS}" -o -n "${DEBUG_MK_SCRIPTS_CHECK_STAGEDIR}" ] && set -x
 
 set -u
 

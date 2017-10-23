@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/qmake.mk 404694 2015-12-28 18:51:41Z rakuco $
+# $FreeBSD: head/Mk/Uses/qmake.mk 424156 2016-10-18 11:20:01Z jbeich $
 #
 # Provide support for qmake-based projects
 #
@@ -90,6 +90,7 @@ _QMAKE_WRKSRC?=	${CONFIGURE_WRKSRC}
 CONFIGURE_WRKSRC=	${WRKDIR}/.build
 BUILD_WRKSRC=		${CONFIGURE_WRKSRC}
 INSTALL_WRKSRC=		${BUILD_WRKSRC}
+TEST_WRKSRC=		${BUILD_WRKSRC}
 QMAKE_SOURCE_PATH?=	${WRKSRC}
 .else
 QMAKE_SOURCE_PATH?=	# empty
@@ -107,8 +108,7 @@ qmake-configure:
 		${SETENV} ${QMAKE_ENV} ${_QMAKE} ${QMAKE_ARGS} ${QMAKE_SOURCE_PATH}
 
 .if !target(do-configure) && ! ${qmake_ARGS:M_env}
-do-configure: qmake-configure
-	@${DO_NADA}
+_USES_configure+=	450:qmake-configure
 .endif
 
 .endif # !defined(_INCLUDE_USES_QMAKE_MK)

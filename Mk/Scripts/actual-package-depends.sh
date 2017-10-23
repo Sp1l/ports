@@ -1,6 +1,8 @@
 #!/bin/sh
 # MAINTAINER: portmgr@FeeeBSD.org
-# $FreeBSD: head/Mk/Scripts/actual-package-depends.sh 383711 2015-04-10 08:45:09Z antoine $
+# $FreeBSD: head/Mk/Scripts/actual-package-depends.sh 415573 2016-05-20 19:01:59Z mat $
+
+[ -n "${DEBUG_MK_SCRIPTS}" -o -n "${DEBUG_MK_SCRIPTS_ACTUAL_PACKAGE_DEPENDS}" ] && set -x
 
 if [ -z "${PKG_BIN}" ]; then
 	echo "PKG_BIN required in environment." >&2

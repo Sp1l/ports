@@ -3,7 +3,7 @@
 #
 # Created by: Akinori MUSHA <knu@FreeBSD.org>
 #
-# $FreeBSD: head/Mk/bsd.ruby.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/bsd.ruby.mk 450490 2017-09-24 12:41:44Z sunpoet $
 #
 
 .if !defined(Ruby_Include)
@@ -15,11 +15,9 @@ Ruby_Include_MAINTAINER=	ruby@FreeBSD.org
 # [variables that a user may define]
 #
 # RUBY_VER		- (See below)
-# RUBY_DEFAULT_VER	- Set to (e.g.) "2.0" if you want to refer to "ruby20"
+# RUBY_DEFAULT_VER	- Set to (e.g.) "2.4" if you want to refer to "ruby24"
 #			  just as "ruby".
 # RUBY_ARCH		- (See below)
-# RUBY_RD_HTML		- Define if you want HTML files generated from RD files.
-#
 #
 # [variables that each port can define]
 #
@@ -33,7 +31,6 @@ Ruby_Include_MAINTAINER=	ruby@FreeBSD.org
 # USE_RUBY		- Says that the port uses ruby for building and running.
 # RUBY_NO_BUILD_DEPENDS	- Says that the port should not build-depend on ruby.
 # RUBY_NO_RUN_DEPENDS	- Says that the port should not run-depend on ruby.
-# USE_LIBRUBY		- Says that the port uses libruby.
 # USE_RUBY_EXTCONF	- Says that the port uses extconf.rb to configure.
 #			  Implies USE_RUBY.
 # RUBY_EXTCONF		- Set to the alternative name of extconf.rb
@@ -44,7 +41,6 @@ Ruby_Include_MAINTAINER=	ruby@FreeBSD.org
 #			  build.
 # RUBY_SETUP		- Set to the alternative name of setup.rb
 #			  (default: setup.rb).
-# USE_RUBY_RDTOOL	- Says that the port uses rdtool to generate documents.
 # USE_RUBY_RDOC		- Says that the port uses rdoc to generate documents.
 # RUBY_REQUIRE		- Set to a Ruby expression to evaluate before building
 #			  the port.  The constant "Ruby" is set to the integer
@@ -52,15 +48,7 @@ Ruby_Include_MAINTAINER=	ruby@FreeBSD.org
 #			  expression will be set to RUBY_PROVIDED, which is
 #			  left undefined if the result is nil, false or a
 #			  zero-length string.  Implies USE_RUBY.
-# RUBY_SHEBANG_FILES	- Specify the files which shebang lines you want to fix.
-# RUBY_RD_FILES		- Specify the RD files which you want to generate HTML
-#			  documents from. If this is defined and not empty,
-#			  USE_RUBY_RDTOOL is implied and RUBY_RD_HTML_FILES is
-#			  defined.
-# USE_RUBYGEMS		- Says that the port uses rubygems packaging system.
-# RUBYGEM_AUTOPLIST	- Generate packing list for rubygems based port
-#			  automatically.
-#
+# USE_RUBYGEMS		- Do not use this -- instead USES=gem
 #
 # [variables that each port should not (re)define]
 #
@@ -99,18 +87,14 @@ Ruby_Include_MAINTAINER=	ruby@FreeBSD.org
 #
 # RUBY_MODNAME		- Set to the module name (default: ${PORTNAME}).
 #
-# RUBY_RD2		- Full path of rd2 executable.
 # RUBY_RDOC		- Full path of rdoc executable.
 #
 # RUBY_BASE_PORT	- Port path of base ruby without PORTSDIR, without
 #			  suffix except version.
 # RUBY_PORT		- Port path of ruby without PORTSDIR.
-# RUBY_RDTOOL_PORT	- Port path of rdtool without PORTSDIR.
 # RUBY_RDOC_PORT	- Port path of rdoc without PORTSDIR.
 #
-# DEPEND_LIBRUBY	- LIB_DEPENDS entry for libruby.
 # DEPEND_RUBY		- BUILD_DEPENDS/RUN_DEPENDS entry for ruby.
-# DEPEND_RUBY_RDTOOL	- BUILD_DEPENDS entry for rdtool.
 # DEPEND_RUBY_RDOC	- BUILD_DEPENDS entry for rdoc.
 #
 # RUBY_LIBDIR		- Installation path for architecture independent
@@ -129,10 +113,7 @@ Ruby_Include_MAINTAINER=	ruby@FreeBSD.org
 #			  documents.
 # RUBY_MODDOCDIR	- Installation path for the module's documents.
 # RUBY_MODEXAMPLESDIR	- Installation path for the module's examples.
-# RUBY_ELISPDIR		- Installation path for emacs lisp files.
 #
-
-.include "${PORTSDIR}/Mk/bsd.default-versions.mk"
 
 .if defined(RUBY_DEFAULT_VER)
 WARNING+=	"RUBY_DEFAULT_VER is defined, consider using DEFAULT_VERSIONS=ruby=${RUBY_DEFAULT_VER} instead"
@@ -144,12 +125,12 @@ RUBY_VER?=		${RUBY_DEFAULT_VER}
 
 .if defined(RUBY)
 .if !exists(${RUBY})
-IGNORE=	cannot install: you set the variable RUBY to "${RUBY}", but it does not seem to exist.  Please specify an already installed ruby executable.
+IGNORE=	cannot install: you set the variable RUBY to "${RUBY}", but it does not seem to exist.  Please specify an already installed ruby executable
 .endif
 
 _RUBY_TEST!=		${RUBY} -e 'begin; require "rbconfig"; puts "ok" ; rescue LoadError; puts "error"; end'
 .if !empty(_RUBY_TEST) && ${_RUBY_TEST} != "ok"
-IGNORE=	cannot install: you set the variable RUBY to "${RUBY}", but it failed to include rbconfig.  Please specify a properly installed ruby executable.
+IGNORE=	cannot install: you set the variable RUBY to "${RUBY}", but it failed to include rbconfig.  Please specify a properly installed ruby executable
 .endif
 
 _RUBY_CONFIG=		${RUBY} -r rbconfig -e 'C = RbConfig::CONFIG' -e
@@ -167,50 +148,54 @@ _RUBY_VENDORDIR!=	${_RUBY_CONFIG} 'puts C["vendordir"]'
 RUBY?=			${LOCALBASE}/bin/${RUBY_NAME}
 
 .if defined(RUBY_VER)
-. if ${RUBY_VER} == 2.0
-#
-# Ruby 2.0
-#
-RUBY_RELVERSION=	2.0.0
-RUBY_PORTREVISION=	0
-RUBY_PORTEPOCH=		1
-RUBY_PATCHLEVEL=	647
-RUBY20=			""	# PLIST_SUB helpers
-
-. elif ${RUBY_VER} == 2.1
-#
-# Ruby 2.1
-#
-RUBY_RELVERSION=	2.1.7
-RUBY_PORTREVISION=	0
-RUBY_PORTEPOCH=		1
-RUBY_PATCHLEVEL=	0
-RUBY21=			""	# PLIST_SUB helpers
-
-. elif ${RUBY_VER} == 2.2
+# When adding a version, please keep the comment in
+# Mk/bsd.default-versions.mk in sync.
+. if ${RUBY_VER} == 2.2
 #
 # Ruby 2.2
 #
-RUBY_RELVERSION=	2.2.3
+RUBY_RELVERSION=	2.2.8
 RUBY_PORTREVISION=	0
 RUBY_PORTEPOCH=		1
 RUBY_PATCHLEVEL=	0
 RUBY22=			""	# PLIST_SUB helpers
 
+. elif ${RUBY_VER} == 2.3
+#
+# Ruby 2.3
+#
+RUBY_RELVERSION=	2.3.5
+RUBY_PORTREVISION=	0
+RUBY_PORTEPOCH=		1
+RUBY_PATCHLEVEL=	0
+RUBY23=			""	# PLIST_SUB helpers
+
+. elif ${RUBY_VER} == 2.4
+#
+# Ruby 2.4
+#
+RUBY_RELVERSION=	2.4.2
+RUBY_PORTREVISION=	0
+RUBY_PORTEPOCH=		1
+RUBY_PATCHLEVEL=	0
+RUBY24=			""	# PLIST_SUB helpers
+
+# When adding a version, please keep the comment in
+# Mk/bsd.default-versions.mk in sync.
 . else
 #
 # Other versions
 #
-IGNORE=	Only ruby 2.0, 2.1 and 2.2 are supported
+IGNORE=	Only ruby 2.2, 2.3 and 2.4 are supported
 _INVALID_RUBY_VER=	1
 . endif
 .endif # defined(RUBY_VER)
 
 .if !defined(_INVALID_RUBY_VER)
 
-RUBY20?=		"@comment "
-RUBY21?=		"@comment "
 RUBY22?=		"@comment "
+RUBY23?=		"@comment "
+RUBY24?=		"@comment "
 
 .if defined(BROKEN_RUBY${RUBY_VER:R}${RUBY_VER:E})
 .if ${BROKEN_RUBY${RUBY_VER:R}${RUBY_VER:E}} == "yes"
@@ -249,24 +234,6 @@ _RUBY_VENDORDIR?=	${_RUBY_SYSLIBDIR}/ruby/vendor_ruby
 
 .if !defined(_INVALID_RUBY_VER)
 
-.if defined(LANG) && !empty(LANG)
-GEM_ENV+=		LANG=${LANG}
-.else
-GEM_ENV+=		LANG=en_US.UTF-8
-.endif
-
-.if defined(LC_ALL) && !empty(LC_ALL)
-GEM_ENV+=		LC_ALL=${LC_ALL}
-.else
-GEM_ENV+=		LC_ALL=en_US.UTF-8
-.endif
-
-.if defined(LC_CTYPE) && !empty(LC_CTYPE)
-GEM_ENV+=		LC_CTYPE=${LC_CTYPE}
-.else
-GEM_ENV+=		LC_CTYPE=UTF-8
-.endif
-
 RUBY_DEFAULT_SUFFIX?=	${RUBY_DEFAULT_VER:S/.//}
 
 RUBY_DISTVERSION?=	${RUBY_VERSION}
@@ -289,25 +256,23 @@ RUBY_SHLIBVER?=		${RUBY_VER:S/.//}
 
 RUBY_CONFIGURE_ARGS+=	--program-prefix=""
 
-DEPENDS_ARGS+=		RUBY_VER="${RUBY_VER}"
+.if ${RUBY_VER} != ${RUBY_DEFAULT_VER}
+DEPENDS_ARGS+=		RUBY_VER=${RUBY_VER}
+.endif
 
 RUBY_CONFIGURE_ARGS+=	--program-suffix="${RUBY_SUFFIX}"
 
 RUBY_MODNAME?=		${PORTNAME}
 
 # Commands
-RUBY_RD2?=		${LOCALBASE}/bin/rd2
 RUBY_RDOC?=		${LOCALBASE}/bin/rdoc${RUBY_VER:S/.//}
 
 # Ports
 RUBY_BASE_PORT?=	lang/ruby${RUBY_VER:S/.//}
 RUBY_PORT?=		${RUBY_BASE_PORT}
-RUBY_RDTOOL_PORT?=	textproc/ruby-rdtool
 
 # Depends
-DEPEND_LIBRUBY?=	lib${RUBY_NAME}.so.${RUBY_SHLIBVER}:${PORTSDIR}/${RUBY_PORT}
-DEPEND_RUBY?=		${RUBY}:${PORTSDIR}/${RUBY_PORT}
-DEPEND_RUBY_RDTOOL?=	${RUBY_RD2}:${PORTSDIR}/${RUBY_RDTOOL_PORT}
+DEPEND_RUBY?=		${RUBY}:${RUBY_PORT}
 
 # Directories
 RUBY_LIBDIR?=		${_RUBY_SYSLIBDIR}/ruby/${RUBY_VER}
@@ -322,7 +287,6 @@ RUBY_RIDIR?=		${PREFIX}/share/ri/${RUBY_VER}/system
 RUBY_SITERIDIR?=	${PREFIX}/share/ri/${RUBY_VER}/site
 RUBY_MODDOCDIR?=	${RUBY_DOCDIR}/${RUBY_MODNAME}
 RUBY_MODEXAMPLESDIR?=	${RUBY_EXAMPLESDIR}/${RUBY_MODNAME}
-RUBY_ELISPDIR?=		${PREFIX}/lib/ruby/elisp
 
 # PLIST
 PLIST_RUBY_DIRS=	RUBY_LIBDIR="${RUBY_LIBDIR}" \
@@ -336,8 +300,7 @@ PLIST_RUBY_DIRS=	RUBY_LIBDIR="${RUBY_LIBDIR}" \
 			RUBY_DOCDIR="${RUBY_DOCDIR}" \
 			RUBY_EXAMPLESDIR="${RUBY_EXAMPLESDIR}" \
 			RUBY_RIDIR="${RUBY_RIDIR}" \
-			RUBY_SITERIDIR="${RUBY_SITERIDIR}" \
-			RUBY_ELISPDIR="${RUBY_ELISPDIR}"
+			RUBY_SITERIDIR="${RUBY_SITERIDIR}"
 
 PLIST_SUB+=		${PLIST_RUBY_DIRS:C,DIR="(${LOCALBASE}|${PREFIX})/,DIR=",} \
 			RUBY_VERSION="${RUBY_VERSION}" \
@@ -347,9 +310,9 @@ PLIST_SUB+=		${PLIST_RUBY_DIRS:C,DIR="(${LOCALBASE}|${PREFIX})/,DIR=",} \
 			RUBY_SUFFIX="${RUBY_SUFFIX}" \
 			RUBY_NAME="${RUBY_NAME}" \
 			RUBY_DEFAULT_SUFFIX="${RUBY_DEFAULT_SUFFIX}" \
-			RUBY20=${RUBY20} \
-			RUBY21=${RUBY21} \
-			RUBY22=${RUBY22}
+			RUBY22=${RUBY22} \
+			RUBY23=${RUBY23} \
+			RUBY24=${RUBY24}
 
 .if defined(USE_RUBY_RDOC)
 MAKE_ENV+=	RUBY_RDOC=${RUBY_RDOC}
@@ -372,147 +335,9 @@ RUBY_PROVIDED=		"should be"	# the latest version is going to be installed
 .endif
 .endif
 
-# fix shebang lines
-.if defined(RUBY_SHEBANG_FILES) && !empty(RUBY_SHEBANG_FILES)
-USE_RUBY=		yes
-
-post-patch:	ruby-shebang-patch
-
-ruby-shebang-patch:
-	@cd ${WRKSRC}; for f in ${RUBY_SHEBANG_FILES}; do \
-	${ECHO_MSG} "===>  Fixing the #! line of $$f"; \
-	TMPFILE=`mktemp -t rubyshebang`; \
-	cp $$f $$TMPFILE; \
-	${AWK} 'BEGIN {flag = 0;}								\
-		{										\
-			if (flag == 0) {							\
-				if ($$0 ~ /^#!/) {						\
-					sub(/#!(.*\/)?(env[[:space:]]+)?ruby/, "#!${RUBY}", $$0);\
-					print $$0;						\
-				}								\
-				else {								\
-					print "#!${RUBY}";					\
-					print $$0;						\
-				}								\
-				flag = 1;							\
-			} else {								\
-				print $$0;							\
-			}									\
-		}' $$TMPFILE > $$f; \
-	rm -f $$TMPFILE; \
-	done
-.endif
-
 .if ${PORT_OPTIONS:MDEBUG}
 RUBY_FLAGS+=	-d
 .endif
-
-#
-# RubyGems support
-#
-.if defined(USE_RUBYGEMS)
-
-BUILD_DEPENDS+=	${RUBYGEMBIN}:${PORTSDIR}/devel/ruby-gems
-RUN_DEPENDS+=	${RUBYGEMBIN}:${PORTSDIR}/devel/ruby-gems
-
-PKGNAMEPREFIX?=	rubygem-
-EXTRACT_SUFX=	.gem
-EXTRACT_ONLY=
-DIST_SUBDIR=	rubygem
-
-EXTRACT_DEPENDS+=	${RUBYGEMBIN}:${PORTSDIR}/devel/ruby-gems
-GEMS_BASE_DIR=	lib/ruby/gems/${RUBY_VER}
-GEMS_DIR=	${GEMS_BASE_DIR}/gems
-DOC_DIR=	${GEMS_BASE_DIR}/doc
-CACHE_DIR=	${GEMS_BASE_DIR}/cache
-SPEC_DIR=	${GEMS_BASE_DIR}/specifications
-EXT_DIR=	${GEMS_BASE_DIR}/extensions
-GEM_NAME?=	${PORTNAME}-${PORTVERSION}
-GEM_LIB_DIR?=	${GEMS_DIR}/${GEM_NAME}
-GEM_DOC_DIR?=	${DOC_DIR}/${GEM_NAME}
-GEM_SPEC?=	${SPEC_DIR}/${GEM_NAME}.gemspec
-GEM_CACHE?=	${CACHE_DIR}/${GEM_NAME}.gem
-
-PLIST_SUB+=	PORTVERSION="${PORTVERSION}" \
-		REV="${RUBY_GEM}" \
-		GEMS_BASE_DIR="lib/ruby/gems/${RUBY_VER}" \
-		GEMS_DIR="${GEMS_DIR}" \
-		DOC_DIR="${DOC_DIR}" \
-		CACHE_DIR="${CACHE_DIR}" \
-		SPEC_DIR="${SPEC_DIR}" \
-		EXT_DIR="${EXT_DIR}" \
-		PORT="${PORTNAME}-${PORTVERSION}" \
-		GEM_NAME="${GEM_NAME}" \
-		GEM_LIB_DIR="${GEM_LIB_DIR}" \
-		GEM_DOC_DIR="${GEM_DOC_DIR}" \
-		GEM_SPEC="${GEM_SPEC}" \
-		GEM_CACHE="${GEM_CACHE}" \
-		EXTRACT_SUFX="${EXTRACT_SUFX}"
-
-RUBYGEMBIN=	${LOCALBASE}/bin/gem${RUBY_VER:S/.//}
-
-. if defined(DISTFILES)
-GEMFILES=	${DISTFILES:C/:[^:]+$//}
-. else
-GEMFILES=	${DISTNAME}${EXTRACT_SUFX}
-. endif
-
-GEMSPEC=	${PORTNAME}.gemspec
-
-RUBYGEM_ARGS=-l --no-update-sources --install-dir ${STAGEDIR}${PREFIX}/lib/ruby/gems/${RUBY_VER} --ignore-dependencies --bindir=${STAGEDIR}${PREFIX}/bin
-GEM_ENV+=	RB_USER_INSTALL=yes
-.if defined(NOPORTDOCS)
-RUBYGEM_ARGS+=	--no-rdoc --no-ri
-.else
-RUBYGEM_ARGS+=	--rdoc --ri
-.endif
-
-do-extract:
-	@${SETENV} ${GEM_ENV} ${RUBYGEMBIN} unpack --target=${WRKDIR} ${DISTDIR}/${DIST_SUBDIR}/${GEMFILES}
-	@(cd ${BUILD_WRKSRC}; if ! ${SETENV} ${GEM_ENV} ${RUBYGEMBIN} spec --ruby ${DISTDIR}/${DIST_SUBDIR}/${GEMFILES} > ${GEMSPEC} ; then \
-		if [ -n "${BUILD_FAIL_MESSAGE}" ] ; then \
-			${ECHO_MSG} "===> Extraction failed unexpectedly."; \
-			(${ECHO_CMD} "${BUILD_FAIL_MESSAGE}") | ${FMT} 75 79 ; \
-			fi; \
-		${FALSE}; \
-		fi)
-
-do-build:
-	@(cd ${BUILD_WRKSRC}; if ! ${SETENV} ${GEM_ENV} ${RUBYGEMBIN} build --force ${GEMSPEC} ; then \
-		if [ -n "${BUILD_FAIL_MESSAGE}" ] ; then \
-			${ECHO_MSG} "===> Compilation failed unexpectedly."; \
-			(${ECHO_CMD} "${BUILD_FAIL_MESSAGE}") | ${FMT} 75 79 ; \
-			fi; \
-		${FALSE}; \
-		fi)
-
-do-install:
-	(cd ${BUILD_WRKSRC}; ${SETENV} ${GEM_ENV} ${RUBYGEMBIN} install ${RUBYGEM_ARGS} ${GEMFILES} -- --build-args ${CONFIGURE_ARGS})
-	${RM} -r ${STAGEDIR}${PREFIX}/${GEMS_BASE_DIR}/build_info/
-	${RMDIR} ${STAGEDIR}${PREFIX}/${EXT_DIR} 2> /dev/null || ${TRUE}
-.if defined(NOPORTDOCS)
-	-@${RMDIR} ${STAGEDIR}${PREFIX}/${DOC_DIR}
-.endif
-
-. if defined(RUBYGEM_AUTOPLIST)
-.  if !target(post-install-script)
-post-install-script:
-	@${ECHO} ${GEM_CACHE} >> ${TMPPLIST}
-	@${ECHO} ${GEM_SPEC} >> ${TMPPLIST}
-.if !defined(NOPORTDOCS)
-	@${FIND} -ds ${STAGEDIR}${PREFIX}/${DOC_DIR} -type f -print | ${SED} -E -e \
-		's,^${STAGEDIR}${PREFIX}/?,,' >> ${TMPPLIST}
-.endif
-	@${FIND} -ds ${STAGEDIR}${PREFIX}/${GEM_LIB_DIR} -type f -print | ${SED} -E -e \
-		's,^${STAGEDIR}${PREFIX}/?,,' >> ${TMPPLIST}
-	@if [ -d ${STAGEDIR}${PREFIX}/${EXT_DIR} ]; then \
-		${FIND} -ds ${STAGEDIR}${PREFIX}/${EXT_DIR} -type f -print | ${SED} -E -e \
-		's,^${STAGEDIR}${PREFIX}/?,,' >> ${TMPPLIST} ; \
-	fi
-.  endif
-. endif
-
-.endif # USE_RUBYGEMS
 
 #
 # extconf.rb support
@@ -568,10 +393,6 @@ ruby-setup-install:
 	${SETENV} ${MAKE_ENV} ${RUBY} ${RUBY_FLAGS} ${RUBY_SETUP} install --prefix=${STAGEDIR}
 .endif
 
-.if defined(USE_LIBRUBY)
-LIB_DEPENDS+=		${DEPEND_LIBRUBY}
-.endif
-
 .if defined(USE_RUBY)
 .if !defined(RUBY_NO_BUILD_DEPENDS)
 EXTRACT_DEPENDS+=	${DEPEND_RUBY}
@@ -581,54 +402,6 @@ BUILD_DEPENDS+=		${DEPEND_RUBY}
 .if !defined(RUBY_NO_RUN_DEPENDS)
 RUN_DEPENDS+=		${DEPEND_RUBY}
 .endif
-.endif
-
-.if defined(USE_RAKE)
-BUILD_DEPENDS+=		${LOCALBASE}/bin/rake:${PORTSDIR}/devel/rubygem-rake
-RAKE_BIN=	${LOCALBASE}/bin/rake
-.endif
-
-# documents
-
-RUBY_NO_RD_HTML=	yes
-
-.if defined(RUBY_RD_HTML)
-.undef RUBY_NO_RD_HTML
-.endif
-
-.if defined(NOPORTDOCS)
-RUBY_NO_RD_HTML=	yes
-.endif
-
-.if defined(RUBY_RD_FILES) && !defined(RUBY_NO_RD_HTML)
-USE_RUBY_RDTOOL=	yes
-
-RUBY_RD_HTML_FILES=	${RUBY_RD_FILES:S/.rb$//:S/.rd././:S/.rd$//:S/$/.html/}
-
-PLIST_SUB+=		RUBY_RD_HTML_FILES=""
-
-pre-install:	ruby-rd-build
-
-ruby-rd-build:
-.if !empty(RUBY_RD_FILES)
-	@${ECHO_MSG} "===>  Generating HTML documents from RD documents"
-	@cd ${WRKSRC}; for rd in ${RUBY_RD_FILES}; do \
-		html=$$(echo $$rd | ${SED} 's/\.rb$$//;s/\.rd\././;s/\.rd$$//').html; \
-		${ECHO_MSG} "${RUBY_RD2} $$rd > $$html"; \
-		${RUBY_RD2} $$rd > $$html; \
-	done
-.else
-	@${DO_NADA}
-.endif
-
-.else
-RUBY_RD_HTML_FILES=	# empty
-
-PLIST_SUB+=		RUBY_RD_HTML_FILES="@comment "
-.endif
-
-.if !defined(NOPORTDOCS) && defined(USE_RUBY_RDTOOL)
-BUILD_DEPENDS+=		${DEPEND_RUBY_RDTOOL}
 .endif
 
 .endif # _INVALID_RUBY_VER

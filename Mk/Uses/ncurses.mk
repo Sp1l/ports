@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/ncurses.mk 403050 2015-12-05 09:46:20Z bapt $
+# $FreeBSD: head/Mk/Uses/ncurses.mk 421554 2016-09-08 14:12:55Z mat $
 #
 # handle dependency on the ncurses port
 #
@@ -48,8 +48,6 @@ check-depends-ncurses:
 	@${FALSE}
 .  endif
 
-NCURSESRPATH=	/usr/lib:${LOCALBASE}/lib
-
 .elif ${ncurses_ARGS} == port
 NCURSESBASE=	${LOCALBASE}
 NCURSESINC=	${LOCALBASE}/include/ncurses
@@ -73,19 +71,19 @@ NCURSES_SHLIBVER?=	${NCURSES_SHLIBFILE:E}
 NCURSES_PORT?=		devel/ncurses
 NCURSES_SHLIBVER?=	6
 
-BUILD_DEPENDS+=		${LOCALBASE}/lib/libncurses.so.${NCURSES_SHLIBVER}:${PORTSDIR}/${NCURSES_PORT}
-RUN_DEPENDS+=		${LOCALBASE}/lib/libncurses.so.${NCURSES_SHLIBVER}:${PORTSDIR}/${NCURSES_PORT}
+BUILD_DEPENDS+=		${LOCALBASE}/lib/libncurses.so.${NCURSES_SHLIBVER}:${NCURSES_PORT}
+RUN_DEPENDS+=		${LOCALBASE}/lib/libncurses.so.${NCURSES_SHLIBVER}:${NCURSES_PORT}
 NCURSESRPATH=		${NCURSESBASE}/lib
+
+.if defined(NCURSES_RPATH)
+CFLAGS+=	-Wl,-rpath,${NCURSESRPATH}
+.endif
+LDFLAGS+=	-Wl,-rpath=${NCURSESRPATH}
 
 .else
 .error		USES=ncurses only accept 'port' and 'base' as arguments, got ${ncurses_ARGS}
 .endif
 
 NCURSESLIB=	${NCURSESBASE}/lib
-
-.if defined(NCURSES_RPATH)
-CFLAGS+=	-Wl,-rpath,${NCURSESRPATH}
-.endif
-LDFLAGS+=	-Wl,-rpath=${NCURSESRPATH}
 
 .endif

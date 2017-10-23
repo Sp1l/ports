@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/lha.mk 400846 2015-11-05 12:35:26Z mat $
+# $FreeBSD: head/Mk/Uses/lha.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # handle lha archives
 #
@@ -14,7 +14,7 @@ EXTRACT_SUFX?=	.lzh
 IGNORE=	Incorrect 'USES+=lha:${lha_ARGS}' expecting 'USES+=lha'
 .endif
 
-EXTRACT_DEPENDS+=	lha:${PORTSDIR}/archivers/lha
+EXTRACT_DEPENDS+=	lha:archivers/lha
 EXTRACT_CMD?=		${LHA_CMD}
 EXTRACT_BEFORE_ARGS?=	xfpw=${EXTRACT_WRKDIR}
 EXTRACT_AFTER_ARGS?=

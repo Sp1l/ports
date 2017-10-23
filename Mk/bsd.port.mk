@@ -1,7 +1,7 @@
 #-*- tab-width: 4; -*-
 # ex:ts=4
 #
-# $FreeBSD: head/Mk/bsd.port.mk 450940 2017-09-29 23:37:16Z bdrewery $
+# $FreeBSD: head/Mk/bsd.port.mk 452543 2017-10-20 17:07:23Z bdrewery $
 #	$NetBSD: $
 #
 #	bsd.port.mk - 940820 Jordan K. Hubbard.
@@ -336,6 +336,9 @@ FreeBSD_MAINTAINER=	portmgr@FreeBSD.org
 #                         purposes. You can override the debug flags that are
 #                         passed to the compiler by setting DEBUG_FLAGS. It is
 #                         set to "-g" at default.
+#
+#			  NOTE: to override a globally defined WITH_DEBUG at a
+#			        later time ".undef WITH_DEBUG" can be used
 #
 # WITH_DEBUG_PORTS		- A list of origins for which WITH_DEBUG will be set
 #
@@ -1056,12 +1059,16 @@ STAGEDIR?=	${WRKDIR}/stage
 NOTPHONY?=
 FLAVORS?=
 FLAVOR?=
+# Store env FLAVOR for later
+.if !defined(_FLAVOR)
+_FLAVOR:=	${FLAVOR}
+.endif
 # XXX: We have no real FLAVORS support in ports or tools yet.
 #PORTS_FEATURES+=	FLAVORS
 MINIMAL_PKG_VERSION=	1.6.0
 
 _PORTS_DIRECTORIES+=	${PKG_DBDIR} ${PREFIX} ${WRKDIR} ${EXTRACT_WRKDIR} \
-						${STAGEDIR}${PREFIX} ${WRKDIR}/pkg
+						${STAGEDIR}${PREFIX} ${WRKDIR}/pkg ${BINARY_LINKDIR}
 
 # Ensure .CURDIR contains an absolute path without a trailing slash.  Failed
 # builds can occur when PORTSDIR is a symbolic link, or with something like
@@ -1609,6 +1616,13 @@ _WRKDIR=	work-${FLAVOR}
 .endif
 
 WRKDIR?=		${WRKDIRPREFIX}${.CURDIR}/${_WRKDIR}
+BINARY_LINKDIR=	${WRKDIR}/.bin
+PATH:=			${BINARY_LINKDIR}:${PATH}
+.if !${MAKE_ENV:MPATH=*} && !${CONFIGURE_ENV:MPATH=*}
+MAKE_ENV+=			PATH=${PATH}
+CONFIGURE_ENV+=		PATH=${PATH}
+.endif
+
 .if !defined(IGNORE_MASTER_SITE_GITHUB) && defined(USE_GITHUB) && empty(USE_GITHUB:Mnodefault)
 WRKSRC?=		${WRKDIR}/${GH_PROJECT}-${GH_TAGNAME_EXTRACT}
 .endif
@@ -1676,7 +1690,7 @@ CFLAGS:=	${CFLAGS:C/${_CPUCFLAGS}//}
 .endif
 
 # Reset value from bsd.own.mk.
-.if defined(WITH_DEBUG) && !defined(WITHOUT_DEBUG)
+.if defined(WITH_DEBUG)
 .if !defined(INSTALL_STRIPPED)
 STRIP=	#none
 MAKE_ENV+=	DONTSTRIP=yes
@@ -2138,12 +2152,12 @@ SCRIPTS_ENV+=	${INSTALL_MACROS}
 # In the -exec shell commands, we add add a . as the first argument, it would
 # end up being $0 aka the script name, which is not part of $@, so we force it
 # to be able to use $@ directly.
-COPYTREE_BIN=	${SH} -c '(${FIND} -Ed $$0 $$2 | ${CPIO} -dumpl $$1 >/dev/null 2>&1) && \
-						   ${FIND} -Ed $$0 $$2 \(   -type d -exec ${SH} -c '\''cd '\''$$1'\'' && chmod 755 "$$@"'\'' -- . {} + \
-												 -o -type f -exec ${SH} -c '\''cd '\''$$1'\'' && chmod ${BINMODE} "$$@"'\'' -- . {} + \)' --
-COPYTREE_SHARE=	${SH} -c '(${FIND} -Ed $$0 $$2 | ${CPIO} -dumpl $$1 >/dev/null 2>&1) && \
-						   ${FIND} -Ed $$0 $$2 \(   -type d -exec ${SH} -c '\''cd '\''$$1'\'' && chmod 755 "$$@"'\'' -- . {} + \
-												 -o -type f -exec ${SH} -c '\''cd '\''$$1'\'' && chmod ${_SHAREMODE} "$$@"'\'' -- . {} + \)' --
+COPYTREE_BIN=	${SH} -c '(${FIND} -Ed $$1 $$3 | ${CPIO} -dumpl $$2 >/dev/null 2>&1) && \
+						   ${FIND} -Ed $$1 $$3 \(   -type d -exec ${SH} -c '\''cd '\''$$2'\'' && chmod 755 "$$@"'\'' . {} + \
+												 -o -type f -exec ${SH} -c '\''cd '\''$$2'\'' && chmod ${BINMODE} "$$@"'\'' . {} + \)' COPYTREE_BIN
+COPYTREE_SHARE=	${SH} -c '(${FIND} -Ed $$1 $$3 | ${CPIO} -dumpl $$2 >/dev/null 2>&1) && \
+						   ${FIND} -Ed $$1 $$3 \(   -type d -exec ${SH} -c '\''cd '\''$$2'\'' && chmod 755 "$$@"'\'' . {} + \
+												 -o -type f -exec ${SH} -c '\''cd '\''$$2'\'' && chmod ${_SHAREMODE} "$$@"'\'' . {} + \)' COPYTREE_SHARE
 
 # The user can override the NO_PACKAGE by specifying this from
 # the make command line
@@ -3736,7 +3750,12 @@ post-clean-noflavor:
 clean: ${CLEAN_DEPENDENCIES}
 .endif
 
-.for _f in ${FLAVORS}
+.if !empty(_FLAVOR)
+_CLEANFLAVORS=	${_FLAVOR}
+.else
+_CLEANFLAVORS=	${FLAVORS}
+.endif
+.for _f in ${_CLEANFLAVORS}
 CLEAN_DEPENDENCIES=
 .if !defined(NOCLEANDEPENDS)
 CLEAN_DEPENDENCIES+=	limited-clean-depends-${_f}
@@ -5180,6 +5199,15 @@ install-desktop-entries:
 .endif
 .endif
 
+.if !empty(BINARY_ALIAS)
+.if !target(create-binary-alias)
+create-binary-alias: ${BINARY_LINKDIR}
+.for target src in ${BINARY_ALIAS:C/=/ /}
+	@${RLN} `which ${src}` ${BINARY_LINKDIR}/${target}
+.endfor
+.endif
+.endif
+
 .if defined(WARNING)
 WARNING_WAIT?=	10
 show-warnings:
@@ -5267,7 +5295,8 @@ _PATCH_SEQ=		050:ask-license 100:patch-message 150:patch-depends \
 				700:post-patch 850:post-patch-script \
 				${_OPTIONS_patch} ${_USES_patch}
 _CONFIGURE_DEP=	patch
-_CONFIGURE_SEQ=	150:build-depends 151:lib-depends 200:configure-message \
+_CONFIGURE_SEQ=	150:build-depends 151:lib-depends 160:create-binary-alias \
+				200:configure-message \
 				300:pre-configure 450:pre-configure-script \
 				490:run-autotools-fixup 500:do-configure 700:post-configure \
 				850:post-configure-script \

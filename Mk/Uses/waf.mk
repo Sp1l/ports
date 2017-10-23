@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/waf.mk 383600 2015-04-08 18:32:18Z antoine $
+# $FreeBSD: head/Mk/Uses/waf.mk 423928 2016-10-13 16:26:09Z amdmi3 $
 #
 # Provide support to use the waf building system
 #
@@ -30,6 +30,7 @@ MAKEFILE=	#
 MAKE_FLAGS=	#
 ALL_TARGET=	#
 HAS_CONFIGURE=	yes
+MAKE_ARGS+=	--verbose
 WAF_CMD?=	./waf
 
 CONFIGURE_TARGET?=	configure

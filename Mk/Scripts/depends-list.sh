@@ -1,21 +1,28 @@
 #!/bin/sh
 # MAINTAINER: portmgr@FreeBSD.org
-# $FreeBSD: head/Mk/Scripts/depends-list.sh 399712 2015-10-19 19:23:53Z bdrewery $
+# $FreeBSD: head/Mk/Scripts/depends-list.sh 450663 2017-09-26 14:14:44Z mat $
 
 set -e
 
 . ${dp_SCRIPTSDIR}/functions.sh
 
 recursive=0
+missing=0
 requires_wrkdir=0
-while getopts "rw" FLAG; do
+while getopts "mrw" FLAG; do
 	case "${FLAG}" in
+		m)
+			missing=1
+			recursive=1
+			;;
 		r)
 			recursive=1
 			;;
 		w)
 			# Only list dependencies that have a WRKDIR.  Used for
 			# 'make clean-depends'.
+			# Without -r recurse when WRKDIR exists; with -r
+			# always recurse.
 			requires_wrkdir=1
 			;;
 		*)
@@ -26,15 +33,21 @@ while getopts "rw" FLAG; do
 done
 shift $((OPTIND-1))
 
-validate_env dp_PORTSDIR dp_PKGNAME
+validate_env PORTSDIR dp_PKGNAME
 if [ ${recursive} -eq 1 -o ${requires_wrkdir} -eq 1 ]; then
 	validate_env dp_MAKE
 	# Cache command executions to avoid looking them up again in every
 	# sub-make.
-	MAKE="${dp_MAKE}" PORTSDIR="${dp_PORTSDIR}" export_ports_env >/dev/null
+	MAKE="${dp_MAKE}" export_ports_env >/dev/null
 fi
 
+[ -n "${DEBUG_MK_SCRIPTS}" -o -n "${DEBUG_MK_SCRIPTS_DEPENDS_LIST}" ] && set -x
+
 set -u
+
+if [ ${missing} -eq 1 ]; then
+	existing=$(${dp_PKG_INFO} -aoq|paste -d ' ' -s -)
+fi
 
 check_dep() {
 	local _dep wrkdir show_dep
@@ -46,8 +59,13 @@ check_dep() {
 		IFS=${myifs}
 
 		case "${2}" in
-			/*) d=${2} ;;
-			*) d=${dp_PORTSDIR}/${2} ;;
+		/*) d=${2} ;;
+		*) d=${PORTSDIR}/${2} ;;
+		esac
+
+		case "${d}" in
+		*@*/*) ;; # Ignore @ in the path which would not be a flavor
+		*@*) d=${d%@*} ;;
 		esac
 
 		case " ${checked} " in
@@ -60,15 +78,19 @@ check_dep() {
 			continue
 		fi
 
+		# If only looking for missing, show if missing
+		if [ ${missing} -eq 1 ]; then
+			case " ${existing} " in
+				*\ ${d#${PORTSDIR}/}\ *) continue ;; # We have it, nothing to see
+			esac
+		fi
+
 		# Grab any needed vars from the port.
 
-		if [ ${requires_wrkdir} -eq 1 -a ${recursive} -eq 1 ]; then
+		if [ ${requires_wrkdir} -eq 1 ]; then
 			set -- $(${dp_MAKE} -C ${d} -VWRKDIR -V_UNIFIED_DEPENDS)
 			wrkdir="$1"
 			shift
-		elif [ ${requires_wrkdir} -eq 1 -a ${recursive} -eq 0 ]; then
-			set -- "$(${dp_MAKE} -C ${d} -VWRKDIR)"
-			wrkdir="$1"
 		elif [ ${recursive} -eq 1 ]; then
 			set -- $(${dp_MAKE} -C ${d} -V_UNIFIED_DEPENDS)
 		fi
@@ -79,7 +101,7 @@ check_dep() {
 			show_dep=0
 		fi
 		[ ${show_dep} -eq 1 ] && echo ${d}
-		if [ ${recursive} -eq 1 ]; then
+		if [ ${recursive} -eq 1 -o ${requires_wrkdir} -eq 1 -a ${show_dep} -eq 1 ]; then
 			check_dep $@
 		fi
 	done

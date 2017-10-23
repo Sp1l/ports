@@ -260,11 +260,11 @@ _APACHE_VERSION_MAX:=	${_APACHE_VERSION_CHECK:C/.*-([1-9][0-9])/\1/}
 
 # ==============================================================
 # num+
-.if ${_USE_APACHE:M*+}
+.if !empty(_USE_APACHE:M*+)
 _APACHE_WANTED_VERSIONS=	${DEFAULT_APACHE_VERSION}
 
 # -num
-.elif ${_USE_APACHE:M\-[0-9][0-9]}
+.elif !empty(_USE_APACHE:M\-[0-9][0-9])
 .for _v in ${_APACHE_VERSIONS:O}
 .	if ${_APACHE_VERSION_MAX} >= ${_v}
 _APACHE_WANTED_VERSIONS+=	${_v}
@@ -272,7 +272,7 @@ _APACHE_WANTED_VERSIONS+=	${_v}
 .endfor
 
 # num-num
-.elif ${_USE_APACHE:M[0-9][0-9]-[0-9][0-9]}
+.elif !empty(_USE_APACHE:M[0-9][0-9]-[0-9][0-9])
 .for _v in ${_APACHE_VERSIONS}
 .	if ${_APACHE_VERSION_MIN} <= ${_v} && ${_APACHE_VERSION_MAX} >= ${_v}
 _APACHE_WANTED_VERSIONS+=	${_v}
@@ -280,7 +280,7 @@ _APACHE_WANTED_VERSIONS+=	${_v}
 .endfor
 
 # num
-.elif ${_USE_APACHE:M[0-9][0-9]}
+.elif !empty(_USE_APACHE:M[0-9][0-9])
 _APACHE_WANTED_VERSIONS=	${_USE_APACHE:M[0-9][0-9]}
 .endif
 # ==============================================================

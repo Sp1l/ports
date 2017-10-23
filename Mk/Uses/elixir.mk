@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/elixir.mk 407042 2016-01-23 16:46:11Z olgeni $
+# $FreeBSD: head/Mk/Uses/elixir.mk 439368 2017-04-25 08:34:26Z olgeni $
 #
 # Handle Elixir related ports
 #
@@ -44,7 +44,7 @@ ELIXIR_APP_ROOT?=	${PREFIX}/lib/elixir/lib/${ELIXIR_APP_NAME}
 ELIXIR_HIDDEN?=		"^${ELIXIR_APP_NAME}$$"
 ELIXIR_LOCALE?=		en_US.UTF-8
 MIX_CMD?=		${LOCALBASE}/bin/mix
-MIX_COMPILE?=		${SETENV} ${MIX_ENV} LANG=${ELIXIR_LOCALE} MIX_ENV=${MIX_ENV_NAME} ELIXIR_HIDDEN=${ELIXIR_HIDDEN} ${MIX_CMD} ${MIX_TARGET}
+MIX_COMPILE?=		${SETENV} ${MIX_ENV} LANG=${ELIXIR_LOCALE} LC_ALL=${ELIXIR_LOCALE} MIX_ENV=${MIX_ENV_NAME} ELIXIR_HIDDEN=${ELIXIR_HIDDEN} ${MIX_CMD} ${MIX_TARGET}
 MIX_REWRITE?=
 MIX_BUILD_DEPS?=
 MIX_RUN_DEPS?=
@@ -58,33 +58,33 @@ MIX_EXTRA_APPS?=
 MIX_EXTRA_DIRS?=
 MIX_EXTRA_FILES?=
 
-BUILD_DEPENDS+=	elixir:${PORTSDIR}/lang/elixir
-RUN_DEPENDS+=	elixir:${PORTSDIR}/lang/elixir
+BUILD_DEPENDS+=	elixir:lang/elixir
+RUN_DEPENDS+=	elixir:lang/elixir
 
 .for depend in ${MIX_BUILD_DEPS}
-BUILD_DEPENDS+=	${depend:T}>=0:${PORTSDIR}/${depend}
+BUILD_DEPENDS+=	${depend:T}>=0:${depend}
 .endfor
 
 .for depend in ${MIX_RUN_DEPS}
-RUN_DEPENDS+=	${depend:T}>=0:${PORTSDIR}/${depend}
+RUN_DEPENDS+=	${depend:T}>=0:${depend}
 .endfor
 
 .if !target(do-build)
 do-build:
 .if ${MIX_REWRITE} != ""
-	@${REINPLACE_CMD} -i '' -E -e "s@{.*(only|optional): .*},?@@" ${WRKSRC}/mix.exs
+	@${REINPLACE_CMD} -i '' -E -e "s@\{.*(only|optional): .*},?@@" ${WRKSRC}/mix.exs
 .for depend in ${MIX_BUILD_DEPS}
 	@if [ $$(echo ${depend:T} | sed -e "s/erlang-//") != ${depend:T} ]; then \
-		${REINPLACE_CMD} -i '' -E -e "s@{ *:(${depend:T:S/erlang-//}), *(github:|\").*} *,?@@" ${WRKSRC}/mix.exs; \
+		${REINPLACE_CMD} -i '' -E -e "s@\{ *:(${depend:T:S/erlang-//}), *(github:|\").*} *,?@@" ${WRKSRC}/mix.exs; \
 	else \
-		${REINPLACE_CMD} -i '' -E -e "s@{ *:(${depend:T:S/elixir-//}), *(github:|\").*}@{ :\1, path: \"${ELIXIR_LIB_ROOT}/\\1\", compile: false }@" ${WRKSRC}/mix.exs; \
+		${REINPLACE_CMD} -i '' -E -e "s@\{ *:(${depend:T:S/elixir-//}), *(github:|\").*}@{ :\1, path: \"${ELIXIR_LIB_ROOT}/\\1\", compile: false }@" ${WRKSRC}/mix.exs; \
 	fi
 .endfor
 .endif
-	@${RM} -f ${WRKSRC}/mix.lock
+	@${RM} ${WRKSRC}/mix.lock
 	@cd ${WRKSRC} && ${MIX_COMPILE}
 .for app in ${MIX_EXTRA_APPS}
-	@${RM} -f ${WRKSRC}/${app}/mix.lock
+	@${RM} ${WRKSRC}/${app}/mix.lock
 	@cd ${WRKSRC}/${app} && ${MIX_COMPILE}
 .endfor
 .endif # .if !target(do-build)

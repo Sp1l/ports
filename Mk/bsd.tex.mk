@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/bsd.tex.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/bsd.tex.mk 420340 2016-08-17 12:16:24Z mat $
 #
 # bsd.tex.mk - Common part for TeX related ports
 #
@@ -195,11 +195,11 @@ _C:=	${_U:C/.*://:S/,/ /g:C/[<>=][^\:]*//g}
 _V:=${_UU:C/[<>=][^\:]*//:C/\:.*$//}
 .  if defined(_USE_TEX_${_V}_PORT)
 .   if !empty(_VOP)
-.    for _T in ${_USE_TEX_${_V}_PKGNAME}${_VOP}:${PORTSDIR}/${_USE_TEX_${_V}_PORT}
+.    for _T in ${_USE_TEX_${_V}_PKGNAME}${_VOP}:${_USE_TEX_${_V}_PORT}
 TEX_${_CC}_DEPENDS+=	${_T}
 .    endfor
 .   else
-.    for _T in ${_USE_TEX_${_V}_DEP}:${PORTSDIR}/${_USE_TEX_${_V}_PORT}
+.    for _T in ${_USE_TEX_${_V}_DEP}:${_USE_TEX_${_V}_PORT}
 TEX_${_CC}_DEPENDS+=	${_T}
 .    endfor
 .   endif
@@ -271,12 +271,12 @@ do-fmtutil-$F:
 	${RMDIR} ${STAGEDIR}${PREFIX}/${TEXMFDISTDIR}/web2c || ${TRUE}
 	${RMDIR} ${STAGEDIR}${PREFIX}/${TEXMFDISTDIR} || ${TRUE}
 _PLIST_FILES+=	${TEX_FORMAT_${F:tu}_FILES}
-_PLIST_DIRSTRY+=${TEX_FORMAT_${F:tu}_DIRS}
+_PLIST_DIRS+=${TEX_FORMAT_${F:tu}_DIRS}
 _PLIST_FILES+=	${TEX_FORMAT_${F:tu}_BIN}
 . endfor
 post-install-script: do-fmtutil
 PLIST_FILES=	${_PLIST_FILES:O:u}
-PLIST_DIRSTRY=	${_PLIST_DIRSTRY:O:u} ${TEXMFVARDIR}/web2c
+PLIST_DIRS=	${_PLIST_DIRS:O:u} ${TEXMFVARDIR}/web2c
 .endif
 
 .if !empty(USE_TEX:Mupdmap)

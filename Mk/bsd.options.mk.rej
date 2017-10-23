@@ -1,0 +1,13 @@
+@@ -495,9 +495,9 @@
+ 
+ .  if ${PORT_OPTIONS:M${opt}}
+ .    if defined(${opt}_USE)
+-.      for option in ${${opt}_USE}
+-_u=		${option:C/=.*//g}
+-USE_${_u:tu}+=	${option:C/.*=//g:C/,/ /g}
++.      for option in ${${opt}_USE:C/=.*//:O:u}
++_u=		${option}
++USE_${_u:tu}+=	${${opt}_USE:M${option}=*:C/.*=//g:C/,/ /g}
+ .      endfor
+ .    endif
+ .    if defined(${opt}_VARS)

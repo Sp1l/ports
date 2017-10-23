@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/bsd.wx.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/bsd.wx.mk 433963 2017-02-12 20:39:55Z rene $
 #
 # bsd.wx.mk - Support for wxWidgets based ports.
 #
@@ -91,7 +91,7 @@
 #	USE_WX_NOT=	2.8
 #
 
-WX_Include_MAINTAINER=	alepulver@FreeBSD.org
+WX_Include_MAINTAINER=	ports@FreeBSD.org
 
 #
 # Global definitions.
@@ -475,13 +475,13 @@ _WX_DEP_TYPE=		${comp:C/.+_([[:alpha:]]+)$/\1/}
 .	for comp_part in ${_WX_COMP}
 .		if ${_WX_DEP_TYPE} == "lib"
 .			if defined(_WX_LIB_${_WX_COMP}_${_WX_VER})
-LIB_DEPENDS+=		lib${_WX_LIB_${comp_part}_${_WX_VER}}.so:${PORTSDIR}/${_WX_PORT_${comp_part}_${_WX_VER}}
+LIB_DEPENDS+=		lib${_WX_LIB_${comp_part}_${_WX_VER}}.so:${_WX_PORT_${comp_part}_${_WX_VER}}
 .			else
-BUILD_DEPENDS+=		${_WX_FILE_${comp_part}_${_WX_VER}}:${PORTSDIR}/${_WX_PORT_${comp_part}_${_WX_VER}}
-RUN_DEPENDS+=		${_WX_FILE_${comp_part}_${_WX_VER}}:${PORTSDIR}/${_WX_PORT_${comp_part}_${_WX_VER}}
+BUILD_DEPENDS+=		${_WX_FILE_${comp_part}_${_WX_VER}}:${_WX_PORT_${comp_part}_${_WX_VER}}
+RUN_DEPENDS+=		${_WX_FILE_${comp_part}_${_WX_VER}}:${_WX_PORT_${comp_part}_${_WX_VER}}
 .			endif
 .		else
-${_WX_DEP_TYPE:tu}_DEPENDS+=	${_WX_FILE_${comp_part}_${_WX_VER}}:${PORTSDIR}/${_WX_PORT_${comp_part}_${_WX_VER}}
+${_WX_DEP_TYPE:tu}_DEPENDS+=	${_WX_FILE_${comp_part}_${_WX_VER}}:${_WX_PORT_${comp_part}_${_WX_VER}}
 .		endif
 .	endfor
 .endfor

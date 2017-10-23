@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/pgsql.mk 408625 2016-02-10 12:18:20Z fjoe $
+# $FreeBSD: head/Mk/Uses/pgsql.mk 447720 2017-08-10 20:25:17Z girgen $
 #
 # Provide support for PostgreSQL (pgsql)
 #
@@ -31,7 +31,9 @@ _INCLUDE_USES_PGSQL_MK=	yes
 #	to add dependencies; use WANT_PGSQL as explained above
 #
 
-VALID_PGSQL_VER=	9.0 9.1 9.2 9.3 9.4 9.5
+# When adding a version, please keep the comment in
+# Mk/bsd.default-versions.mk in sync.
+VALID_PGSQL_VER=	9.2 9.3 9.4 9.5 9.6 10
 
 # Override non-default LIBVERS like this:
 #PGSQL99_LIBVER=6
@@ -40,8 +42,6 @@ PGSQL_LIBVER=	5
 .for v in ${VALID_PGSQL_VER:S,.,,}
 PGSQL$v_LIBVER?=	${PGSQL_LIBVER}
 .endfor
-
-.include "${PORTSDIR}/Mk/bsd.default-versions.mk"
 
 .for v in ${PGSQL_DEFAULT}
 .  if ! ${VALID_PGSQL_VER:M$v}
@@ -57,13 +57,13 @@ PGSQL_DEFAULT?=	${$w_PGSQL_VER:C,^.,&.,}
 .  endfor
 
 .  ifdef DEFAULT_PGSQL_VER && WITH_PGSQL_VER
-IGNORE=		will not allow setting both DEFAULT_PGSQL_VER and WITH_PGSQL_VER.  Use DEFAULT_VERSIONS=pgsql=9.0 instead
+IGNORE=		will not allow setting both DEFAULT_PGSQL_VER and WITH_PGSQL_VER.  Use DEFAULT_VERSIONS=pgsql=9.6 instead
 .  endif
 
 # Setting/finding PostgreSQL version we want.
 PG_CONFIG?=	${LOCALBASE}/bin/pg_config
 .  if exists(${PG_CONFIG})
-_PGSQL_VER!=	${PG_CONFIG} --version | ${SED} -n 's/PostgreSQL[^0-9]*\([0-9][0-9]*\.[0-9][0-9]*\)[^0-9].*/\1/p'
+_PGSQL_VER!=	${PG_CONFIG} --version | ${SED} -n 's/PostgreSQL[^0-9]*\([0-9]\.*[0-9]\).*/\1/p'
 .  endif
 
 # Handle the + and - version stuff
@@ -93,8 +93,12 @@ PGSQL_VER=	${version}
 .      endif
 PGSQL_VER?=	${version}
 .    endfor
-.    if defined(_PGSQL_VER) && ${_WANT_PGSQL_VER:M${_PGSQL_VER}} == ${_PGSQL_VER}
+.    if defined(_PGSQL_VER)
+.      for v in ${_PGSQL_VER}
+.        if ${_WANT_PGSQL_VER:M$v} == ${_PGSQL_VER}
 PGSQL_VER=	${_PGSQL_VER}
+.        endif
+.      endfor
 .    endif
 .    if defined(_PGSQL_VER) && ${_PGSQL_VER} != ${PGSQL_VER}
 IGNORE?=	cannot install: the port wants postgresql-client version ${_WANT_PGSQL_VER} and you have version ${_PGSQL_VER} installed
@@ -124,8 +128,8 @@ IGNORE?=		cannot install: does not work with postgresql${PGSQL_VER_NODOT}-client
 .	endfor
 .    endif # IGNORE_WITH_PGSQL
 
-.if !defined(WANT_PGSQL) || ${WANT_PGSQL} == lib
-LIB_DEPENDS+=	libpq.so.${PGSQL${PGSQL_VER_NODOT}_LIBVER}:${PORTSDIR}/databases/postgresql${PGSQL_VER_NODOT}-client
+.if !defined(WANT_PGSQL) || ${WANT_PGSQL:Mlib}
+LIB_DEPENDS+=	libpq.so.${PGSQL${PGSQL_VER_NODOT}_LIBVER}:databases/postgresql${PGSQL_VER_NODOT}-client
 .endif
 
 _USE_PGSQL_DEP=		client contrib docs pgtcl pltcl plperl server
@@ -139,10 +143,10 @@ _USE_PGSQL_DEP_server=	postgres
 .    if defined(WANT_PGSQL)
 .      for depend in ${_USE_PGSQL_DEP}
 .        if ${WANT_PGSQL:M${depend}}
-BUILD_DEPENDS+=	${_USE_PGSQL_DEP_${depend}}:${PORTSDIR}/databases/postgresql${PGSQL_VER_NODOT}-${depend}
-RUN_DEPENDS+=	${_USE_PGSQL_DEP_${depend}}:${PORTSDIR}/databases/postgresql${PGSQL_VER_NODOT}-${depend}
+BUILD_DEPENDS+=	${_USE_PGSQL_DEP_${depend}}:databases/postgresql${PGSQL_VER_NODOT}-${depend}
+RUN_DEPENDS+=	${_USE_PGSQL_DEP_${depend}}:databases/postgresql${PGSQL_VER_NODOT}-${depend}
 .        elif ${WANT_PGSQL:M${depend}\:*}
-BUILD_DEPENDS+=	${NONEXISTENT}:${PORTSDIR}/databases/postgresql${PGSQL_VER_NODOT}-${depend}:${WANT_PGSQL:M${depend}\:*:C,^[^:]*\:,,}
+BUILD_DEPENDS+=	${NONEXISTENT}:databases/postgresql${PGSQL_VER_NODOT}-${depend}:${WANT_PGSQL:M${depend}\:*:C,^[^:]*\:,,}
 .        endif
 .      endfor
 .    endif

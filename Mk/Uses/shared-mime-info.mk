@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/shared-mime-info.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/shared-mime-info.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # handle dependency depends on shared-mime-info and package regen
 #
@@ -15,8 +15,8 @@ _INCLUDE_USES_SHARED_MIME_INFO_MK=	yes
 IGNORE=	USES=shared-mime-info does not require args
 .endif
 
-BUILD_DEPENDS+=	update-mime-database:${PORTSDIR}/misc/shared-mime-info
-RUN_DEPENDS+=	update-mime-database:${PORTSDIR}/misc/shared-mime-info
+BUILD_DEPENDS+=	update-mime-database:misc/shared-mime-info
+RUN_DEPENDS+=	update-mime-database:misc/shared-mime-info
 PLIST_FILES+=	"@shared-mime-info share/mime"
 
 .endif

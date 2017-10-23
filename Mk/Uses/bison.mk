@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/bison.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/bison.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # handle dependency on the bison port
 #
@@ -11,7 +11,7 @@
 .if !defined(_INCLUDE_USES_BISON_MK)
 _INCLUDE_USES_BISON_MK=	yes
 
-_BISON_DEPENDS=	bison:${PORTSDIR}/devel/bison
+_BISON_DEPENDS=	bison:devel/bison
 
 .if empty(bison_ARGS)
 bison_ARGS=	build

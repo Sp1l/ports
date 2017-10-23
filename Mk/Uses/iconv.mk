@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/iconv.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/iconv.mk 450634 2017-09-25 20:55:27Z tijl $
 #
 # handle dependency on the iconv port
 #
@@ -24,11 +24,11 @@ ICONV_INCLUDE_PATH=	${LOCALBASE}/include
 ICONV_LIB_PATH=		${LOCALBASE}/lib/libiconv.so
 
 .if ${iconv_ARGS:Mbuild}
-BUILD_DEPENDS+=	${ICONV_CMD}:${PORTSDIR}/converters/libiconv
+BUILD_DEPENDS+=	${ICONV_CMD}:converters/libiconv
 .elif ${iconv_ARGS:Mpatch}
-PATCH_DEPENDS+=	${ICONV_CMD}:${PORTSDIR}/converters/libiconv
+PATCH_DEPENDS+=	${ICONV_CMD}:converters/libiconv
 .else
-LIB_DEPENDS+=	libiconv.so:${PORTSDIR}/converters/libiconv
+LIB_DEPENDS+=	libiconv.so:converters/libiconv
 .endif
 
 .else
@@ -41,16 +41,16 @@ ICONV_CONFIGURE_BASE=
 ICONV_INCLUDE_PATH=	/usr/include
 ICONV_LIB_PATH=		/usr/lib/libc.so
 
-.if ${OPSYS} == DragonFly || (${OPSYS} == FreeBSD && (${OSVERSION} < 1001514 \
- || (${OSVERSION} >= 1100000 && ${OSVERSION} < 1100069))) \
- || exists(${LOCALBASE}/include/iconv.h)
-BUILD_DEPENDS+=	libiconv>=1.14_9:${PORTSDIR}/converters/libiconv
+.if exists(${LOCALBASE}/include/iconv.h)
+# Check that libiconv iconv.h is recent enough for LIBICONV_PLUG to work.
+BUILD_DEPENDS+=	libiconv>=1.14_11:converters/libiconv
+.endif
+
+# LIBICONV_PLUG makes libiconv iconv.h act like libc iconv.h.
 CPPFLAGS+=	-DLIBICONV_PLUG
 CFLAGS+=	-DLIBICONV_PLUG
 CXXFLAGS+=	-DLIBICONV_PLUG
 OBJCFLAGS+=	-DLIBICONV_PLUG
-ICONV_INCLUDE_PATH=	${LOCALBASE}/include
-.endif
 
 .endif
 

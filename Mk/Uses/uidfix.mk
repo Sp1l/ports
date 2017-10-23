@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/uidfix.mk 388528 2015-06-04 11:53:06Z bapt $
+# $FreeBSD: head/Mk/Uses/uidfix.mk 413204 2016-04-13 12:20:40Z mi $
 #
 # Changes some default behaviour of build systems to allow installing as user.
 #
@@ -16,6 +16,7 @@ GID!=	id -g
 .if ${UID} != 0
 MAKE_ENV+=	BINOWN=${UID} SHAREOWN=${UID} CONFOWN=${UID} LIBOWN=${UID}
 MAKE_ENV+=	BINGRP=${GID} SHAREGRP=${GID} CONFGRP=${GID} LIBGRP=${GID}
+MAKE_ENV+=	INCSOWN=${UID} INCSGRP=${GID}
 BINOWN=	${UID}
 LIBOWN=	${UID}
 SHAREOWN=	${UID}
@@ -24,5 +25,7 @@ BINGRP=	${GID}
 LIBGRP=	${GID}
 SHAREGRP=	${GID}
 WWWGRP=	${GID}
+INCSOWN=	${UID}
+INCSGRP=	${GID}
 .endif
 .endif

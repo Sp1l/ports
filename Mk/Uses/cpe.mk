@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/cpe.mk 383010 2015-04-02 15:02:44Z mat $
+# $FreeBSD: head/Mk/Uses/cpe.mk 440110 2017-05-04 14:58:54Z mat $
 #
 # Include CPE information in package manifest as a CPE 2.3 formatted
 # string.  See http://scap.nist.gov/specifications/cpe/ for details.
@@ -16,7 +16,7 @@
 #			otherwise ${ARCH}.
 # CPE_OTHER		Defaults to ${PORTREVISION} if non-zero.
 #
-# MAINTAINER: ports-secteam@freebsd.org
+# MAINTAINER: ports-secteam@FreeBSD.org
 
 .if !defined(_INCLUDE_USES_CPE_MK)
 _INCLUDE_USES_CPE_MK=    yes

@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/jpeg.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/jpeg.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # Handle dependency on jpeg
 #
@@ -23,14 +23,14 @@ jpeg_ARGS=	lib
 .endif
 
 .if ${jpeg_ARGS} == lib
-LIB_DEPENDS+=	libjpeg.so:${PORTSDIR}/${JPEG_PORT}
+LIB_DEPENDS+=	libjpeg.so:${JPEG_PORT}
 .elif ${jpeg_ARGS} == build
-BUILD_DEPENDS+=	cjpeg:${PORTSDIR}/${JPEG_PORT}
+BUILD_DEPENDS+=	cjpeg:${JPEG_PORT}
 .elif ${jpeg_ARGS} == run
-RUN_DEPENDS+=	cjpeg:${PORTSDIR}/${JPEG_PORT}
+RUN_DEPENDS+=	cjpeg:${JPEG_PORT}
 .elif ${jpeg_ARGS} == both
-BUILD_DEPENDS+=	cjpeg:${PORTSDIR}/${JPEG_PORT}
-RUN_DEPENDS+=	cjpeg:${PORTSDIR}/${JPEG_PORT}
+BUILD_DEPENDS+=	cjpeg:${JPEG_PORT}
+RUN_DEPENDS+=	cjpeg:${JPEG_PORT}
 .else
 IGNORE=		USES=jpeg - invalid args: [${jpeg_ARGS}] specified
 .endif

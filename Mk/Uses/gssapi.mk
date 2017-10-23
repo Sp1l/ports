@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/gssapi.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/gssapi.mk 424411 2016-10-21 12:51:40Z mat $
 #
 # handle dependency on Kerberos port
 #
@@ -75,8 +75,8 @@
 .if !defined(_INCLUDE_USES_GSSAPI_MK)
 _INCLUDE_USES_GSSAPI_MK=	yes
 
-_HEIMDAL_DEPENDS=${GSSAPILIBDIR}/libgssapi.so:${PORTSDIR}/security/heimdal
-_MITKRB5_DEPENDS=${GSSAPILIBDIR}/libkrb5support.so:${PORTSDIR}/security/krb5
+_HEIMDAL_DEPENDS=${GSSAPILIBDIR}/libgssapi.so:security/heimdal
+_MITKRB5_DEPENDS=${GSSAPILIBDIR}/libkrb5support.so:security/krb5
 _HEADERS=	sys/types.h sys/stat.h stdint.h
 
 .undef _FIXUP_KRB5CONFIG
@@ -91,6 +91,9 @@ gssapi_ARGS=	base
 .for _A in ${gssapi_ARGS}
 _local:=	${_A}
 .if ${_local} == "base"
+.  if ${SSL_DEFAULT} != base
+IGNORE=	You are using OpenSSL from ports and have selected GSSAPI from base, please select another GSSAPI value
+.  endif
 HEIMDAL_HOME=	/usr
 GSSAPIBASEDIR=	${HEIMDAL_HOME}
 GSSAPILIBDIR=	${GSSAPIBASEDIR}/lib
@@ -192,7 +195,7 @@ debug-krb:
 	    ${GSSAPILIBS} ${GSSAPILDFLAGS} ${_DEBUG_KRB_RPATH} \
 	    /tmp/${.TARGET}.c && \
 	    ldd /tmp/${.TARGET}.x; \
-	    rm -f /tmp/${.TARGET}.x
+	    ${RM} /tmp/${.TARGET}.x
 	@echo "PREFIX: ${PREFIX}"
 	@echo "GSSAPIBASEDIR: ${GSSAPIBASEDIR}"
 	@echo "GSSAPIINCDIR: ${GSSAPIINCDIR}"

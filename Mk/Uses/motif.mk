@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/motif.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/motif.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # handle dependency on motif
 #
@@ -18,10 +18,10 @@ IGNORE=	USES=motif takes no arguments
 .endif
 
 .if defined(WANT_LESSTIF)
-LIB_DEPENDS+=		libXm.so:${PORTSDIR}/x11-toolkits/lesstif
+LIB_DEPENDS+=		libXm.so:x11-toolkits/lesstif
 .else
 USE_XORG+=	xpm
-LIB_DEPENDS+=		libXm.so.4:${PORTSDIR}/x11-toolkits/open-motif
+LIB_DEPENDS+=		libXm.so.4:x11-toolkits/open-motif
 .endif
 
 MOTIFLIB?=	-L${LOCALBASE}/lib -lXm -lXp

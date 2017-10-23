@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/pkgconfig.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/pkgconfig.mk 435591 2017-03-07 10:22:41Z tijl $
 #
 # handle dependency on the pkgconf port
 #
@@ -11,7 +11,7 @@
 .if !defined(_INCLUDE_USES_PKGCONFIG_MK)
 _INCLUDE_USES_PKGCONFIG_MK=	yes
 
-_PKGCONFIG_DEPENDS=	pkgconf:${PORTSDIR}/devel/pkgconf
+_PKGCONFIG_DEPENDS=	pkgconf>=1.3.0_1:devel/pkgconf
 
 .if empty(pkgconfig_ARGS)
 pkgconfig_ARGS=	build

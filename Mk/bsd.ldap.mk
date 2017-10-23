@@ -1,7 +1,7 @@
 # -*- tab-width: 4; -*-
 # ex: ts=4
 #
-# $FreeBSD: head/Mk/bsd.ldap.mk 362835 2014-07-24 18:34:16Z tijl $
+# $FreeBSD: head/Mk/bsd.ldap.mk 451193 2017-10-04 09:32:12Z bapt $
 #
 
 .if defined(_POSTMKINCLUDED) && !defined(Ldap_Post_Include)
@@ -24,7 +24,8 @@ Database_Include_MAINTAINER=		ports@FreeBSD.org
 # WANT_OPENLDAP_VER
 #				- Maintainer can set an arbitrary version of OpenLDAP by using it.
 # WANT_OPENLDAP_SASL
-#				- If set, this port depends on SASL enabled OpenLDAP client.
+#				- User-defined variable to depend upon SASL-enabled OpenLDAP
+#				  client. Must NOT be set in a port Makefile.
 # IGNORE_OPENLDAP_OPENLDAP
 #				- This variable can be defined if the ports doesn't support
 #				  one or more version of OpenLDAP.
@@ -36,7 +37,6 @@ Database_Include_MAINTAINER=		ports@FreeBSD.org
 .if defined(USE_OPENLDAP)
 DEFAULT_OPENLDAP_VER?=	24
 # OpenLDAP client versions currently supported
-OPENLDAP23_LIB=		libldap-2.3.so.2
 OPENLDAP24_LIB=		libldap-2.4.so.2
 
 .if exists(${LOCALBASE}/bin/ldapwhoami)
@@ -45,7 +45,7 @@ _OPENLDAP_VER!=	${LOCALBASE}/bin/ldapwhoami -VV 2>&1 | ${GREP} ldapwhoami | ${SE
 
 .if defined(WANT_OPENLDAP_VER)
 .if defined(WITH_OPENLDAP_VER) && ${WITH_OPENLDAP_VER} != ${WANT_OPENLDAP_VER}
-IGNORE=		cannot install: the port wants openldap${WANT_OPENLDAP_VER}-client and you try to install openldap${WITH_OPENLDAP_VER}-client.
+IGNORE=		cannot install: the port wants openldap${WANT_OPENLDAP_VER}-client and you try to install openldap${WITH_OPENLDAP_VER}-client
 .endif
 OPENLDAP_VER=	${WANT_OPENLDAP_VER}
 .elif defined(WITH_OPENLDAP_VER)
@@ -89,7 +89,7 @@ IGNORE=		cannot install: doesn't work with OpenLDAP version: ${OPENLDAP_VER} (Do
 .		endif
 .	endfor
 .endif # IGNORE_WITH_OPENLDAP
-LIB_DEPENDS+=	${OPENLDAP${OPENLDAP_VER}_LIB}:${PORTSDIR}/net/openldap${OPENLDAP_VER}${_OPENLDAP_FLAVOUR}-client
+LIB_DEPENDS+=	${OPENLDAP${OPENLDAP_VER}_LIB}:net/openldap${OPENLDAP_VER}${_OPENLDAP_FLAVOUR}-client
 .else
 IGNORE=		cannot install: unknown OpenLDAP version: ${OPENLDAP_VER}
 .endif # Check for correct libs

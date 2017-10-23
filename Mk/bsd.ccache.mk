@@ -1,4 +1,10 @@
-# $FreeBSD: head/Mk/bsd.ccache.mk 384027 2015-04-14 20:58:26Z bdrewery $
+# $FreeBSD: head/Mk/bsd.ccache.mk 435818 2017-03-10 02:20:51Z bdrewery $
+#-*- tab-width: 4; -*-
+# ex:ts=4
+#
+# WITH_CCACHE_BUILD=yes enables depending on ccache and using it in the build.
+# NO_CCACHE_DEPEND will additionally not add the dependency on ccache.
+# NO_CCACHE will disable this entirely.
 
 COMMANDS_Include_MAINTAINER=	portmgr@FreeBSD.org
 
@@ -20,15 +26,18 @@ WARNING+=	WITH_CCACHE_BUILD support disabled, please set CCACHE_DIR.
 # don't use if ccache already set in CC
 .if !defined(NO_CCACHE) && defined(WITH_CCACHE_BUILD) && !${CC:M*ccache*} && \
   !defined(NO_BUILD) && !defined(NOCCACHE)
+
 # Avoid depends loops between ccache and pkg
-.	if ${PKGORIGIN} != devel/ccache && ${PKGORIGIN} != ${PKG_ORIGIN}
-BUILD_DEPENDS+=		${LOCALBASE}/bin/ccache:${PORTSDIR}/devel/ccache
+.	if !defined(NO_CCACHE_DEPEND) && \
+    ${PKGORIGIN} != ${PKG_ORIGIN}
+BUILD_DEPENDS+=		${LOCALBASE}/bin/ccache:devel/ccache
 .	endif
 
-_CCACHE_PATH=	${LOCALBASE}/libexec/ccache
+CCACHE_WRAPPER_PATH?=	${LOCALBASE}/libexec/ccache
 
+.if exists(${CCACHE_WRAPPER_PATH})
 # Prepend the ccache dir into the PATH and setup ccache env
-PATH:=	${_CCACHE_PATH}:${PATH}
+PATH:=	${CCACHE_WRAPPER_PATH}:${PATH}
 #.MAKEFLAGS:		PATH=${PATH}
 .if !${MAKE_ENV:MPATH=*} && !${CONFIGURE_ENV:MPATH=*}
 MAKE_ENV+=			PATH=${PATH}
@@ -41,6 +50,7 @@ CONFIGURE_ENV+=		PATH=${PATH}
 MAKE_ENV+=		CCACHE_DIR="${CCACHE_DIR}"
 CONFIGURE_ENV+=	CCACHE_DIR="${CCACHE_DIR}"
 .	endif
+.endif
 .endif
 
 .endif

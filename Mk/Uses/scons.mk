@@ -1,4 +1,4 @@
-# $FreeBSD: head/Mk/Uses/scons.mk 399326 2015-10-15 07:36:38Z bapt $
+# $FreeBSD: head/Mk/Uses/scons.mk 411970 2016-03-27 01:23:25Z bapt $
 #
 # Provide support to use the scons
 #
@@ -22,7 +22,7 @@ LINKFLAGS?=		${LDFLAGS}
 LIBPATH?=		${LOCALBASE}/lib
 CPPPATH?=		${LOCALBASE}/include
 SCONS=			${LOCALBASE}/bin/scons
-BUILD_DEPENDS+=		${SCONS}:${PORTSDIR}/devel/scons
+BUILD_DEPENDS+=		${SCONS}:devel/scons
 MAKE_CMD=		${SCONS}
 MAKE_ARGS+=	CCFLAGS="${CCFLAGS}" CXXFLAGS="${CXXFLAGS}" \
 		LINKFLAGS="${LINKFLAGS}" PKGCONFIGDIR="${PKGCONFIGDIR}"  \
