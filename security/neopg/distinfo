@@ -1,0 +1,9 @@
+TIMESTAMP = 1514909608
+SHA256 (das-labor-neopg-v0.0.4_GH0.tar.gz) = 1d50c5c2d2ab728e1417e297c042f5cbbcdb6423f5d26ef13c87d218e4789a4e
+SIZE (das-labor-neopg-v0.0.4_GH0.tar.gz) = 6533283
+SHA256 (google-googletest-ec44c6c_GH0.tar.gz) = b025e98f215f21a5b6e50aef9e37f2b57d43bec2b4afb46eacc16a1a26ce559d
+SIZE (google-googletest-ec44c6c_GH0.tar.gz) = 1281540
+SHA256 (taocpp-PEGTL-482b27e_GH0.tar.gz) = b32f6b8802472420c98763662b57ed20fca3248c0415c660ceee3ec78436f0ab
+SIZE (taocpp-PEGTL-482b27e_GH0.tar.gz) = 145177
+SHA256 (agauniyal-rang-866b9ad_GH0.tar.gz) = 4e56a3802e98457fa112bc568fb2cf62b9c76bd577cd68466c24e56e608a8304
+SIZE (agauniyal-rang-866b9ad_GH0.tar.gz) = 76536
