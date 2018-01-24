@@ -1,7 +1,7 @@
 # $FreeBSD$
 
 PORTNAME=	mariadb
-PORTVERSION=	3.0.1
+PORTVERSION=	3.0.2
 CATEGORIES=	databases ipv6
 MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
 		http://mirrors.supportex.net/${SITESDIR}/ \
@@ -12,7 +12,7 @@ MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
 		http://mirror.layerjet.com/${SITESDIR}/ \
 		http://mirror.switch.ch/mirror/${SITESDIR}/
 PKGNAMESUFFIX=	-connector-odbc
-DISTNAME=	${PORTNAME}${PKGNAMESUFFIX}-${PORTVERSION}-beta-src
+DISTNAME=	${PORTNAME}${PKGNAMESUFFIX}-${PORTVERSION}-ga-src
 
 MAINTAINER=	brnrd@FreeBSD.org
 COMMENT=	MariaDB database connector for C
