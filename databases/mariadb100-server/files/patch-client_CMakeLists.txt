@@ -1,4 +1,4 @@
---- client/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
+--- client/CMakeLists.txt.orig	2015-06-17 14:54:11 UTC
 +++ client/CMakeLists.txt
 @@ -30,6 +30,7 @@ INCLUDE_DIRECTORIES(
  COPY_OPENSSL_DLLS(copy_openssl_client)

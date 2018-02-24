@@ -1,4 +1,4 @@
---- libservices/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
+--- libservices/CMakeLists.txt.orig	2015-06-17 14:54:11 UTC
 +++ libservices/CMakeLists.txt
 @@ -29,4 +29,6 @@ SET(MYSQLSERVICES_SOURCES
    logger_service.c)

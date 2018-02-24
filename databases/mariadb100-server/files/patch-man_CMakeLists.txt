@@ -1,4 +1,4 @@
---- man/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
+--- man/CMakeLists.txt.orig	2015-06-17 14:54:11 UTC
 +++ man/CMakeLists.txt
 @@ -34,7 +34,8 @@ SET(MAN1_TEST mysql-stress-test.pl.1 mys
  

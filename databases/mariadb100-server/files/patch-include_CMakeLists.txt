@@ -1,4 +1,4 @@
---- include/CMakeLists.txt.orig	2015-05-08 14:37:45 UTC
+--- include/CMakeLists.txt.orig	2015-06-17 14:54:11 UTC
 +++ include/CMakeLists.txt
 @@ -62,17 +62,21 @@ SET(HEADERS 
    handler_ername.h

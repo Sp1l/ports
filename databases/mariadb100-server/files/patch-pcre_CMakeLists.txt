@@ -1,4 +1,4 @@
---- pcre/CMakeLists.txt.orig	2015-05-08 14:37:46 UTC
+--- pcre/CMakeLists.txt.orig	2015-06-17 14:54:12 UTC
 +++ pcre/CMakeLists.txt
 @@ -513,6 +513,8 @@ IF(PCRE_SHOW_REPORT)
    MESSAGE(STATUS "")
