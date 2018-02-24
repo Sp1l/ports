@@ -1,14 +1,5 @@
---- mysys/my_default.c.orig	2016-03-24 09:12:11 UTC
+--- mysys/my_default.c.orig	2017-04-04 19:11:51 UTC
 +++ mysys/my_default.c
-@@ -90,7 +90,7 @@ static my_bool defaults_already_read= FA
- 
- /* Which directories are searched for options (and in which order) */
- 
--#define MAX_DEFAULT_DIRS 6
-+#define MAX_DEFAULT_DIRS 7
- #define DEFAULT_DIRS_SIZE (MAX_DEFAULT_DIRS + 1)  /* Terminate with NULL */
- static const char **default_directories = NULL;
- 
 @@ -785,7 +785,7 @@ static int search_default_file_with_ext(
    {
      MY_STAT stat_info;
@@ -25,8 +16,8 @@
 +  if (strstr(name, "/etc") == name)
 +  {
 +    fprintf(stderr,
-+	      "error: Config file %s in invalid location, please move to or merge with /usr/local%s\n",
-+	      name,name);
++             "error: Config file %s in invalid location, please move to or merge with /usr/local%s\n",
++             name,name);
 +      goto err;
 +  }
 +
@@ -43,7 +34,7 @@
          }
        }
      }
-@@ -1223,13 +1232,10 @@ static const char **init_default_directo
+@@ -1192,13 +1201,10 @@ static const char **init_default_directo
  
  #else
  

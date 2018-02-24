@@ -1,4 +1,4 @@
-# $FreeBSD: head/databases/mariadb101-client/Makefile 408822 2016-02-13 19:02:11Z brnrd $
+# $FreeBSD: head/databases/mariadb101-client/Makefile 436392 2017-03-18 11:05:32Z brnrd $
 
 PORTNAME=	mariadb
 PKGNAMESUFFIX=	101-client
@@ -11,7 +11,7 @@ FILESDIR=	${.CURDIR}/files
 PATCHDIR=	${.CURDIR}/files
 PLIST=		${.CURDIR}/pkg-plist
 
-CMAKE_ARGS+=	-DWITHOUT_SERVER=1 -DWITH_WSREP=0
+CMAKE_ARGS+=	-DWITHOUT_SERVER=1
 INSTALL_TARGET=	install
 
 USE_LDCONFIG=	${PREFIX}/lib/mysql
@@ -19,14 +19,17 @@ USE_LDCONFIG=	${PREFIX}/lib/mysql
 CLIENT_ONLY=	yes
 
 post-install:
+	${RM} ${STAGEDIR}${PREFIX}/bin/wsrep*
+	${RM} ${STAGEDIR}${PREFIX}/bin/mysqld_safe_helper
 	${RM} ${STAGEDIR}${PREFIX}/share/aclocal/mysql.m4
 	${RM} -r ${STAGEDIR}${PREFIX}/share/pkgconfig
+	${RM} -r ${STAGEDIR}${PREFIX}/include/mysql/private
 .	for b in mysql mysqladmin mysqlbinlog mysqlcheck mysqldump \
 		mysqlimport mysqlshow mysqlslap
 		${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/${b}
 .	endfor
 	${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/libmysqlclient.so.18
-.	for b in dialog.so mysql_clear_password.so 
+.	for b in dialog.so mysql_clear_password.so client_ed25519.so
 		${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/plugin/${b}
 .	endfor
 	# Fix https://mariadb.atlassian.net/browse/MDEV-9388

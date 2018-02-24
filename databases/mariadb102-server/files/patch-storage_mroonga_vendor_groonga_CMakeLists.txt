@@ -1,8 +1,8 @@
 From https://github.com/openquery/mariadb-server/commit/43bf72e45b9ead6aa0dc4abd6e5719c6381974b5
 
---- storage/mroonga/vendor/groonga/CMakeLists.txt.orig	2015-10-15 15:43:50 UTC
+--- storage/mroonga/vendor/groonga/CMakeLists.txt.orig	2017-05-14 23:13:18 UTC
 +++ storage/mroonga/vendor/groonga/CMakeLists.txt
-@@ -167,6 +167,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
+@@ -167,6 +167,10 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COM
    MY_CHECK_AND_SET_COMPILER_FLAG("-Wno-clobbered")
  endif()
  

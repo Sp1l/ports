@@ -3,13 +3,14 @@ bin/aria_dump_log
 bin/aria_ftdump
 bin/aria_pack
 bin/aria_read_log
-@comment bin/mariadb_config
+bin/innochecksum
+bin/mariabackup
+bin/mbstream
 bin/my_print_defaults
 bin/myisam_ftdump
 bin/myisamchk
 bin/myisamlog
 bin/myisampack
-@comment bin/mysql
 bin/mysql_client_test
 bin/mysql_client_test_embedded
 bin/mysql_convert_table_format
@@ -17,23 +18,17 @@ bin/mysql_embedded
 bin/mysql_fix_extensions
 bin/mysql_install_db
 %%ROCKSDB%%bin/mysql_ldb
+%%ROCKSDB%%bin/myrocks_hotbackup
 bin/mysql_plugin
 bin/mysql_secure_installation
 bin/mysql_setpermission
 bin/mysql_tzinfo_to_sql
 bin/mysql_upgrade
-@comment bin/mysqladmin
-@comment bin/mysqlbinlog
-@comment bin/mysqlcheck
 bin/mysqld_multi
 bin/mysqld_safe
 bin/mysqld_safe_helper
-@comment bin/mysqldump
 bin/mysqldumpslow
 bin/mysqlhotcopy
-@comment bin/mysqlimport
-@comment bin/mysqlshow
-@comment bin/mysqlslap
 bin/mysqltest
 bin/mysqltest_embedded
 @comment bin/mytop
@@ -50,79 +45,7 @@ bin/wsrep_sst_mysqldump
 bin/wsrep_sst_rsync
 bin/wsrep_sst_xtrabackup
 bin/wsrep_sst_xtrabackup-v2
-@comment include/mysql/errmsg.h
-@comment include/mysql/ma_list.h
-@comment include/mysql/ma_pvio.h
-@comment include/mysql/ma_tls.h
-@comment include/mysql/mariadb/ma_io.h
-@comment include/mysql/mariadb_com.h
-@comment include/mysql/mariadb_ctype.h
-@comment include/mysql/mariadb_dyncol.h
-@comment include/mysql/mariadb_stmt.h
-@comment include/mysql/mariadb_version.h
-@comment include/mysql/mysql.h
-@comment include/mysql/mysql/client_plugin.h
-@comment include/mysql/mysql/plugin_auth.h
-@comment include/mysql/mysql/plugin_auth_common.h
-include/mysql/private/atomic/gcc_builtins.h
-include/mysql/private/atomic/generic-msvc.h
-include/mysql/private/atomic/solaris.h
-include/mysql/private/atomic/x86-gcc.h
-include/mysql/private/config.h
-include/mysql/private/dur_prop.h
-include/mysql/private/embedded_priv.h
-include/mysql/private/ft_global.h
-include/mysql/private/hash.h
-include/mysql/private/heap.h
-include/mysql/private/lf.h
-include/mysql/private/maria.h
-include/mysql/private/my_alarm.h
-include/mysql/private/my_atomic.h
-include/mysql/private/my_base.h
-include/mysql/private/my_bit.h
-include/mysql/private/my_bitmap.h
-include/mysql/private/my_check_opt.h
-include/mysql/private/my_compare.h
-include/mysql/private/my_context.h
-include/mysql/private/my_cpu.h
-include/mysql/private/my_crypt.h
-include/mysql/private/my_default.h
-include/mysql/private/my_handler_errors.h
-include/mysql/private/my_libwrap.h
-include/mysql/private/my_md5.h
-include/mysql/private/my_nosys.h
-include/mysql/private/my_rdtsc.h
-include/mysql/private/my_rnd.h
-include/mysql/private/my_stacktrace.h
-include/mysql/private/my_systemd.h
-include/mysql/private/my_time.h
-include/mysql/private/my_tree.h
-include/mysql/private/my_uctype.h
-include/mysql/private/my_user.h
-include/mysql/private/myisam.h
-include/mysql/private/myisamchk.h
-include/mysql/private/myisammrg.h
-include/mysql/private/myisampack.h
-include/mysql/private/mysql_async.h
-include/mysql/private/mysqld_default_groups.h
-include/mysql/private/mysys_err.h
-include/mysql/private/password.h
-include/mysql/private/probes_mysql.h
-include/mysql/private/probes_mysql_nodtrace.h
-include/mysql/private/queues.h
-include/mysql/private/rijndael.h
-include/mysql/private/service_versions.h
-include/mysql/private/ssl_compat.h
-include/mysql/private/t_ctype.h
-include/mysql/private/thr_alarm.h
-include/mysql/private/thr_lock.h
-include/mysql/private/thr_timer.h
-include/mysql/private/thread_pool_priv.h
-include/mysql/private/violite.h
-include/mysql/private/waiting_threads.h
-include/mysql/private/welcome_copyright_notice.h
-include/mysql/private/wqueue.h
-include/mysql/private/wsrep.h
+include/mysql/server/private/embedded_priv.h
 @comment lib/mysql/libmariadb.so
 @comment lib/mysql/libmariadb.so.3
 @comment lib/mysql/libmariadbclient.a
@@ -133,11 +56,9 @@ lib/mysql/plugin/adt_null.so
 lib/mysql/plugin/auth_0x0100.so
 lib/mysql/plugin/auth_ed25519.so
 %%NO_GSSAPI_NONE%%lib/mysql/plugin/auth_gssapi.so
-@comment lib/mysql/plugin/auth_gssapi_client.so
 lib/mysql/plugin/auth_pam.so
 lib/mysql/plugin/auth_socket.so
 lib/mysql/plugin/auth_test_plugin.so
-@comment lib/mysql/plugin/client_ed25519.so
 @comment lib/mysql/plugin/daemon_example.ini
 lib/mysql/plugin/debug_key_management.so
 @comment lib/mysql/plugin/dialog.so
@@ -149,7 +70,6 @@ lib/mysql/plugin/ha_blackhole.so
 lib/mysql/plugin/ha_connect.so
 lib/mysql/plugin/ha_federated.so
 lib/mysql/plugin/ha_federatedx.so
-%%INNOBASE%%lib/mysql/plugin/ha_innobase.so
 %%MROONGA%%lib/mysql/plugin/ha_mroonga.so
 %%OQGRAPH%%lib/mysql/plugin/ha_oqgraph.so
 %%ROCKSDB%%lib/mysql/plugin/ha_rocksdb.so
@@ -158,25 +78,20 @@ lib/mysql/plugin/ha_federatedx.so
 %%TOKUDB%%lib/mysql/plugin/ha_tokudb.so
 lib/mysql/plugin/ha_test_sql_discovery.so
 lib/mysql/plugin/handlersocket.so
-@comment lib/mysql/plugin/libaurora.so
 lib/mysql/plugin/libdaemon_example.so
-@comment lib/mysql/plugin/libreplication.so
 lib/mysql/plugin/locales.so
 lib/mysql/plugin/metadata_lock_info.so
 lib/mysql/plugin/mypluglib.so
-@comment lib/mysql/plugin/mysql_clear_password.so
 lib/mysql/plugin/qa_auth_client.so
 lib/mysql/plugin/qa_auth_interface.so
 lib/mysql/plugin/qa_auth_server.so
 lib/mysql/plugin/query_cache_info.so
 lib/mysql/plugin/query_response_time.so
-lib/mysql/plugin/sha256_password.so
 lib/mysql/plugin/semisync_master.so
 lib/mysql/plugin/semisync_slave.so
 lib/mysql/plugin/server_audit.so
 lib/mysql/plugin/simple_password_check.so
 lib/mysql/plugin/sql_errlog.so
-lib/mysql/plugin/trace_example.so
 lib/mysql/plugin/wsrep_info.so
 libexec/mysqld
 man/man1/aria_chk.1.gz
@@ -220,52 +135,14 @@ man/man1/wsrep_sst_xtrabackup-v2.1.gz
 man/man1/wsrep_sst_xtrabackup.1.gz
 man/man8/mysqld.8.gz
 %%DATADIR%%/binary-configure
-%%DATADIR%%/charsets/Index.xml
-%%DATADIR%%/charsets/README
-%%DATADIR%%/charsets/armscii8.xml
-%%DATADIR%%/charsets/ascii.xml
-%%DATADIR%%/charsets/cp1250.xml
-%%DATADIR%%/charsets/cp1251.xml
-%%DATADIR%%/charsets/cp1256.xml
-%%DATADIR%%/charsets/cp1257.xml
-%%DATADIR%%/charsets/cp850.xml
-%%DATADIR%%/charsets/cp852.xml
-%%DATADIR%%/charsets/cp866.xml
-%%DATADIR%%/charsets/dec8.xml
-%%DATADIR%%/charsets/geostd8.xml
-%%DATADIR%%/charsets/greek.xml
-%%DATADIR%%/charsets/hebrew.xml
-%%DATADIR%%/charsets/hp8.xml
-%%DATADIR%%/charsets/keybcs2.xml
-%%DATADIR%%/charsets/koi8r.xml
-%%DATADIR%%/charsets/koi8u.xml
-%%DATADIR%%/charsets/latin1.xml
-%%DATADIR%%/charsets/latin2.xml
-%%DATADIR%%/charsets/latin5.xml
-%%DATADIR%%/charsets/latin7.xml
-%%DATADIR%%/charsets/macce.xml
-%%DATADIR%%/charsets/macroman.xml
-%%DATADIR%%/charsets/swe7.xml
-%%DATADIR%%/czech/errmsg.sys
-%%DATADIR%%/danish/errmsg.sys
-%%DATADIR%%/dutch/errmsg.sys
-%%DATADIR%%/english/errmsg.sys
-%%DATADIR%%/errmsg-utf8.txt
-%%DATADIR%%/estonian/errmsg.sys
 %%DATADIR%%/fill_help_tables.sql
-%%DATADIR%%/french/errmsg.sys
-%%DATADIR%%/german/errmsg.sys
-%%DATADIR%%/greek/errmsg.sys
-%%DATADIR%%/hungarian/errmsg.sys
-%%DATADIR%%/install_spider.sql
-%%DATADIR%%/italian/errmsg.sys
-%%DATADIR%%/japanese/errmsg.sys
-%%DATADIR%%/korean/errmsg.sys
 %%DATADIR%%/magic
-@comment %%DATADIR%%/maria_add_gis_sp.sql
-@comment %%DATADIR%%/maria_add_gis_sp_bootstrap.sql
+%%SPIDER%%%%DATADIR%%/install_spider.sql
+%%DATADIR%%/maria_add_gis_sp.sql
+%%DATADIR%%/maria_add_gis_sp_bootstrap.sql
 %%MROONGA%%%%DATADIR%%/mroonga/install.sql
 %%MROONGA%%%%DATADIR%%/mroonga/uninstall.sql
+%%MROONGA%%%%DATADIR%%/mroonga/AUTHORS
 %%DATADIR%%/my-huge.cnf
 %%DATADIR%%/my-innodb-heavy-4G.cnf
 %%DATADIR%%/my-large.cnf
@@ -279,16 +156,7 @@ man/man8/mysqld.8.gz
 %%DATADIR%%/mysql_test_data_timezone.sql
 %%DATADIR%%/mysql_to_mariadb.sql
 %%DATADIR%%/mysqld_multi.server
-%%DATADIR%%/norwegian-ny/errmsg.sys
-%%DATADIR%%/norwegian/errmsg.sys
-%%DATADIR%%/polish/errmsg.sys
-%%DATADIR%%/portuguese/errmsg.sys
-%%DATADIR%%/romanian/errmsg.sys
-%%DATADIR%%/russian/errmsg.sys
-%%DATADIR%%/serbian/errmsg.sys
-%%DATADIR%%/slovak/errmsg.sys
-%%DATADIR%%/spanish/errmsg.sys
-%%DATADIR%%/swedish/errmsg.sys
-%%DATADIR%%/ukrainian/errmsg.sys
 %%DATADIR%%/wsrep.cnf
 %%DATADIR%%/wsrep_notify
+%%MROONGA%%share/groonga-normalizer-mysql/README.md
+%%MROONGA%%share/groonga/README.md

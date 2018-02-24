@@ -1,4 +1,4 @@
---- include/mysql/service_encryption.h.orig	2015-12-23 15:33:29 UTC
+--- include/mysql/service_encryption.h.orig	2017-04-04 19:11:35 UTC
 +++ include/mysql/service_encryption.h
 @@ -37,9 +37,11 @@ extern "C" {
  #elif defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__)

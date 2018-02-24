@@ -1,8 +1,8 @@
 Fix build error
 
---- storage/tokudb/PerconaFT/portability/memory.cc.orig	2015-10-15 15:43:52 UTC
+--- storage/tokudb/PerconaFT/portability/memory.cc.orig	2017-05-14 23:13:21 UTC
 +++ storage/tokudb/PerconaFT/portability/memory.cc
-@@ -94,11 +94,6 @@ PATENT RIGHTS GRANT:
+@@ -42,11 +42,6 @@ Copyright (c) 2006, 2015, Percona and/or
  #include <string.h>
  #include <stdio.h>
  #include <stdlib.h>

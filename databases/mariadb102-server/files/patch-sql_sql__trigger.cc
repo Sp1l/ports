@@ -1,8 +1,8 @@
 Fix clang build error
 
---- sql/sql_trigger.cc.orig	2015-10-15 15:43:47 UTC
+--- sql/sql_trigger.cc.orig	2017-05-14 23:13:18 UTC
 +++ sql/sql_trigger.cc
-@@ -192,32 +192,32 @@ static File_option triggers_file_paramet
+@@ -177,32 +177,32 @@ static File_option triggers_file_paramet
  {
    {
      { C_STRING_WITH_LEN("triggers") },
@@ -40,8 +40,8 @@ Fix clang build error
 +    static_cast<int>(my_offsetof(class Table_triggers_list, db_cl_names)),
      FILE_OPTIONS_STRLIST
    },
-   { { 0, 0 }, 0, FILE_OPTIONS_STRING }
-@@ -226,7 +226,7 @@ static File_option triggers_file_paramet
+   {
+@@ -216,7 +216,7 @@ static File_option triggers_file_paramet
  File_option sql_modes_parameters=
  {
    { C_STRING_WITH_LEN("sql_modes") },

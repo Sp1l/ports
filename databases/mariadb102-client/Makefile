@@ -1,4 +1,4 @@
-# $FreeBSD:  412011 2016-03-27 20:57:51Z brnrd $
+# $FreeBSD: head/databases/mariadb102-client/Makefile 461733 2018-02-13 17:47:50Z brnrd $
 
 PORTNAME=	mariadb
 PKGNAMESUFFIX=	102-client
@@ -11,24 +11,27 @@ FILESDIR=	${.CURDIR}/files
 PATCHDIR=	${.CURDIR}/files
 PLIST=		${.CURDIR}/pkg-plist
 
-CMAKE_ARGS+=	-DWITHOUT_SERVER=1 -DWITH_WSREP=0
-INSTALL_TARGET=	install
+CMAKE_ARGS+=	-DWITHOUT_SERVER=1 \
+		-DCONC_WITH_UNITTEST=0 \
+		-DCONC_WITH_MYSQLCOMPAT=1 \
+		-DWITH_WSREP=0
 
 USE_LDCONFIG=	${PREFIX}/lib/mysql
 
 CLIENT_ONLY=	yes
 
+post-configure:
+	${REINPLACE_CMD} -Ee 's|(#define INCLUDE.*)"$$|\1 -I${PREFIX}/include"|' \
+		-e 's|(#define LIBS.*)"\\ $$|\1 -L${PREFIX}/lib "\\|' \
+		${WRKSRC}/libmariadb/mariadb_config/mariadb_config.c
+
 post-install:
-	${RM} ${STAGEDIR}${PREFIX}/share/aclocal/mysql.m4
-	${RM} -r ${STAGEDIR}${PREFIX}/share/pkgconfig
-.	for b in mysql mysqladmin mysqlbinlog mysqlcheck mysqldump \
-		mysqlimport mysqlshow mysqlslap
-		${STRIP_CMD} ${STAGEDIR}${PREFIX}/bin/${b}
-.	endfor
-	${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/libmysqlclient.so.18
-.	for b in dialog.so mysql_clear_password.so 
-		${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/plugin/${b}
-.	endfor
+	${RM} ${STAGEDIR}${PREFIX}/share/aclocal/mysql.m4 \
+		${STAGEDIR}${PREFIX}/man/man1/aria* \
+		${STAGEDIR}${PREFIX}/man/man1/myisam*
+	${RM} -r ${STAGEDIR}${PREFIX}/share/pkgconfig \
+		${STAGEDIR}${DATADIR}/policy \
+		${STAGEDIR}${PREFIX}/include/mysql/server
 	# Fix https://mariadb.atlassian.net/browse/MDEV-9388
 	@${REINPLACE_CMD} 's/-l-pthread/-lpthread/' ${STAGEDIR}${PREFIX}/bin/mysql_config
 
