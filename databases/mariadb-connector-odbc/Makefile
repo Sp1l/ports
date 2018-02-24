@@ -1,7 +1,7 @@
-# $FreeBSD$
+# $FreeBSD: head/databases/mariadb-connector-odbc/Makefile 461755 2018-02-13 22:36:59Z brnrd $
 
 PORTNAME=	mariadb
-DISTVERSION=	3.0.1-beta
+DISTVERSION=	3.0.3
 CATEGORIES=	databases ipv6
 MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
 		http://mirrors.supportex.net/${SITESDIR}/ \
@@ -12,10 +12,10 @@ MASTER_SITES=	http://ftp.osuosl.org/pub/${SITESDIR}/ \
 		http://mirror.layerjet.com/${SITESDIR}/ \
 		http://mirror.switch.ch/mirror/${SITESDIR}/
 PKGNAMESUFFIX=	-connector-odbc
-DISTNAME=	${PORTNAME}${PKGNAMESUFFIX}-${DISTVERSION}-src
+DISTNAME=	${PORTNAME}${PKGNAMESUFFIX}-${DISTVERSION}-ga-src
 
 MAINTAINER=	brnrd@FreeBSD.org
-COMMENT=	MariaDB database connector for C
+COMMENT=	MariaDB database connector for odbc
 
 LICENSE=	LGPL21
 LICENSE_FILE=	${WRKSRC}/COPYING
