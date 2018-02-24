@@ -13,13 +13,11 @@ include/mariadb/mysql.h
 include/mariadb/mysql/client_plugin.h
 include/mariadb/mysql/plugin_auth.h
 include/mariadb/mysql/plugin_auth_common.h
+include/mariadb/mysqld_error.h
 lib/mariadb/libmariadb.so
 lib/mariadb/libmariadb.so.3
 lib/mariadb/libmariadbclient.a
 lib/mariadb/plugin/auth_gssapi_client.so
 lib/mariadb/plugin/dialog.so
-lib/mariadb/plugin/libaurora.so
-lib/mariadb/plugin/libreplication.so
 lib/mariadb/plugin/mysql_clear_password.so
 lib/mariadb/plugin/remote_io.so
-lib/mariadb/plugin/trace_example.so
