@@ -2,7 +2,7 @@
 # $FreeBSD: head/security/openssl-devel/Makefile 453383 2017-11-02 22:00:58Z brnrd $
 
 PORTNAME=	openssl
-DISTVERSION=	1.1.1-pre2
+DISTVERSION=	1.1.1-pre3
 CATEGORIES=	security devel
 MASTER_SITES=   https://www.openssl.org/source/ \
 		ftp://ftp.cert.dfn.de/pub/tools/net/openssl/source/
