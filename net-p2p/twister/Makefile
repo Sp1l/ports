@@ -1,8 +1,11 @@
 # Created by: Thierry Thomas <thierry@pompo.net>
-# $FreeBSD: head/net-p2p/twister/Makefile 382189 2015-03-24 23:45:41Z marino $
+# $FreeBSD: head/net-p2p/twister/Makefile 459315 2018-01-18 04:11:02Z jbeich $
 
 PORTNAME=	twister-core
-PORTVERSION=	0.141130
+PORTVERSION=	0.9.34
+DISTVERSIONPREFIX=	v
+PORTREVISION=	10
+PORTEPOCH=	1
 CATEGORIES=	net-p2p
 
 MAINTAINER=	thierry@FreeBSD.org
@@ -12,24 +15,19 @@ LICENSE=	BSD3CLAUSE MIT
 LICENSE_COMB=	dual
 LICENSE_FILE=	${WRKSRC}/COPYING
 
-LIB_DEPENDS=	libboost_system.so:${PORTSDIR}/devel/boost-libs	\
-		libleveldb.so:${PORTSDIR}/databases/leveldb	\
-		libicui18n.so:${PORTSDIR}/devel/icu
+LIB_DEPENDS=	libboost_system.so:devel/boost-libs	\
+		libleveldb.so:databases/leveldb
+
+BROKEN=		fails to build with boost 1.66, see bug 224134
+BROKEN_powerpc64=	Does not build: /usr/bin/ld: final link failed: Bad value
 
 OPTIONS_DEFINE=	DOCS
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	miguelfreitas
-GH_PROJECT=	${PORTNAME}
-GH_TAGNAME=	${GH_COMMIT}
-GH_COMMIT=	9d3b074
 
-USE_BDB=	yes
-WANT_BDB_VER=	48
-USE_OPENSSL=	yes
-USES=		gmake iconv
+USES=		bdb:48 autoreconf:build gmake iconv libtool ssl
 
-USE_AUTOTOOLS=	libtoolize:env aclocal:env autoconf:env autoheader:env automake:env
 GNU_CONFIGURE=	yes
 CONFIGURE_WRKSRC=${WRKSRC}/libtorrent
 CONFIGURE_ARGS=	--with-libiconv			\
@@ -46,22 +44,18 @@ MAKE_ENV=	BOOST_INCLUDE_PATH=${LOCALBASE}/include	\
 PLIST_FILES=	bin/twisterd
 PORTDOCS=	README.md
 
-.include <bsd.port.options.mk>
-
-.if (${OPSYS} == FreeBSD && ${OSVERSION} < 1000000)
-WITH_OPENSSL_PORT=	yes
-.endif
+post-patch:
+	@${REINPLACE_CMD} 's|%%PORTVERSION%%|${PORTVERSION}|'	\
+		${WRKSRC}/share/genbuild.sh
 
 pre-configure:
-	${REINPLACE_CMD} -e 's|%%PORTVERSION%%|${PORTVERSION}|'	\
-		${WRKSRC}/share/genbuild.sh
 	(cd ${CONFIGURE_WRKSRC} && ./autotool.sh)
 
 do-install:
 	${INSTALL_PROGRAM} ${BUILD_WRKSRC}/twisterd ${STAGEDIR}${PREFIX}/bin
-.if ${PORT_OPTIONS:MDOCS}
-	${MKDIR} ${STAGEDIR}${DOCSDIR}
+
+do-install-DOCS-on:
+	@${MKDIR} ${STAGEDIR}${DOCSDIR}
 	${INSTALL_DATA} ${WRKSRC}/README.md ${STAGEDIR}${DOCSDIR}
-.endif
 
 .include <bsd.port.mk>
