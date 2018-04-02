@@ -1,5 +1,5 @@
 # Created by: Bernard Spil <brnrd@FreeBSD.org>
-# $FreeBSD: head/www/mod_http2-devel/Makefile 461576 2018-02-12 11:20:56Z brnrd $
+# $FreeBSD: head/www/mod_http2-devel/Makefile 464189 2018-03-11 17:38:45Z brnrd $
 
 PORTNAME=	mod_http2
 PORTVERSION=	1.10.16
@@ -16,9 +16,8 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 LIB_DEPENDS=	libnghttp2.so:www/libnghttp2
 
-USES=		autoreconf libtool ssl
+USES=		apache:2.4+ autoreconf libtool ssl
 USE_GITHUB=	yes
-USE_APACHE=	24+
 
 GH_ACCOUNT=	icing
 GH_PROJECT=	mod_h2
@@ -29,6 +28,7 @@ MODULENAME=	${GH_PROJECT}
 
 CFLAGS+=	-I${LOCALBASE}/include
 
+SUB_FILES=	200_mod_http2.conf 300_mod_proxy_http2.conf
 PORTDOCS=	README README.md
 PLIST_FILES=	${APACHEMODDIR}/mod_h2.so \
 		${APACHEMODDIR}/mod_proxy_h2.so
