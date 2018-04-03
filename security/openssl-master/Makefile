@@ -2,7 +2,7 @@
 # $FreeBSD: head/security/openssl-devel/Makefile 453383 2017-11-02 22:00:58Z brnrd $
 
 PORTNAME=	openssl
-DISTVERSION=	1.1.1-pre3
+DISTVERSION=	1.1.1-pre4
 CATEGORIES=	security devel
 MASTER_SITES=   https://www.openssl.org/source/ \
 		ftp://ftp.cert.dfn.de/pub/tools/net/openssl/source/
@@ -78,7 +78,7 @@ SSL3_DESC=	SSLv3 (unsafe)
 TLS1_DESC=	TLSv1.0
 TLS1_1_DESC=	TLSv1.1
 TLS1_2_DESC=	TLSv1.1
-TLS1_3_DESC=	TLSv1.3
+TLS1_3_DESC=	TLSv1.3 
 ZLIB_DESC=	zlib compression support
 
 OPTIONS_SUB=	yes
