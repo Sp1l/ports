@@ -1410,6 +1410,8 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_new_id.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_hkdf_key.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_hkdf_salt.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set1_pbe_pass.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set1_scrypt_salt.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_tls1_prf_secret.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_app_data.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_cb.3.gz
@@ -1425,7 +1427,14 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_rsa_keygen_bits.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_rsa_keygen_pubexp.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_rsa_padding.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set_rsa_pss_keygen_md.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set_rsa_pss_keygen_mgf1_md.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set_rsa_pss_keygen_saltlen.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_rsa_pss_saltlen.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set_scrypt_N.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set_scrypt_maxmem_bytes.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set_scrypt_p.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set_scrypt_r.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_signature_md.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set_tls1_prf_md.3.gz
 %%MAN3%%man/man3/EVP_PKEY_METHOD.3.gz
