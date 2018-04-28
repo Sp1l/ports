@@ -37,11 +37,6 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 		-DINSTALL_SUPPORTFILESDIR="share/mysql" \
 		-DLOCAL_BOOST_DIR=${WRKSRC}/../boost_1_59_0 \
 		-DWITH_INNODB_EXTRA_DEBUG=0
-##		-DWITH_INNODB_MEMCACHED=0 \
-##		-DWITH_INNOBASE_STORAGE_ENGINE=0
-##		-DWITH_SSL={ssl_type|path_name} \
-##		-DWITH_SYSTEMD=0 \
-
 
 SHEBANG_FILES=	scripts/*.pl* scripts/*.sh
 
