@@ -1,7 +1,7 @@
 # $FreeBSD: head/databases/mariadb102-server/Makefile 459320 2018-01-18 09:54:32Z brnrd $
 
 PORTNAME?=	mariadb
-PORTVERSION=	10.3.4
+PORTVERSION=	10.3.7
 PORTREVISION?=	0
 CATEGORIES=	databases ipv6
 MASTER_SITES=	http://mirrors.supportex.net/${SITESDIR}/ \
@@ -12,7 +12,7 @@ MASTER_SITES=	http://mirrors.supportex.net/${SITESDIR}/ \
 		http://mirror.layerjet.com/${SITESDIR}/ \
 		http://mirror.switch.ch/mirror/${SITESDIR}/ \
 		http://ftp.osuosl.org/pub/${SITESDIR}/
-PKGNAMESUFFIX?=	102-server
+PKGNAMESUFFIX?=	103-server
 
 MAINTAINER=	brnrd@FreeBSD.org
 COMMENT?=	Multithreaded SQL database (server)
@@ -30,7 +30,7 @@ PKGMESSAGE=	${WRKDIR}/pkg-message
 SLAVEDIRS=	databases/mariadb102-client
 USES=		bison:build cmake:noninja compiler:c++11-lib cpe iconv:translit libedit ncurses shebangfix ssl
 USE_LDCONFIG=	${PREFIX}/lib/mysql
-SHEBANG_FILES=	scripts/*.sh
+SHEBANG_FILES=	scripts/*.sh storage/rocksdb/myrocks_hotbackup
 SITESDIR=	mariadb/mariadb-${PORTVERSION}/source
 DOCSDIR=	${PREFIX}/share/doc/mysql
 
@@ -121,16 +121,16 @@ OPTIONS_SUB=		yes
 .if defined(CLIENT_ONLY)
 # MySQL-Client part
 USES+=		readline
-GSSAPI_NONE_CMAKE_ON=	-DPLUGIN_AUTH_GSSAPI_CLIENT=NO
+GSSAPI_NONE_CMAKE_ON=	-DPLUGIN_AUTH_GSSAPI_CLIENT=OFF
 .else
 # MySQL-Server part
-USES+=		mysql:102m
+USES+=		mysql:103m
 USE_LDCONFIG+=	${PREFIX}/lib/mysql/plugin
 USE_RC_SUBR=	mysql-server
 USERS=		mysql
 GROUPS=		mysql
 CMAKE_ARGS+=	-DWITH_EMBEDDED_SERVER="ON" \
-		-DPLUGIN_AUTH_GSSAPI_CLIENT=NO \
+		-DPLUGIN_AUTH_GSSAPI_CLIENT=OFF \
 		-DCMAKE_SKIP_BUILD_RPATH:BOOL=YES \
 		-DWITHOUT_EXAMPLE_STORAGE_ENGINE=1 \
 		-DWITHOUT_CLIENT=1
@@ -153,9 +153,9 @@ LZO_CMAKE_ON=		-DWITH_INNODB_LZO=ON
 LZO_LIB_DEPENDS=	liblzo2.so:archivers/lzo2
 MROONGA_IMPLIES=	LZ4
 MSGPACK_LIB_DEPENDS=	libmsgpackc.so:devel/msgpack
-OQGRAPH_BROKEN=		OQGRAPH fails to build with boost 1.66, see bug 224089
 OQGRAPH_LIB_DEPENDS=	libboost_system.so:devel/boost-libs \
 			libJudy.so:devel/judy
+ROCKSDB_USES=		python
 SNAPPY_CMAKE_OFF=	-DWITH_INNODB_SNAPPY=OFF -DWITH_ROCKSDB_snappy=OFF
 SNAPPY_CMAKE_ON=	-DWITH_INNODB_SNAPPY=ON  -DWITH_ROCKSDB_snappy=ON
 SNAPPY_LIB_DEPENDS=	libsnappy.so:archivers/snappy

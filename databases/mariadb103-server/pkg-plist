@@ -6,11 +6,12 @@ bin/aria_read_log
 bin/innochecksum
 bin/mariabackup
 bin/mbstream
-bin/my_print_defaults
+@comment bin/my_print_defaults
 bin/myisam_ftdump
 bin/myisamchk
 bin/myisamlog
 bin/myisampack
+%%ROCKSDB%%bin/myrocks_hotbackup
 bin/mysql_client_test
 bin/mysql_client_test_embedded
 bin/mysql_convert_table_format
@@ -48,9 +49,11 @@ include/mysql/server/private/embedded_priv.h
 @comment lib/mysql/libmariadb.so
 @comment lib/mysql/libmariadb.so.3
 @comment lib/mysql/libmariadbclient.a
+lib/mysql/libmariadbd.a
+lib/mysql/libmariadbd.so
+lib/mysql/libmariadbd.so.19
 lib/mysql/libmysqld.a
 lib/mysql/libmysqld.so
-lib/mysql/libmysqld.so.19
 lib/mysql/plugin/adt_null.so
 lib/mysql/plugin/auth_0x0100.so
 lib/mysql/plugin/auth_ed25519.so
@@ -86,11 +89,10 @@ lib/mysql/plugin/qa_auth_interface.so
 lib/mysql/plugin/qa_auth_server.so
 lib/mysql/plugin/query_cache_info.so
 lib/mysql/plugin/query_response_time.so
-lib/mysql/plugin/semisync_master.so
-lib/mysql/plugin/semisync_slave.so
 lib/mysql/plugin/server_audit.so
 lib/mysql/plugin/simple_password_check.so
 lib/mysql/plugin/sql_errlog.so
+lib/mysql/plugin/test_versioning.so
 lib/mysql/plugin/wsrep_info.so
 libexec/mysqld
 man/man1/aria_chk.1.gz
@@ -142,24 +144,16 @@ man/man8/mysqld.8.gz
 %%MROONGA%%%%DATADIR%%/mroonga/install.sql
 %%MROONGA%%%%DATADIR%%/mroonga/uninstall.sql
 %%MROONGA%%%%DATADIR%%/mroonga/AUTHORS
-%%DATADIR%%/my-huge.cnf
-%%DATADIR%%/my-innodb-heavy-4G.cnf
-%%DATADIR%%/my-large.cnf
-%%DATADIR%%/my-medium.cnf
-%%DATADIR%%/my-small.cnf
 %%DATADIR%%/mysql-log-rotate
 %%DATADIR%%/mysql.server
 %%DATADIR%%/mysql_performance_tables.sql
 %%DATADIR%%/mysql_system_tables.sql
 %%DATADIR%%/mysql_system_tables_data.sql
 %%DATADIR%%/mysql_test_data_timezone.sql
+%%DATADIR%%/mysql_test_db.sql
 %%DATADIR%%/mysql_to_mariadb.sql
 %%DATADIR%%/mysqld_multi.server
 %%DATADIR%%/wsrep.cnf
 %%DATADIR%%/wsrep_notify
-%%MROONGA%%%%PORTDOCS%%%%DOCSDIR%%/CREDITS
-%%MROONGA%%%%PORTDOCS%%%%DOCSDIR%%/EXCEPTIONS-CLIENT
-%%MROONGA%%%%PORTDOCS%%%%DOCSDIR%%/INSTALL-BINARY
-%%MROONGA%%%%PORTDOCS%%%%DOCSDIR%%/README-wsrep
 %%MROONGA%%share/groonga-normalizer-mysql/README.md
 %%MROONGA%%share/groonga/README.md

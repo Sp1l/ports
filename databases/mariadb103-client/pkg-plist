@@ -85,6 +85,7 @@ lib/mysql/plugin/sha256_password.so
 %%DATADIR%%/italian/errmsg.sys
 %%DATADIR%%/japanese/errmsg.sys
 %%DATADIR%%/korean/errmsg.sys
+@comment %%DATADIR%%/mysql_test_db.sql
 %%DATADIR%%/norwegian-ny/errmsg.sys
 %%DATADIR%%/norwegian/errmsg.sys
 %%DATADIR%%/polish/errmsg.sys
