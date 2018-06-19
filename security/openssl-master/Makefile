@@ -1,4 +1,4 @@
- Created by: Dirk Froemberg <dirk@FreeBSD.org>
+# Created by: Dirk Froemberg <dirk@FreeBSD.org>
 # $FreeBSD: head/security/openssl-devel/Makefile 453383 2017-11-02 22:00:58Z brnrd $
 
 PORTNAME=	openssl
