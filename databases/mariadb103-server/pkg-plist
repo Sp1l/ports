@@ -37,12 +37,14 @@ bin/mysqldumpslow
 bin/resolve_stack_dump
 bin/resolveip
 %%ROCKSDB%%bin/sst_dump
+@comment bin/test-connect-t
 %%TOKUDB%%bin/tokuft_logprint
 %%TOKUDB%%bin/tokuftdump
 bin/wsrep_sst_common
 bin/wsrep_sst_mariabackup
 bin/wsrep_sst_mysqldump
 bin/wsrep_sst_rsync
+bin/wsrep_sst_rsync_wan
 bin/wsrep_sst_xtrabackup
 bin/wsrep_sst_xtrabackup-v2
 include/mysql/server/private/embedded_priv.h
