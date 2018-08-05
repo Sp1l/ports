@@ -1,0 +1,49 @@
+***********************************************************************
+*                         POST INSTALL CONFIGURATION                  *
+***********************************************************************
+
+Please note that everything has been installed in %%WWWDIR%%.
+
+You will probably want to add an alias to your httpd.conf file, something
+like this:
+
+    	Alias /nextcloud %%WWWDIR%%
+	AcceptPathInfo On
+	<Directory %%WWWDIR%%>
+	    AllowOverride All
+	    Require all granted
+	</Directory>
+
+And restart Apache.
+
+***********************************************************************
+*                       NEXTCLOUD VERSION UPGRADE                     *
+***********************************************************************
+
+After a version migration you should upgrade your nextcloud instance
+using command line:
+
+  cd %%WWWDIR%%
+  su -m www -c "php ./occ upgrade"
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                    /!\ NEXTCLOUD 13.0.1 UPDATE /!\
+
+The nextcloud 13.0.1 package changes the location of the bundled apps.
+After updating to 13.0.1 you MUST adapt your configuration. You MUST
+add an additional entry to the "apps-paths" array in config/config.php
+
+    1 =>
+    array (
+      'path' => '%%WWWDIR%%/apps-pkg',
+      'url' => '/apps-pkg',
+      'writable' => false,
+    ),
+
+For the default installation, the fix can be applied with:
+
+  cd %%WWWDIR%%
+  su -m www -c "php ./occ config:import < %%DATADIR%%/fix-apps_paths.json"
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
