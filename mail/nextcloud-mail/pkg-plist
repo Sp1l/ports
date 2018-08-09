@@ -54,7 +54,6 @@
 %%WWWDIR%%/js/routecontroller.js
 %%WWWDIR%%/js/router.js
 %%WWWDIR%%/js/search.js
-%%WWWDIR%%/js/searchproxy.js
 %%WWWDIR%%/js/state.js
 %%WWWDIR%%/krankerl.toml
 %%WWWDIR%%/l10n/.gitkeep
