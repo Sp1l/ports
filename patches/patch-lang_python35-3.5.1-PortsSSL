@@ -1,0 +1,101 @@
+Index: lang/python35/Makefile
+===================================================================
+--- lang/python35/Makefile	(revision 405242)
++++ lang/python35/Makefile	(working copy)
+@@ -28,6 +28,8 @@
+ PYTHON_VERSION=		python${PYTHON_VER}
+ PYTHON_SUFFIX=		${PYTHON_VER:S/.//g}
+ 
++CFLAGS+=		-I${OPENSSLINC}
++
+ DISABLED_EXTENSIONS=	_sqlite3 _tkinter _gdbm
+ CONFIGURE_ARGS+=	--enable-shared --without-ensurepip
+ CONFIGURE_ENV+=		OPT="" DISABLED_EXTENSIONS="${DISABLED_EXTENSIONS}"	# Null out OPT to respect user CFLAGS and remove optimizations
+Index: lang/python35/files/patch-Modules___ssl.c
+===================================================================
+--- lang/python35/files/patch-Modules___ssl.c	(revision 0)
++++ lang/python35/files/patch-Modules___ssl.c	(working copy)
+@@ -0,0 +1,20 @@
++--- Modules/_ssl.c.orig	2015-12-07 01:39:10 UTC
+++++ Modules/_ssl.c
++@@ -3916,7 +3916,7 @@ _ssl_RAND_status_impl(PyModuleDef *modul
++     return PyLong_FromLong(RAND_status());
++ }
++ 
++-#ifdef HAVE_RAND_EGD
+++#ifndef OPENSSL_NO_EGD
++ /*[clinic input]
++ _ssl.RAND_egd
++     path: object(converter="PyUnicode_FSConverter")
++@@ -3942,7 +3942,7 @@ _ssl_RAND_egd_impl(PyModuleDef *module, 
++     }
++     return PyLong_FromLong(bytes);
++ }
++-#endif /* HAVE_RAND_EGD */
+++#endif /* OPENSSL_NO_EGD */
++ 
++ 
++ 
+
+Property changes on: lang/python35/files/patch-Modules___ssl.c
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property
+Index: lang/python35/files/patch-Modules_clinic___ssl.c.h
+===================================================================
+--- lang/python35/files/patch-Modules_clinic___ssl.c.h	(revision 0)
++++ lang/python35/files/patch-Modules_clinic___ssl.c.h	(working copy)
+@@ -0,0 +1,20 @@
++--- Modules/clinic/_ssl.c.h.orig	2015-12-07 01:39:10 UTC
+++++ Modules/clinic/_ssl.c.h
++@@ -893,7 +893,7 @@ _ssl_RAND_status(PyModuleDef *module, Py
++     return _ssl_RAND_status_impl(module);
++ }
++ 
++-#if defined(HAVE_RAND_EGD)
+++#if !defined(OPENSSL_NO_EGD)
++ 
++ PyDoc_STRVAR(_ssl_RAND_egd__doc__,
++ "RAND_egd($module, path, /)\n"
++@@ -924,7 +924,7 @@ exit:
++     return return_value;
++ }
++ 
++-#endif /* defined(HAVE_RAND_EGD) */
+++#endif /* defined(OPENSSL_NO_EGD) */
++ 
++ PyDoc_STRVAR(_ssl_get_default_verify_paths__doc__,
++ "get_default_verify_paths($module, /)\n"
+
+Property changes on: lang/python35/files/patch-Modules_clinic___ssl.c.h
+___________________________________________________________________
+Added: svn:mime-type
+## -0,0 +1 ##
++text/plain
+\ No newline at end of property
+Added: svn:keywords
+## -0,0 +1 ##
++FreeBSD=%H
+\ No newline at end of property
+Added: fbsd:nokeywords
+## -0,0 +1 ##
++yes
+\ No newline at end of property
+Added: svn:eol-style
+## -0,0 +1 ##
++native
+\ No newline at end of property

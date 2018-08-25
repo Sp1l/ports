@@ -5,7 +5,7 @@
  	 * It's actually an OpenSSL FAQ, and according to them, it's up to the
  	 * application coders to seed the RNG. -- William Yodlowsky */
 -	if (RAND_egd(RAND_file_name(f_randfile, sizeof(f_randfile))) < 0) {
-+#ifdef HAVE_RAND_EGD
++#ifndef OPENSSL_NO_EGD
 +	if (RAND_egd(RAND_file_name(f_randfile, sizeof(f_randfile))) < 0) 
 +#endif
 +	{
