@@ -4822,6 +4822,7 @@
 %%WWWDIR%%/apps-pkg/encryption/lib/AppInfo/Application.php
 %%WWWDIR%%/apps-pkg/encryption/lib/Command/DisableMasterKey.php
 %%WWWDIR%%/apps-pkg/encryption/lib/Command/EnableMasterKey.php
+%%WWWDIR%%/apps-pkg/encryption/lib/Command/RecoverUser.php
 %%WWWDIR%%/apps-pkg/encryption/lib/Controller/RecoveryController.php
 %%WWWDIR%%/apps-pkg/encryption/lib/Controller/SettingsController.php
 %%WWWDIR%%/apps-pkg/encryption/lib/Controller/StatusController.php
@@ -6387,6 +6388,7 @@
 %%WWWDIR%%/apps-pkg/files_sharing/js/app.js
 %%WWWDIR%%/apps-pkg/files_sharing/js/files_drop.js
 %%WWWDIR%%/apps-pkg/files_sharing/js/public.js
+%%WWWDIR%%/apps-pkg/files_sharing/js/public_note.js
 %%WWWDIR%%/apps-pkg/files_sharing/js/share.js
 %%WWWDIR%%/apps-pkg/files_sharing/js/sharebreadcrumbview.js
 %%WWWDIR%%/apps-pkg/files_sharing/js/sharedfilelist.js
@@ -8524,6 +8526,8 @@
 %%WWWDIR%%/apps-pkg/notifications/l10n/pt_PT.json
 %%WWWDIR%%/apps-pkg/notifications/l10n/ru.js
 %%WWWDIR%%/apps-pkg/notifications/l10n/ru.json
+%%WWWDIR%%/apps-pkg/notifications/l10n/sk.js
+%%WWWDIR%%/apps-pkg/notifications/l10n/sk.json
 %%WWWDIR%%/apps-pkg/notifications/l10n/sr.js
 %%WWWDIR%%/apps-pkg/notifications/l10n/sr.json
 %%WWWDIR%%/apps-pkg/notifications/l10n/sv.js
@@ -9875,6 +9879,7 @@
 %%WWWDIR%%/apps-pkg/twofactor_backupcodes/lib/Migration/Version1002Date20170607113030.php
 %%WWWDIR%%/apps-pkg/twofactor_backupcodes/lib/Migration/Version1002Date20170919123342.php
 %%WWWDIR%%/apps-pkg/twofactor_backupcodes/lib/Migration/Version1002Date20170926101419.php
+%%WWWDIR%%/apps-pkg/twofactor_backupcodes/lib/Migration/Version1002Date20180821043638.php
 %%WWWDIR%%/apps-pkg/twofactor_backupcodes/lib/Provider/BackupCodesProvider.php
 %%WWWDIR%%/apps-pkg/twofactor_backupcodes/lib/Service/BackupCodeStorage.php
 %%WWWDIR%%/apps-pkg/twofactor_backupcodes/lib/Settings/Personal.php
@@ -10672,7 +10677,9 @@
 %%WWWDIR%%/core/Command/Encryption/SetDefaultModule.php
 %%WWWDIR%%/core/Command/Encryption/ShowKeyStorageRoot.php
 %%WWWDIR%%/core/Command/Encryption/Status.php
+%%WWWDIR%%/core/Command/Group/Add.php
 %%WWWDIR%%/core/Command/Group/AddUser.php
+%%WWWDIR%%/core/Command/Group/Delete.php
 %%WWWDIR%%/core/Command/Group/ListCommand.php
 %%WWWDIR%%/core/Command/Group/RemoveUser.php
 %%WWWDIR%%/core/Command/Integrity/CheckApp.php
@@ -10789,6 +10796,8 @@
 %%WWWDIR%%/core/doc/admin/_images/antivirus-executable.png
 %%WWWDIR%%/core/doc/admin/_images/antivirus-logging.png
 %%WWWDIR%%/core/doc/admin/_images/applicable.png
+%%WWWDIR%%/core/doc/admin/_images/apps_overview.png
+%%WWWDIR%%/core/doc/admin/_images/apps_store.png
 %%WWWDIR%%/core/doc/admin/_images/auth_mechanism.png
 %%WWWDIR%%/core/doc/admin/_images/auth_rsa.png
 %%WWWDIR%%/core/doc/admin/_images/authentication-types.png
@@ -10904,6 +10913,7 @@
 %%WWWDIR%%/core/doc/admin/_sources/configuration_files/files_locking_transactional.txt
 %%WWWDIR%%/core/doc/admin/_sources/configuration_files/index.txt
 %%WWWDIR%%/core/doc/admin/_sources/configuration_files/previews_configuration.txt
+%%WWWDIR%%/core/doc/admin/_sources/configuration_files/primary_storage.txt
 %%WWWDIR%%/core/doc/admin/_sources/configuration_mimetypes/index.txt
 %%WWWDIR%%/core/doc/admin/_sources/configuration_server/activity_configuration.txt
 %%WWWDIR%%/core/doc/admin/_sources/configuration_server/antivirus_configuration.txt
@@ -11080,6 +11090,7 @@
 %%WWWDIR%%/core/doc/admin/configuration_files/files_locking_transactional.html
 %%WWWDIR%%/core/doc/admin/configuration_files/index.html
 %%WWWDIR%%/core/doc/admin/configuration_files/previews_configuration.html
+%%WWWDIR%%/core/doc/admin/configuration_files/primary_storage.html
 %%WWWDIR%%/core/doc/admin/configuration_mimetypes/index.html
 %%WWWDIR%%/core/doc/admin/configuration_server/activity_configuration.html
 %%WWWDIR%%/core/doc/admin/configuration_server/antivirus_configuration.html
@@ -12432,7 +12443,7 @@
 %%WWWDIR%%/lib/private/Memcache/Memcached.php
 %%WWWDIR%%/lib/private/Memcache/NullCache.php
 %%WWWDIR%%/lib/private/Memcache/Redis.php
-%%WWWDIR%%/lib/private/Memcache/XCache.php
+%%WWWDIR%%/lib/private/MemoryInfo.php
 %%WWWDIR%%/lib/private/Migration/BackgroundRepair.php
 %%WWWDIR%%/lib/private/Migration/ConsoleOutput.php
 %%WWWDIR%%/lib/private/Migration/SimpleOutput.php
@@ -12456,6 +12467,7 @@
 %%WWWDIR%%/lib/private/Preview/GIF.php
 %%WWWDIR%%/lib/private/Preview/Generator.php
 %%WWWDIR%%/lib/private/Preview/GeneratorHelper.php
+%%WWWDIR%%/lib/private/Preview/HEIC.php
 %%WWWDIR%%/lib/private/Preview/Illustrator.php
 %%WWWDIR%%/lib/private/Preview/Image.php
 %%WWWDIR%%/lib/private/Preview/JPEG.php
