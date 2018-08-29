@@ -4,7 +4,7 @@
  	    ssl_thread_setup(fn);
  	    
              /* Need to seed PRNG, too! */
-+#ifdef HAVE_RAND_EGD
++#ifndef OPENSSL_NO_EGD
              if ( RAND_egd( ( RAND_file_name( f_randfile, sizeof( f_randfile ) ) == f_randfile ) ? f_randfile : "/.rnd" ) ) 
 +#endif
  	    {
