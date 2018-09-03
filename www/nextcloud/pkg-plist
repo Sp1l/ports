@@ -8451,6 +8451,8 @@
 %%WWWDIR%%/apps-pkg/notifications/img/notifications-dark.svg
 %%WWWDIR%%/apps-pkg/notifications/img/notifications-new-dark.svg
 %%WWWDIR%%/apps-pkg/notifications/img/notifications-new.svg
+%%WWWDIR%%/apps-pkg/notifications/img/notifications-red-new-dark.svg
+%%WWWDIR%%/apps-pkg/notifications/img/notifications-red-new.svg
 %%WWWDIR%%/apps-pkg/notifications/img/notifications.png
 %%WWWDIR%%/apps-pkg/notifications/img/notifications.svg
 %%WWWDIR%%/apps-pkg/notifications/js/notifications.js
