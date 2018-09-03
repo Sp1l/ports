@@ -2,7 +2,7 @@
 # $FreeBSD: head/www/nextcloud-notes/Makefile 477534 2018-08-18 20:42:46Z sunpoet $
 
 PORTNAME=	notes
-PORTVERSION=	2.4.0
+PORTVERSION=	2.4.1
 DISTVERSIONPREFIX=	v
 CATEGORIES=	www
 MASTER_SITES=	https://github.com/${PKGNAMEPREFIX:S/-//}/${PORTNAME}/releases/download/${DISTVERSIONPREFIX}${PORTVERSION}/
