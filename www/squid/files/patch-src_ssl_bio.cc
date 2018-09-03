@@ -1,11 +1,16 @@
---- src/ssl/bio.cc.orig	2015-10-01 14:52:11 UTC
+Fix build with LibreSSL
+
+--- src/ssl/bio.cc.orig	2018-07-02 03:26:07 UTC
 +++ src/ssl/bio.cc
-@@ -1009,7 +1009,7 @@ Ssl::Bio::sslFeatures::parseV3Hello(cons
- 
-     ciphers += 2;
-     if (ciphersLen) {
--        const SSL_METHOD *method = SSLv3_method();
-+        const SSL_METHOD *method = SSLv23_method();
-         for (size_t i = 0; i < ciphersLen; i += 2) {
-             // each cipher in v3/tls  HELLO message is of size 2
-             const SSL_CIPHER *c = method->get_cipher_by_char((ciphers + i));
+@@ -76,7 +76,11 @@ Ssl::Bio::Create(const int fd, Security:
+         BIO_meth_set_create(SquidMethods, squid_bio_create);
+         BIO_meth_set_destroy(SquidMethods, squid_bio_destroy);
+     }
++#ifdef LIBRESSL_VERSION_NUMBER
++    BIO_METHOD *useMethod = SquidMethods;
++#else
+     const BIO_METHOD *useMethod = SquidMethods;
++#endif
+ #else
+     BIO_METHOD *useMethod = &SquidMethods;
+ #endif

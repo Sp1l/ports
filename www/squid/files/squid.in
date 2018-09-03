@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $FreeBSD: head/www/squid/files/squid.in 398231 2015-09-30 18:58:04Z bdrewery $
+# $FreeBSD: head/www/squid/files/squid.in 474197 2018-07-08 20:46:45Z swills $
 #
 # PROVIDE: squid
 # REQUIRE: LOGIN
@@ -42,6 +42,9 @@
 # squid_krb5_ktname:
 #		Alternative Kerberos 5 Key Table.
 #		Default: none
+# squid_krb5_config:
+#		Alternative Kerberos 5 config file
+#		Default: none
 
 . /etc/rc.subr
 
@@ -56,7 +59,6 @@ reload_cmd=squid_reload
 start_precmd=squid_prestart
 start_postcmd=squid_getpid
 stop_precmd=squid_prestop
-stop_postcmd=squid_poststop
 configtest_cmd=squid_configtest
 reload_precmd=squid_configtest
 restart_precmd=squid_configtest
@@ -78,21 +80,23 @@ squid_load_rc_config()
 	required_dirs=$chdir
 	required_files=$squid_conf
 	command_args="${required_args} ${squid_flags}"
-	procname="?squid-*"
+#	We used to need it in squid3 to match pid and proc name
+#	procname="?squid-*"
 	pidfile=$squid_pidfile
-	state_dir=/var/run/squid
 }
 
 squid_prestart()
 {
-	# prepare the state directory:
-	[ -d ${state_dir} ] && rm -rf ${state_dir}
-	install -d -o ${squid_user} -m 0755 ${state_dir}
-
 	# setup KRB5_KTNAME:
 	squid_krb5_ktname=${squid_krb5_ktname:-"NONE"}
 	if [ "${squid_krb5_ktname}" != "NONE" ]; then
 		export KRB5_KTNAME=${squid_krb5_ktname}
+	fi
+
+	# setup KRB5_CONFIG:
+	squid_krb5_config=${squid_krb5_config:-"NONE"}
+	if [ "${squid_krb5_config}" != "NONE" ]; then
+		export KRB5_CONFIG=${squid_krb5_config}
 	fi
 
 	# setup FIB tables:
@@ -114,13 +118,11 @@ squid_prestart()
 
 squid_reload()
 {
-
 	$command $required_args $squid_flags -k reconfigure
 }
 
 squid_configtest()
 {
-
 	echo "Performing sanity check on ${name} configuration."
 	if $command $required_args $squid_flags -k check; then
 		echo "Configuration for ${name} passes."
@@ -148,12 +150,7 @@ squid_getpid()
 squid_prestop()
 {
 	command_args="$command_args -k shutdown"
-	$command $required_args $squid_flags -k check 2>/dev/null
-}
-
-squid_poststop()
-{
-	rm -rf ${state_dir}
+	squid_configtest
 }
 
 load_rc_config $name
