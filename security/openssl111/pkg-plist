@@ -1041,10 +1041,10 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EC_GROUP_get_asn1_flag.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_basis_type.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_cofactor.3.gz
+%%MAN3%%man/man3/EC_GROUP_get_curve.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_curve_GF2m.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_curve_GFp.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_curve_name.3.gz
-%%MAN3%%man/man3/EC_GROUP_get_curve.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_degree.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_ecparameters.3.gz
 %%MAN3%%man/man3/EC_GROUP_get_ecpkparameters.3.gz
@@ -1064,10 +1064,10 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EC_GROUP_order_bits.3.gz
 %%MAN3%%man/man3/EC_GROUP_precompute_mult.3.gz
 %%MAN3%%man/man3/EC_GROUP_set_asn1_flag.3.gz
+%%MAN3%%man/man3/EC_GROUP_set_curve.3.gz
 %%MAN3%%man/man3/EC_GROUP_set_curve_GF2m.3.gz
 %%MAN3%%man/man3/EC_GROUP_set_curve_GFp.3.gz
 %%MAN3%%man/man3/EC_GROUP_set_curve_name.3.gz
-%%MAN3%%man/man3/EC_GROUP_set_curve.3.gz
 %%MAN3%%man/man3/EC_GROUP_set_generator.3.gz
 %%MAN3%%man/man3/EC_GROUP_set_point_conversion_form.3.gz
 %%MAN3%%man/man3/EC_GROUP_set_seed.3.gz
@@ -1116,9 +1116,9 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EC_POINT_dup.3.gz
 %%MAN3%%man/man3/EC_POINT_free.3.gz
 %%MAN3%%man/man3/EC_POINT_get_Jprojective_coordinates_GFp.3.gz
+%%MAN3%%man/man3/EC_POINT_get_affine_coordinates.3.gz
 %%MAN3%%man/man3/EC_POINT_get_affine_coordinates_GF2m.3.gz
 %%MAN3%%man/man3/EC_POINT_get_affine_coordinates_GFp.3.gz
-%%MAN3%%man/man3/EC_POINT_get_affine_coordinates.3.gz
 %%MAN3%%man/man3/EC_POINT_hex2point.3.gz
 %%MAN3%%man/man3/EC_POINT_invert.3.gz
 %%MAN3%%man/man3/EC_POINT_is_at_infinity.3.gz
@@ -1133,12 +1133,12 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EC_POINT_point2hex.3.gz
 %%MAN3%%man/man3/EC_POINT_point2oct.3.gz
 %%MAN3%%man/man3/EC_POINT_set_Jprojective_coordinates_GFp.3.gz
+%%MAN3%%man/man3/EC_POINT_set_affine_coordinates.3.gz
 %%MAN3%%man/man3/EC_POINT_set_affine_coordinates_GF2m.3.gz
 %%MAN3%%man/man3/EC_POINT_set_affine_coordinates_GFp.3.gz
-%%MAN3%%man/man3/EC_POINT_set_affine_coordinates.3.gz
+%%MAN3%%man/man3/EC_POINT_set_compressed_coordinates.3.gz
 %%MAN3%%man/man3/EC_POINT_set_compressed_coordinates_GF2m.3.gz
 %%MAN3%%man/man3/EC_POINT_set_compressed_coordinates_GFp.3.gz
-%%MAN3%%man/man3/EC_POINT_set_compressed_coordinates.3.gz
 %%MAN3%%man/man3/EC_POINT_set_to_infinity.3.gz
 %%MAN3%%man/man3/EC_POINTs_make_affine.3.gz
 %%MAN3%%man/man3/EC_POINTs_mul.3.gz
@@ -1375,11 +1375,12 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EVP_MD_CTX_copy_ex.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_ctrl.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_free.3.gz
-%%MAN3%%man/man3/EVP_MD_CTX_md_data.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_md.3.gz
+%%MAN3%%man/man3/EVP_MD_CTX_md_data.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_new.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_reset.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_set_flags.3.gz
+%%MAN3%%man/man3/EVP_MD_CTX_set_pkey_ctx.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_size.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_test_flags.3.gz
 %%MAN3%%man/man3/EVP_MD_CTX_type.3.gz
@@ -1420,6 +1421,8 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_ctrl_str.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_dup.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_free.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_get1_id.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_get1_id_len.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_get_app_data.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_get_cb.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_get_keygen_info.3.gz
@@ -1429,6 +1432,7 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_new_id.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_hkdf_key.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_hkdf_salt.3.gz
+%%MAN3%%man/man3/EVP_PKEY_CTX_set1_id.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_pbe_pass.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_scrypt_salt.3.gz
 %%MAN3%%man/man3/EVP_PKEY_CTX_set1_tls1_prf_secret.3.gz
@@ -1529,6 +1533,7 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_get_ctrl.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_get_decrypt.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_get_derive.3.gz
+%%MAN3%%man/man3/EVP_PKEY_meth_get_digest_custom.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_get_encrypt.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_get_init.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_get_keygen.3.gz
@@ -1548,6 +1553,7 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_set_ctrl.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_set_decrypt.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_set_derive.3.gz
+%%MAN3%%man/man3/EVP_PKEY_meth_set_digest_custom.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_set_encrypt.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_set_init.3.gz
 %%MAN3%%man/man3/EVP_PKEY_meth_set_keygen.3.gz
@@ -1927,7 +1933,10 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/OCSP_resp_get0_certs.3.gz
 %%MAN3%%man/man3/OCSP_resp_get0_id.3.gz
 %%MAN3%%man/man3/OCSP_resp_get0_produced_at.3.gz
+%%MAN3%%man/man3/OCSP_resp_get0_respdata.3.gz
+%%MAN3%%man/man3/OCSP_resp_get0_signature.3.gz
 %%MAN3%%man/man3/OCSP_resp_get0_signer.3.gz
+%%MAN3%%man/man3/OCSP_resp_get0_tbs_sigalg.3.gz
 %%MAN3%%man/man3/OCSP_resp_get1_id.3.gz
 %%MAN3%%man/man3/OCSP_response_create.3.gz
 %%MAN3%%man/man3/OCSP_response_get1_basic.3.gz
@@ -2497,8 +2506,8 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/SSL_CONF_cmd_argv.3.gz
 %%MAN3%%man/man3/SSL_CONF_cmd_value_type.3.gz
 %%MAN3%%man/man3/SSL_CTX_add0_chain_cert.3.gz
-%%MAN3%%man/man3/SSL_CTX_add1_CA_list.3.gz
 %%MAN3%%man/man3/SSL_CTX_add1_chain_cert.3.gz
+%%MAN3%%man/man3/SSL_CTX_add1_to_CA_list.3.gz
 %%MAN3%%man/man3/SSL_CTX_add_client_CA.3.gz
 %%MAN3%%man/man3/SSL_CTX_add_client_custom_ext.3.gz
 %%MAN3%%man/man3/SSL_CTX_add_custom_ext.3.gz
@@ -2732,9 +2741,9 @@ man/man1/x509.1.gz
 %%MAN3%%man/man3/SSL_SESSION_up_ref.3.gz
 %%MAN3%%man/man3/SSL_accept.3.gz
 %%MAN3%%man/man3/SSL_add0_chain_cert.3.gz
-%%MAN3%%man/man3/SSL_add1_CA_list.3.gz
 %%MAN3%%man/man3/SSL_add1_chain_cert.3.gz
 %%MAN3%%man/man3/SSL_add1_host.3.gz
+%%MAN3%%man/man3/SSL_add1_to_CA_list.3.gz
 %%MAN3%%man/man3/SSL_add_client_CA.3.gz
 %%MAN3%%man/man3/SSL_alert_desc_string.3.gz
 %%MAN3%%man/man3/SSL_alert_desc_string_long.3.gz
@@ -3937,6 +3946,7 @@ man/man7/Ed448.7.gz
 man/man7/RAND.7.gz
 man/man7/RAND_DRBG.7.gz
 man/man7/RSA-PSS.7.gz
+man/man7/SM2.7.gz
 man/man7/X25519.7.gz
 man/man7/X448.7.gz
 man/man7/bio.7.gz
