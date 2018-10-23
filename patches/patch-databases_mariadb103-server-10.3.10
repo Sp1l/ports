@@ -1,0 +1,439 @@
+Index: mariadb103-client/Makefile
+===================================================================
+--- mariadb103-client/Makefile	(revision 482478)
++++ mariadb103-client/Makefile	(working copy)
+@@ -7,8 +7,6 @@
+ 
+ COMMENT=	Multithreaded SQL database (client)
+ 
+-BROKEN_aarch64=		fails to link: missing sbrk
+-
+ MASTERDIR=	${.CURDIR}/../mariadb103-server
+ 
+ FILESDIR=	${.CURDIR}/files
+Index: mariadb103-client/files/patch-MDEV-15961
+===================================================================
+--- mariadb103-client/files/patch-MDEV-15961	(revision 477320)
++++ mariadb103-client/files/patch-MDEV-15961	(working copy)
+@@ -1,4 +1,4 @@
+---- mysys/stacktrace.c.orig	2018-03-26 16:41:18 UTC
++--- mysys/stacktrace.c.orig	2018-07-02 07:34:11 UTC
+ +++ mysys/stacktrace.c
+ @@ -34,19 +34,19 @@
+  #include <execinfo.h>
+@@ -28,7 +28,7 @@
+  #ifdef __linux__
+ @@ -149,15 +149,16 @@ static int safe_print_str(const char *ad
+  
+- int my_safe_print_str(const char* val, int max_len)
++ int my_safe_print_str(const char* val, size_t max_len)
+  {
+ +#ifdef __linux__
+ +/* Only needed by the linux version of PTR_SANE */
+Index: mariadb103-client/pkg-plist
+===================================================================
+--- mariadb103-client/pkg-plist	(revision 482478)
++++ mariadb103-client/pkg-plist	(working copy)
+@@ -2,13 +2,10 @@
+ bin/msql2mysql
+ bin/mysql
+ bin/mysql_config
+-bin/mysql_convert_table_format
+ bin/mysql_find_rows
+ @comment bin/mysql_install_db
+ @comment bin/mysql_plugin
+ @comment bin/mysql_secure_installation
+-bin/mysql_setpermission
+-bin/mysql_upgrade
+ bin/mysql_waitpid
+ @comment bin/mysqld_safe_helper
+ bin/mysqlaccess
+@@ -16,17 +13,15 @@
+ bin/mysqlbinlog
+ bin/mysqlcheck
+ bin/mysqldump
+-bin/mysqlhotcopy
+ bin/mysqlimport
+ bin/mysqlshow
+ bin/mysqlslap
+ bin/mysqltest
+-bin/my_print_defaults
+ @comment bin/mytop
+ @comment bin/perror
+-bin/replace
+ @comment bin/resolve_stack_dump
+ @comment bin/resolveip
++@comment bin/wsrep_sst_rsync_wan
+ include/mysql/errmsg.h
+ include/mysql/ma_list.h
+ include/mysql/ma_pvio.h
+@@ -70,7 +65,9 @@
+ @comment man/man1/galera_recovery.1.gz
+ @comment man/man1/innochecksum.1.gz
+ @comment man/man1/mariadb-service-convert.1.gz
++@comment man/man1/mariabackup.1.gz
+ man/man1/msql2mysql.1.gz
++@comment man/man1/mbstream.1.gz
+ man/man1/my_print_defaults.1.gz
+ man/man1/my_safe_process.1.gz
+ @comment man/man1/myisam_ftdump.1.gz
+@@ -85,9 +82,11 @@
+ man/man1/mysql_client_test_embedded.1.gz
+ man/man1/mysql_config.1.gz
+ man/man1/mysql_convert_table_format.1.gz
++@comment man/man1/mysql_embedded.1.gz
+ man/man1/mysql_find_rows.1.gz
+ @comment man/man1/mysql_fix_extensions.1.gz
+ @comment man/man1/mysql_install_db.1.gz
++@comment man/man1/mysql_ldb.1.gz
+ man/man1/mysql_plugin.1.gz
+ @comment man/man1/mysql_secure_installation.1.gz
+ man/man1/mysql_setpermission.1.gz
+@@ -114,10 +113,13 @@
+ @comment man/man1/resolve_stack_dump.1.gz
+ @comment man/man1/resolveip.1.gz
+ @comment man/man1/tokuft_logdump.1.gz
++man/man1/tokuft_logprint.1.gz
+ @comment man/man1/tokuftdump.1.gz
+ @comment man/man1/wsrep_sst_common.1.gz
++@comment man/man1/wsrep_sst_mariabackup.1.gz
+ @comment man/man1/wsrep_sst_mysqldump.1.gz
+ @comment man/man1/wsrep_sst_rsync.1.gz
++@comment man/man1/wsrep_sst_rsync_wan.1.gz
+ @comment man/man1/wsrep_sst_xtrabackup-v2.1.gz
+ @comment man/man1/wsrep_sst_xtrabackup.1.gz
+ @comment man/man8/mysqld.8.gz
+@@ -148,31 +150,6 @@
+ %%DATADIR%%/charsets/macce.xml
+ %%DATADIR%%/charsets/macroman.xml
+ %%DATADIR%%/charsets/swe7.xml
+-%%DATADIR%%/czech/errmsg.sys
+-%%DATADIR%%/danish/errmsg.sys
+-%%DATADIR%%/dutch/errmsg.sys
+-%%DATADIR%%/english/errmsg.sys
+-%%DATADIR%%/errmsg-utf8.txt
+-%%DATADIR%%/estonian/errmsg.sys
+-%%DATADIR%%/french/errmsg.sys
+-%%DATADIR%%/german/errmsg.sys
+-%%DATADIR%%/greek/errmsg.sys
+-%%DATADIR%%/hindi/errmsg.sys
+-%%DATADIR%%/hungarian/errmsg.sys
+-%%DATADIR%%/italian/errmsg.sys
+-%%DATADIR%%/japanese/errmsg.sys
+-%%DATADIR%%/korean/errmsg.sys
+-%%DATADIR%%/norwegian-ny/errmsg.sys
+-%%DATADIR%%/norwegian/errmsg.sys
+-%%DATADIR%%/polish/errmsg.sys
+-%%DATADIR%%/portuguese/errmsg.sys
+-%%DATADIR%%/romanian/errmsg.sys
+-%%DATADIR%%/russian/errmsg.sys
+-%%DATADIR%%/serbian/errmsg.sys
+-%%DATADIR%%/slovak/errmsg.sys
+-%%DATADIR%%/spanish/errmsg.sys
+-%%DATADIR%%/swedish/errmsg.sys
+-%%DATADIR%%/ukrainian/errmsg.sys
+ @comment %%DATADIR%%/binary-configure
+ @comment %%DATADIR%%/fill_help_tables.sql
+ @comment %%DATADIR%%/magic
+Index: mariadb103-server/Makefile
+===================================================================
+--- mariadb103-server/Makefile	(revision 482478)
++++ mariadb103-server/Makefile	(working copy)
+@@ -2,8 +2,8 @@
+ # $FreeBSD$
+ 
+ PORTNAME?=	mariadb
+-PORTVERSION=	10.3.8
+-PORTREVISION?=	2
++PORTVERSION=	10.3.10
++PORTREVISION?=	0
+ CATEGORIES=	databases ipv6
+ MASTER_SITES=	http://mirrors.supportex.net/${SITESDIR}/ \
+ 		http://mirror2.hs-esslingen.de/pub/Mirrors/${SITESDIR}/ \
+@@ -41,7 +41,8 @@
+ # MySQL-Server options
+ OPTIONS_DEFAULT+=	CONNECT_EXTRA INNOBASE SPHINX SPIDER WSREP
+ OPTIONS_GROUP=		COMPRESSION ENGINES GROONGA
+-OPTIONS_DEFINE=		CONNECT_EXTRA WSREP DOCS
++OPTIONS_DEFINE=		CONNECT_EXTRA DOCS
++OPTIONS_DEFINE_amd64=	WSREP
+ OPTIONS_GROUP_COMPRESSION=	LZ4 LZO SNAPPY ZSTD
+ OPTIONS_GROUP_ENGINES=	INNOBASE MROONGA OQGRAPH ROCKSDB SPHINX SPIDER TOKUDB XTRADB
+ OPTIONS_GROUP_GROONGA=	ZMQ MSGPACK
+@@ -120,9 +121,6 @@
+ GSSAPI_NONE_CMAKE_ON=	-DPLUGIN_AUTH_GSSAPI_CLIENT=OFF
+ .else
+ # MySQL-Server part
+-NOT_FOR_ARCHS=		i386
+-NOT_FOR_ARCHS_REASON=	currently does not compile on i386, see \
+-			https://jira.mariadb.org/browse/MDEV-9627
+ USES+=		mysql:103m
+ USE_LDCONFIG+=	${PREFIX}/lib/mysql/plugin
+ USE_RC_SUBR=	mysql-server
+@@ -135,8 +133,7 @@
+ 		-DWITHOUT_CLIENT=1
+ 
+ .for ENGINE in ${OPTIONS_GROUP_ENGINES:NINNOBASE}
+-${ENGINE}_CMAKE_OFF=	-DPLUGIN_${ENGINE}=NO \
+-			-DWITHOUT_${ENGINE}=1
++${ENGINE}_CMAKE_OFF=	-DPLUGIN_${ENGINE}=NO
+ ${ENGINE}_CMAKE_ON=	-DPLUGIN_${ENGINE}=DYNAMIC
+ .endfor
+ INNOBASE_CMAKE_OFF=	-DPLUGIN_INNOBASE=NO -DWITHOUT_INNOBASE=1
+@@ -162,10 +159,19 @@
+ TOKUDB_PORTDOCS=	README.md
+ TOKUDB_VARS=		LICENSE+=PerconaFT LICENSE_COMB=multi
+ WSREP_CMAKE_OFF=	-DWITH_WSREP=OFF
++WSREP_LIB_DEPENDS=	libgalera.so:databases/galera
+ ZMQ_LIB_DEPENDS=	libzmq.so:net/libzmq4
+ ZSTD_CMAKE_ON=		-DWITH_ROCKSDB_ZSTD=ON
+ ZSTD_LIB_DEPENDS=	libzstd.so:archivers/zstd
+ 
++.include <bsd.port.options.mk>
++
++.if ${OPSYS} == FreeBSD && ${OSVERSION} >= 1200057
++SUB_LIST+=	LEGACY_LIMITS="@comment " MODERN_LIMITS=""
++.else
++SUB_LIST+=	LEGACY_LIMITS="" MODERN_LIMITS="@comment "
++.endif
++
+ post-install:
+ 	${RM} -r ${STAGEDIR}${PREFIX}/share/mysql/policy
+ 	${RM} -r ${STAGEDIR}${PREFIX}/include/mysql/server/private
+@@ -178,12 +184,16 @@
+ 
+ .include <bsd.port.pre.mk>
+ 
++.if ${ARCH} != amd64
++PLIST_SUB+=	WSREP="@comment "
++.endif
++
+ .if ${OPSYS} == DragonFly
+ CMAKE_ARGS+=	-DWITHOUT_TOKUDB
+ .endif
+ 
+ post-patch:
+-	${REINPLACE_CMD} 's|%%PREFIX%%|${PREFIX}|g' ${WRKSRC}/mysys/my_default.c
++	${REINPLACE_CMD} 's|/etc|${PREFIX}/etc|g' ${WRKSRC}/mysys/my_default.c
+ 	${REINPLACE_CMD} 's|%%LOCALBASE%%|${LOCALBASE}|g' ${WRKSRC}/scripts/mysql_config.sh \
+ 		${WRKSRC}/storage/tokudb/PerconaFT/cmake_modules/TokuThirdParty.cmake
+ .if ${OPSYS} == DragonFly
+Index: mariadb103-server/distinfo
+===================================================================
+--- mariadb103-server/distinfo	(revision 482478)
++++ mariadb103-server/distinfo	(working copy)
+@@ -1,3 +1,3 @@
+-TIMESTAMP = 1531382110
+-SHA256 (mariadb-10.3.8.tar.gz) = 30bec17514d12d811a05757be46bd41724df28002cdec550d5c757b0b3f31ab8
+-SIZE (mariadb-10.3.8.tar.gz) = 72152953
++TIMESTAMP = 1538732181
++SHA256 (mariadb-10.3.10.tar.gz) = 57767c048982811c7ab21d8527f6f36aa897386e8c7235f11b5505a924d68eda
++SIZE (mariadb-10.3.10.tar.gz) = 70493771
+Index: mariadb103-server/files/mysql-server.in
+===================================================================
+--- mariadb103-server/files/mysql-server.in	(revision 482478)
++++ mariadb103-server/files/mysql-server.in	(working copy)
+@@ -9,9 +9,9 @@
+ # Add the following line to /etc/rc.conf to enable mysql:
+ # mysql_(instance_)?enable (bool):	Set to "NO" by default.
+ #			Set it to "YES" to enable MySQL.
+-# mysql_(instance_)?limits (bool):	Set to "NO" by default.
+-#			Set it to yes to run `limits -e -U mysql`
+-#			just before mysql starts.
++%%LEGACY_LIMITS%%# mysql_(instance_)?limits (bool):	Set to "NO" by default.
++%%LEGACY_LIMITS%%#			Set it to yes to run `limits -e -U mysql`
++%%LEGACY_LIMITS%%#			just before mysql starts.
+ # mysql_(instance_)?dbdir (str):	Default to "/var/db/mysql"
+ #			Base database directory.
+ # mysql_(instance_)?args (str):	Custom additional arguments to be passed
+@@ -33,9 +33,9 @@
+ load_rc_config $name
+ 
+ : ${mysql_enable="NO"}
+-: ${mysql_limits="NO"}
++%%LEGACY_LIMITS%%: ${mysql_limits="NO"}
+ : ${mysql_user="mysql"}
+-: ${mysql_limits_args="-e -U $mysql_user"}
++%%LEGACY_LIMITS%%mysql_limits_args="-e -U ${mysql_user}"
+ : ${mysql_dbdir="/var/db/mysql"}
+ : ${mysql_optfile="${mysql_dbdir}/my.cnf"}
+ 
+@@ -51,9 +51,9 @@
+ 	"$2 "*|*" $2 "*|*" $2"|"$2")
+ 		eval mysql_args="\${mysql_${instance}_args:-\"${mysql_args}\"}"
+ 		eval mysql_dbdir="\${mysql_${instance}_dbdir:-\"/var/db/mysql_${instance}\"}"
+-		eval mysql_limits="\${mysql_${instance}_limits:-\"${mysql_limits}\"}"
++		%%LEGACY_LIMITS%%eval mysql_limits="\${mysql_${instance}_limits:-\"${mysql_limits}\"}"
+ 		eval mysql_user="\${mysql_${instance}_user:-\"${mysql_user}\"}"
+-		eval mysql_limits_args="\${mysql_${instance}_limits_args:-\"-e -U $mysql_user\"}"
++		%%LEGACY_LIMITS%%eval mysql_limits_args="\${mysql_${instance}_limits_args:-\"-e -U $mysql_user\"}"
+ 		eval mysql_optfile="\${mysql_${instance}_optfile:-\"${mysql_dbdir}/my.cnf\"}"
+ 		eval mysql_pidfile="\${mysql_${instance}_pidfile:-\"${mysql_dbdir}/`/bin/hostname`.pid\"}"
+ 	;;
+@@ -119,11 +119,12 @@
+ 	if [ ! -d "${mysql_dbdir}/mysql/." ]; then
+ 		mysql_create_auth_tables || return 1
+ 	fi
+-	if checkyesno mysql_limits; then
+-		eval `/usr/bin/limits ${mysql_limits_args:-"-e -U $mysql_user"}` 2>/dev/null
+-	else
+-		return 0
+-	fi
++%%LEGACY_LIMITS%%	if checkyesno mysql_limits; then
++%%LEGACY_LIMITS%%		eval `/usr/bin/limits ${mysql_limits_args}` 2>/dev/null
++%%LEGACY_LIMITS%%	else
++%%LEGACY_LIMITS%%		return 0
++%%LEGACY_LIMITS%%	fi
++%%MODERN_LIMITS%%	return 0
+ }
+ 
+ mysql_poststart()
+Index: mariadb103-server/files/patch-MDEV-15961
+===================================================================
+--- mariadb103-server/files/patch-MDEV-15961	(revision 477320)
++++ mariadb103-server/files/patch-MDEV-15961	(working copy)
+@@ -1,4 +1,4 @@
+---- mysys/stacktrace.c.orig	2018-03-26 16:41:18 UTC
++--- mysys/stacktrace.c.orig	2018-07-02 07:34:11 UTC
+ +++ mysys/stacktrace.c
+ @@ -34,19 +34,19 @@
+  #include <execinfo.h>
+@@ -28,7 +28,7 @@
+  #ifdef __linux__
+ @@ -149,15 +149,16 @@ static int safe_print_str(const char *ad
+  
+- int my_safe_print_str(const char* val, int max_len)
++ int my_safe_print_str(const char* val, size_t max_len)
+  {
+ +#ifdef __linux__
+ +/* Only needed by the linux version of PTR_SANE */
+Index: mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc
+===================================================================
+--- mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc	(revision 482478)
++++ mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc	(nonexistent)
+@@ -1,13 +0,0 @@
+-diff --git a/sql/semisync_master_ack_receiver.cc b/sql/semisync_master_ack_rece>
+-index ac17c7de40b..fc36ee35d5d 100644
+---- sql/semisync_master_ack_receiver.cc.orig
+-+++ sql/semisync_master_ack_receiver.cc
+-@@ -43,8 +43,7 @@ Ack_receiver::Ack_receiver()
+-   DBUG_ENTER("Ack_receiver::Ack_receiver");
+- 
+-   m_status= ST_DOWN;
+--  mysql_mutex_init(key_LOCK_ack_receiver, &m_mutex,
+--                   MY_MUTEX_INIT_FAST);
+-+  mysql_mutex_init(key_LOCK_ack_receiver, &m_mutex, NULL);
+-   mysql_cond_init(key_COND_ack_receiver, &m_cond, NULL);
+-   m_pid= 0;
+
+Property changes on: mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc
+___________________________________________________________________
+Deleted: fbsd:nokeywords
+## -1 +0,0 ##
+-yes
+\ No newline at end of property
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-text/plain
+\ No newline at end of property
+Index: mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake
+===================================================================
+--- mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake	(revision 482478)
++++ mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake	(working copy)
+@@ -1,6 +1,6 @@
+---- storage/rocksdb/build_rocksdb.cmake.orig	2018-06-25 11:13:28 UTC
++--- storage/rocksdb/build_rocksdb.cmake.orig	2018-10-02 09:45:43 UTC
+ +++ storage/rocksdb/build_rocksdb.cmake
+-@@ -69,15 +69,9 @@ if(ZSTD_FOUND AND (NOT WITH_ROCKSDB_ZSTD
++@@ -69,10 +69,6 @@ if(ZSTD_FOUND AND (NOT WITH_ROCKSDB_ZSTD
+    SET(CMAKE_REQUIRED_LIBRARIES zstd)
+    CHECK_FUNCTION_EXISTS(ZDICT_trainFromBuffer ZSTD_VALID)
+    UNSET(CMAKE_REQUIRED_LIBRARIES)
+@@ -8,11 +8,6 @@
+ -    MESSAGE(FATAL_ERROR
+ -      "WITH_ROCKSDB_ZSTD is ON and ZSTD library was found, but the version needs to be >= 1.1.3")
+ -  endif()
+--  if (ZSTD_VALID)
++   if (ZSTD_VALID)
+      add_definitions(-DZSTD)
+      include_directories(${ZSTD_INCLUDE_DIR})
+-     list(APPEND THIRDPARTY_LIBS ${ZSTD_LIBRARY})
+--  endif()
+- endif()
+- 
+- add_definitions(-DZLIB)
+Index: mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc
+===================================================================
+--- mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc	(revision 482478)
++++ mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc	(nonexistent)
+@@ -1,15 +0,0 @@
+---- storage/rocksdb/rocksdb/db/malloc_stats.cc.orig	2017-08-17 10:05:38 UTC
+-+++ storage/rocksdb/rocksdb/db/malloc_stats.cc
+-@@ -16,7 +16,12 @@
+- namespace rocksdb {
+- 
+- #ifdef ROCKSDB_JEMALLOC
+-+#ifdef __FreeBSD__
+-+#include <malloc_np.h>
+-+#define je_malloc_stats_print malloc_stats_print
+-+#else
+- #include "jemalloc/jemalloc.h"
+-+#endif
+- 
+- typedef struct {
+-   char* cur;
+
+Property changes on: mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc
+___________________________________________________________________
+Deleted: fbsd:nokeywords
+## -1 +0,0 ##
+-yes
+\ No newline at end of property
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-text/plain
+\ No newline at end of property
+Index: mariadb103-server/pkg-plist
+===================================================================
+--- mariadb103-server/pkg-plist	(revision 482478)
++++ mariadb103-server/pkg-plist	(working copy)
+@@ -206,6 +206,8 @@
+ man/man1/galera_recovery.1.gz
+ man/man1/innochecksum.1.gz
+ @comment man/man1/mariadb-service-convert.1.gz
++man/man1/mariabackup.1.gz
++man/man1/mbstream.1.gz
+ @comment man/man1/my_print_defaults.1.gz
+ man/man1/myisam_ftdump.1.gz
+ man/man1/myisamchk.1.gz
+@@ -214,6 +216,7 @@
+ man/man1/mysql.server.1.gz
+ @comment man/man1/mysql_convert_table_format.1.gz
+ man/man1/mysql_fix_extensions.1.gz
++%%ROCKSDB%%man/man1/mysql_ldb.1.gz
+ man/man1/mysql_install_db.1.gz
+ man/man1/mysql_secure_installation.1.gz
+ @comment man/man1/mysql_setpermission.1.gz
+@@ -229,11 +232,13 @@
+ @comment man/man1/replace.1.gz
+ man/man1/resolve_stack_dump.1.gz
+ man/man1/resolveip.1.gz
+-%%TOKUDB%%man/man1/tokuft_logdump.1.gz
++%%TOKUDB%%man/man1/tokuft_logprint.1.gz
+ %%TOKUDB%%man/man1/tokuftdump.1.gz
+ %%WSREP%%man/man1/wsrep_sst_common.1.gz
++%%WSREP%%man/man1/wsrep_sst_mariabackup.1.gz
+ %%WSREP%%man/man1/wsrep_sst_mysqldump.1.gz
+ %%WSREP%%man/man1/wsrep_sst_rsync.1.gz
++%%WSREP%%man/man1/wsrep_sst_rsync_wan.1.gz
+ %%WSREP%%man/man1/wsrep_sst_xtrabackup-v2.1.gz
+ %%WSREP%%man/man1/wsrep_sst_xtrabackup.1.gz
+ man/man8/mysqld.8.gz

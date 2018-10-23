@@ -1,4 +1,5 @@
-# $FreeBSD: head/databases/mariadb102-client/Makefile 459320 2018-01-18 09:54:32Z brnrd $
+# Created by: Bernard Spil <brnrd@FreeBSD.org>
+# $FreeBSD: head/databases/mariadb103-client/Makefile 473292 2018-06-25 05:07:26Z linimon $
 
 PORTNAME=	mariadb
 PORTREVISION=	0
@@ -27,14 +28,8 @@ post-configure:
 		${WRKSRC}/libmariadb/mariadb_config/mariadb_config.c
 
 post-install:
-	${RM} ${STAGEDIR}${PREFIX}/share/aclocal/mysql.m4 \
-		${STAGEDIR}${PREFIX}/man/man1/aria* \
-		${STAGEDIR}${PREFIX}/man/man1/myisam*
-	${RM} -r ${STAGEDIR}${PREFIX}/share/pkgconfig \
-		${STAGEDIR}${DATADIR}/policy \
+	${RM} -r ${STAGEDIR}${DATADIR}/policy \
 		${STAGEDIR}${PREFIX}/include/mysql/server
-	# Fix https://mariadb.atlassian.net/browse/MDEV-9388
-	@${REINPLACE_CMD} 's/-l-pthread/-lpthread/' ${STAGEDIR}${PREFIX}/bin/mysql_config
 
 post-install-GSSAPI_NONE:
 	${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/plugin/auth_gssapi_client.so

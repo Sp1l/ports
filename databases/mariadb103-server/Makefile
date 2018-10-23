@@ -1,7 +1,8 @@
-# $FreeBSD: head/databases/mariadb102-server/Makefile 459320 2018-01-18 09:54:32Z brnrd $
+# Created by: Bernard Spil <brnrd@FreeBSD.org>
+# $FreeBSD: head/databases/mariadb103-server/Makefile 480563 2018-09-24 09:49:21Z mat $
 
 PORTNAME?=	mariadb
-PORTVERSION=	10.3.8
+PORTVERSION=	10.3.10
 PORTREVISION?=	0
 CATEGORIES=	databases ipv6
 MASTER_SITES=	http://mirrors.supportex.net/${SITESDIR}/ \
@@ -22,8 +23,6 @@ LICENSE_NAME_PerconaFT=	PerconaFT patents license
 LICENSE_FILE_PerconaFT=	${WRKSRC}/storage/tokudb/PerconaFT/PATENTS
 LICENSE_PERMS_PerconaFT=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
-BROKEN_aarch64=		fails to link: stacktrace.c: undefined reference to 'sbrk'
-
 SUB_FILES=	pkg-message
 PKGMESSAGE=	${WRKDIR}/pkg-message
 
@@ -40,9 +39,10 @@ OPTIONS_DEFAULT=	GSSAPI_BASE
 
 .if !defined(CLIENT_ONLY)
 # MySQL-Server options
-OPTIONS_DEFAULT+=	CONNECT_EXTRA INNOBASE SPHINX SPIDER
+OPTIONS_DEFAULT+=	CONNECT_EXTRA INNOBASE SPHINX SPIDER WSREP
 OPTIONS_GROUP=		COMPRESSION ENGINES GROONGA
-OPTIONS_DEFINE=		CONNECT_EXTRA
+OPTIONS_DEFINE=		CONNECT_EXTRA DOCS
+OPTIONS_DEFINE_amd64=	WSREP
 OPTIONS_GROUP_COMPRESSION=	LZ4 LZO SNAPPY ZSTD
 OPTIONS_GROUP_ENGINES=	INNOBASE MROONGA OQGRAPH ROCKSDB SPHINX SPIDER TOKUDB XTRADB
 OPTIONS_GROUP_GROONGA=	ZMQ MSGPACK
@@ -60,6 +60,7 @@ ROCKSDB_DESC=	RocksDB LSM engine (Alpha)
 SPHINX_DESC=	SphinxSE engine
 SPIDER_DESC=	Partitioning and XA-transactions engine
 TOKUDB_DESC=	Fractal tree index tree data structure engine
+WSREP_DESC=	Build wsrep clustering
 XTRADB_DESC=	Build XtraDB engine next to InnoDB
 ZMQ_DESC=	ZeroMQ support
 ZSTD_DESC+=	Zstandard compression support (RocksDB only)
@@ -105,10 +106,6 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 
 DATADIR=	${PREFIX}/share/mysql
 
-.ifdef USE_MYSQL
-.error You have `USE_MYSQL' variable defined either in environment or in make(1) arguments. This leads to a circular dependency. Please undefine and try again.
-.endif
-
 CONFLICTS_INSTALL=	mariadb5*-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
 			mariadb10[0-24-9]-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
 			mysql[0-9]*-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
@@ -136,8 +133,7 @@ CMAKE_ARGS+=	-DWITH_EMBEDDED_SERVER="ON" \
 		-DWITHOUT_CLIENT=1
 
 .for ENGINE in ${OPTIONS_GROUP_ENGINES:NINNOBASE}
-${ENGINE}_CMAKE_OFF=	-DPLUGIN_${ENGINE}=NO \
-			-DWITHOUT_${ENGINE}=1
+${ENGINE}_CMAKE_OFF=	-DPLUGIN_${ENGINE}=NO
 ${ENGINE}_CMAKE_ON=	-DPLUGIN_${ENGINE}=DYNAMIC
 .endfor
 INNOBASE_CMAKE_OFF=	-DPLUGIN_INNOBASE=NO -DWITHOUT_INNOBASE=1
@@ -162,32 +158,24 @@ SNAPPY_LIB_DEPENDS=	libsnappy.so:archivers/snappy
 TOKUDB_IMPLIES=		SNAPPY
 TOKUDB_PORTDOCS=	README.md
 TOKUDB_VARS=		LICENSE+=PerconaFT LICENSE_COMB=multi
+WSREP_CMAKE_OFF=	-DWITH_WSREP=OFF
+WSREP_LIB_DEPENDS=	libgalera.so:databases/galera
 ZMQ_LIB_DEPENDS=	libzmq.so:net/libzmq4
 ZSTD_CMAKE_ON=		-DWITH_ROCKSDB_ZSTD=ON
 ZSTD_LIB_DEPENDS=	libzstd.so:archivers/zstd
 
-NOT_FOR_ARCHS=		i386
-NOT_FOR_ARCHS_REASON=	currently does not compile on i386, see \
-			https://jira.mariadb.org/browse/MDEV-9627
+.include <bsd.port.options.mk>
+
+.if ${OPSYS} == FreeBSD && ${OSVERSION} >= 1200057
+SUB_LIST+=	LEGACY_LIMITS="@comment " MODERN_LIMITS=""
+.else
+SUB_LIST+=	LEGACY_LIMITS="" MODERN_LIMITS="@comment "
+.endif
 
 post-install:
-# Remove programs to avoid conflict with mariadb102-client
-# These are "client" components, so there should be a switch that
-# prevents them from being installed but it's unknown right now
-	${RM} ${STAGEDIR}${PREFIX}/bin/msql2mysql \
-		${STAGEDIR}${PREFIX}/bin/mysql_config \
-		${STAGEDIR}${PREFIX}/bin/mysql_find_rows \
-		${STAGEDIR}${PREFIX}/bin/mysqlaccess
-	${RM} -r ${STAGEDIR}/${PREFIX}/share/mysql/policy \
-		${STAGEDIR}/${PREFIX}/share/pkgconfig
-	${RM} ${STAGEDIR}${LOCALBASE}/lib/mysql/libmysqlclient*
-	${RM} ${STAGEDIR}${LOCALBASE}/share/doc/mysql/COPYING \
-		${STAGEDIR}${LOCALBASE}/share/doc/mysql/COPYING.thirdparty \
-		${STAGEDIR}${LOCALBASE}/share/groonga-normalizer-mysql/lgpl-2.0.txt \
-		${STAGEDIR}${LOCALBASE}/share/groonga/COPYING \
-		${STAGEDIR}${LOCALBASE}/storage/groonga/COPYING \
-		${STAGEDIR}${LOCALBASE}/share/mysql/mroonga/COPYING
-	${RM} ${STAGEDIR}${PREFIX}/include/mysql/*.h
+	${RM} -r ${STAGEDIR}${PREFIX}/share/mysql/policy
+	${RM} -r ${STAGEDIR}${PREFIX}/include/mysql/server/private
+	${RM} -r `${FIND} ${STAGEDIR}${DATADIR} -type d -mindepth 1`
 .endif # defined(CLIENT_ONLY)
 
 .if defined(WITH_OPENSSL_PORT)
@@ -196,14 +184,18 @@ GSSAPI_BASE_IGNORE=	BASE_GSSAPI is not compatible with OpenSSL from ports. Use o
 
 .include <bsd.port.pre.mk>
 
+.if ${ARCH} != amd64
+PLIST_SUB+=	WSREP="@comment "
+.endif
+
 .if ${OPSYS} == DragonFly
 CMAKE_ARGS+=	-DWITHOUT_TOKUDB
 .endif
 
 post-patch:
-	${REINPLACE_CMD} 's/*.1/${MAN1}/' ${WRKSRC}/man/CMakeLists.txt
-	${REINPLACE_CMD} 's|%%PREFIX%%|${PREFIX}|g' ${WRKSRC}/mysys/my_default.c
-	${REINPLACE_CMD} 's|%%LOCALBASE%%|${LOCALBASE}|g' ${WRKSRC}/scripts/mysql_config.sh
+	${REINPLACE_CMD} 's|/etc|${PREFIX}/etc|g' ${WRKSRC}/mysys/my_default.c
+	${REINPLACE_CMD} 's|%%LOCALBASE%%|${LOCALBASE}|g' ${WRKSRC}/scripts/mysql_config.sh \
+		${WRKSRC}/storage/tokudb/PerconaFT/cmake_modules/TokuThirdParty.cmake
 .if ${OPSYS} == DragonFly
 	${CP} ${WRKSRC}/cmake/os/FreeBSD.cmake \
 		${WRKSRC}/cmake/os/DragonFly.cmake
