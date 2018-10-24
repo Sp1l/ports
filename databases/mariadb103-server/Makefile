@@ -175,7 +175,7 @@ SUB_LIST+=	LEGACY_LIMITS="" MODERN_LIMITS="@comment "
 post-install:
 	${RM} -r ${STAGEDIR}${PREFIX}/share/mysql/policy
 	${RM} -r ${STAGEDIR}${PREFIX}/include/mysql/server/private
-	${RM} -r `${FIND} ${STAGEDIR}${DATADIR} -type d -mindepth 1`
+	${RM} -r ${STAGEDIR}${DATADIR}/charsets
 .endif # defined(CLIENT_ONLY)
 
 .if defined(WITH_OPENSSL_PORT)
