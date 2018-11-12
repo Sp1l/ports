@@ -68,7 +68,7 @@ lib/mysql/plugin/sha256_password.so
 @comment man/man1/mariabackup.1.gz
 man/man1/msql2mysql.1.gz
 @comment man/man1/mbstream.1.gz
-man/man1/my_print_defaults.1.gz
+@comment man/man1/my_print_defaults.1.gz
 man/man1/my_safe_process.1.gz
 @comment man/man1/myisam_ftdump.1.gz
 @comment man/man1/myisamchk.1.gz

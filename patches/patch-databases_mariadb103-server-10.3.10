@@ -1,7 +1,7 @@
-Index: mariadb103-client/Makefile
+Index: databases/mariadb103-client/Makefile
 ===================================================================
---- mariadb103-client/Makefile	(revision 482478)
-+++ mariadb103-client/Makefile	(working copy)
+--- databases/mariadb103-client/Makefile	(revision 482837)
++++ databases/mariadb103-client/Makefile	(working copy)
 @@ -7,8 +7,6 @@
  
  COMMENT=	Multithreaded SQL database (client)
@@ -11,10 +11,10 @@ Index: mariadb103-client/Makefile
  MASTERDIR=	${.CURDIR}/../mariadb103-server
  
  FILESDIR=	${.CURDIR}/files
-Index: mariadb103-client/files/patch-MDEV-15961
+Index: databases/mariadb103-client/files/patch-MDEV-15961
 ===================================================================
---- mariadb103-client/files/patch-MDEV-15961	(revision 477320)
-+++ mariadb103-client/files/patch-MDEV-15961	(working copy)
+--- databases/mariadb103-client/files/patch-MDEV-15961	(revision 477320)
++++ databases/mariadb103-client/files/patch-MDEV-15961	(working copy)
 @@ -1,4 +1,4 @@
 ---- mysys/stacktrace.c.orig	2018-03-26 16:41:18 UTC
 +--- mysys/stacktrace.c.orig	2018-07-02 07:34:11 UTC
@@ -30,10 +30,10 @@ Index: mariadb103-client/files/patch-MDEV-15961
   {
  +#ifdef __linux__
  +/* Only needed by the linux version of PTR_SANE */
-Index: mariadb103-client/pkg-plist
+Index: databases/mariadb103-client/pkg-plist
 ===================================================================
---- mariadb103-client/pkg-plist	(revision 482478)
-+++ mariadb103-client/pkg-plist	(working copy)
+--- databases/mariadb103-client/pkg-plist	(revision 482837)
++++ databases/mariadb103-client/pkg-plist	(working copy)
 @@ -2,13 +2,10 @@
  bin/msql2mysql
  bin/mysql
@@ -67,16 +67,18 @@ Index: mariadb103-client/pkg-plist
  include/mysql/errmsg.h
  include/mysql/ma_list.h
  include/mysql/ma_pvio.h
-@@ -70,7 +65,9 @@
+@@ -70,8 +65,10 @@
  @comment man/man1/galera_recovery.1.gz
  @comment man/man1/innochecksum.1.gz
  @comment man/man1/mariadb-service-convert.1.gz
 +@comment man/man1/mariabackup.1.gz
  man/man1/msql2mysql.1.gz
+-man/man1/my_print_defaults.1.gz
 +@comment man/man1/mbstream.1.gz
- man/man1/my_print_defaults.1.gz
++@comment man/man1/my_print_defaults.1.gz
  man/man1/my_safe_process.1.gz
  @comment man/man1/myisam_ftdump.1.gz
+ @comment man/man1/myisamchk.1.gz
 @@ -85,9 +82,11 @@
  man/man1/mysql_client_test_embedded.1.gz
  man/man1/mysql_config.1.gz
@@ -135,10 +137,10 @@ Index: mariadb103-client/pkg-plist
  @comment %%DATADIR%%/binary-configure
  @comment %%DATADIR%%/fill_help_tables.sql
  @comment %%DATADIR%%/magic
-Index: mariadb103-server/Makefile
+Index: databases/mariadb103-server/Makefile
 ===================================================================
---- mariadb103-server/Makefile	(revision 482478)
-+++ mariadb103-server/Makefile	(working copy)
+--- databases/mariadb103-server/Makefile	(revision 482837)
++++ databases/mariadb103-server/Makefile	(working copy)
 @@ -2,8 +2,8 @@
  # $FreeBSD$
  
@@ -180,7 +182,7 @@ Index: mariadb103-server/Makefile
  ${ENGINE}_CMAKE_ON=	-DPLUGIN_${ENGINE}=DYNAMIC
  .endfor
  INNOBASE_CMAKE_OFF=	-DPLUGIN_INNOBASE=NO -DWITHOUT_INNOBASE=1
-@@ -162,10 +159,19 @@
+@@ -162,14 +159,23 @@
  TOKUDB_PORTDOCS=	README.md
  TOKUDB_VARS=		LICENSE+=PerconaFT LICENSE_COMB=multi
  WSREP_CMAKE_OFF=	-DWITH_WSREP=OFF
@@ -200,7 +202,12 @@ Index: mariadb103-server/Makefile
  post-install:
  	${RM} -r ${STAGEDIR}${PREFIX}/share/mysql/policy
  	${RM} -r ${STAGEDIR}${PREFIX}/include/mysql/server/private
-@@ -178,12 +184,16 @@
+-	${RM} -r `${FIND} ${STAGEDIR}${DATADIR} -type d -mindepth 1`
++	${RM} -r ${STAGEDIR}${DATADIR}/charsets
+ .endif # defined(CLIENT_ONLY)
+ 
+ .if defined(WITH_OPENSSL_PORT)
+@@ -178,6 +184,10 @@
  
  .include <bsd.port.pre.mk>
  
@@ -211,17 +218,10 @@ Index: mariadb103-server/Makefile
  .if ${OPSYS} == DragonFly
  CMAKE_ARGS+=	-DWITHOUT_TOKUDB
  .endif
- 
- post-patch:
--	${REINPLACE_CMD} 's|%%PREFIX%%|${PREFIX}|g' ${WRKSRC}/mysys/my_default.c
-+	${REINPLACE_CMD} 's|/etc|${PREFIX}/etc|g' ${WRKSRC}/mysys/my_default.c
- 	${REINPLACE_CMD} 's|%%LOCALBASE%%|${LOCALBASE}|g' ${WRKSRC}/scripts/mysql_config.sh \
- 		${WRKSRC}/storage/tokudb/PerconaFT/cmake_modules/TokuThirdParty.cmake
- .if ${OPSYS} == DragonFly
-Index: mariadb103-server/distinfo
+Index: databases/mariadb103-server/distinfo
 ===================================================================
---- mariadb103-server/distinfo	(revision 482478)
-+++ mariadb103-server/distinfo	(working copy)
+--- databases/mariadb103-server/distinfo	(revision 482837)
++++ databases/mariadb103-server/distinfo	(working copy)
 @@ -1,3 +1,3 @@
 -TIMESTAMP = 1531382110
 -SHA256 (mariadb-10.3.8.tar.gz) = 30bec17514d12d811a05757be46bd41724df28002cdec550d5c757b0b3f31ab8
@@ -229,10 +229,10 @@ Index: mariadb103-server/distinfo
 +TIMESTAMP = 1538732181
 +SHA256 (mariadb-10.3.10.tar.gz) = 57767c048982811c7ab21d8527f6f36aa897386e8c7235f11b5505a924d68eda
 +SIZE (mariadb-10.3.10.tar.gz) = 70493771
-Index: mariadb103-server/files/mysql-server.in
+Index: databases/mariadb103-server/files/mysql-server.in
 ===================================================================
---- mariadb103-server/files/mysql-server.in	(revision 482478)
-+++ mariadb103-server/files/mysql-server.in	(working copy)
+--- databases/mariadb103-server/files/mysql-server.in	(revision 482837)
++++ databases/mariadb103-server/files/mysql-server.in	(working copy)
 @@ -9,9 +9,9 @@
  # Add the following line to /etc/rc.conf to enable mysql:
  # mysql_(instance_)?enable (bool):	Set to "NO" by default.
@@ -288,10 +288,10 @@ Index: mariadb103-server/files/mysql-server.in
  }
  
  mysql_poststart()
-Index: mariadb103-server/files/patch-MDEV-15961
+Index: databases/mariadb103-server/files/patch-MDEV-15961
 ===================================================================
---- mariadb103-server/files/patch-MDEV-15961	(revision 477320)
-+++ mariadb103-server/files/patch-MDEV-15961	(working copy)
+--- databases/mariadb103-server/files/patch-MDEV-15961	(revision 477320)
++++ databases/mariadb103-server/files/patch-MDEV-15961	(working copy)
 @@ -1,4 +1,4 @@
 ---- mysys/stacktrace.c.orig	2018-03-26 16:41:18 UTC
 +--- mysys/stacktrace.c.orig	2018-07-02 07:34:11 UTC
@@ -307,10 +307,58 @@ Index: mariadb103-server/files/patch-MDEV-15961
   {
  +#ifdef __linux__
  +/* Only needed by the linux version of PTR_SANE */
-Index: mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc
+Index: databases/mariadb103-server/files/patch-sql_CMakeLists.txt
 ===================================================================
---- mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc	(revision 482478)
-+++ mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc	(nonexistent)
+--- databases/mariadb103-server/files/patch-sql_CMakeLists.txt	(revision 482837)
++++ databases/mariadb103-server/files/patch-sql_CMakeLists.txt	(nonexistent)
+@@ -1,28 +0,0 @@
+---- sql/CMakeLists.txt.orig	2017-08-17 10:05:40 UTC
+-+++ sql/CMakeLists.txt
+-@@ -386,6 +386,7 @@ ADD_CUSTOM_TARGET(distclean
+-   VERBATIM
+-   )
+- 
+-+IF(FALSE)
+- IF(INSTALL_LAYOUT STREQUAL "STANDALONE")
+- 
+- # Copy db.opt into data/test/
+-@@ -429,6 +430,7 @@ ELSE()
+-   INSTALL(FILES ${DUMMY_FILE} DESTINATION data/mysql COMPONENT DataFiles)
+- ENDIF(WIN32 AND MYSQLD_EXECUTABLE)
+- ENDIF(INSTALL_LAYOUT STREQUAL "STANDALONE")
+-+ENDIF()
+- 
+- IF(WIN32)
+-   SET(my_bootstrap_sql ${CMAKE_CURRENT_BINARY_DIR}/my_bootstrap.sql)
+-@@ -472,7 +474,9 @@ IF(WIN32)
+-   TARGET_LINK_LIBRARIES(mysql_upgrade_service mysys winservice)
+- ENDIF(WIN32)
+- 
+-+IF(FALSE)
+- INSTALL(DIRECTORY . DESTINATION ${INSTALL_INCLUDEDIR}/server/private COMPONENT Development
+-   FILES_MATCHING PATTERN "*.h"
+-   PATTERN share EXCLUDE
+-   PATTERN CMakeFiles EXCLUDE)
+-+ENDIF()
+
+Property changes on: databases/mariadb103-server/files/patch-sql_CMakeLists.txt
+___________________________________________________________________
+Deleted: fbsd:nokeywords
+## -1 +0,0 ##
+-yes
+\ No newline at end of property
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-text/plain
+\ No newline at end of property
+Index: databases/mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc
+===================================================================
+--- databases/mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc	(revision 482837)
++++ databases/mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc	(nonexistent)
 @@ -1,13 +0,0 @@
 -diff --git a/sql/semisync_master_ack_receiver.cc b/sql/semisync_master_ack_rece>
 -index ac17c7de40b..fc36ee35d5d 100644
@@ -326,7 +374,7 @@ Index: mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc
 -   mysql_cond_init(key_COND_ack_receiver, &m_cond, NULL);
 -   m_pid= 0;
 
-Property changes on: mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc
+Property changes on: databases/mariadb103-server/files/patch-sql_semisync__master__ack__receiver.cc
 ___________________________________________________________________
 Deleted: fbsd:nokeywords
 ## -1 +0,0 ##
@@ -340,10 +388,47 @@ Deleted: svn:mime-type
 ## -1 +0,0 ##
 -text/plain
 \ No newline at end of property
-Index: mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake
+Index: databases/mariadb103-server/files/patch-sql_share_CMakeLists.txt
 ===================================================================
---- mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake	(revision 482478)
-+++ mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake	(working copy)
+--- databases/mariadb103-server/files/patch-sql_share_CMakeLists.txt	(revision 482837)
++++ databases/mariadb103-server/files/patch-sql_share_CMakeLists.txt	(nonexistent)
+@@ -1,17 +0,0 @@
+---- sql/share/CMakeLists.txt.orig	2017-05-14 23:13:18 UTC
+-+++ sql/share/CMakeLists.txt
+-@@ -14,6 +14,8 @@
+- # along with this program; if not, write to the Free Software
+- # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+- 
+-+IF(FALSE)
+-+
+- SET (dirs 
+- danish
+- german 
+-@@ -53,3 +55,5 @@ INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE
+- )
+- 
+- INSTALL(FILES ${files} DESTINATION ${INSTALL_MYSQLSHAREDIR} COMPONENT Server)
+-+
+-+ENDIF()
+
+Property changes on: databases/mariadb103-server/files/patch-sql_share_CMakeLists.txt
+___________________________________________________________________
+Deleted: fbsd:nokeywords
+## -1 +0,0 ##
+-yes
+\ No newline at end of property
+Deleted: svn:eol-style
+## -1 +0,0 ##
+-native
+\ No newline at end of property
+Deleted: svn:mime-type
+## -1 +0,0 ##
+-text/plain
+\ No newline at end of property
+Index: databases/mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake
+===================================================================
+--- databases/mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake	(revision 482837)
++++ databases/mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake	(working copy)
 @@ -1,6 +1,6 @@
 ---- storage/rocksdb/build_rocksdb.cmake.orig	2018-06-25 11:13:28 UTC
 +--- storage/rocksdb/build_rocksdb.cmake.orig	2018-10-02 09:45:43 UTC
@@ -366,10 +451,10 @@ Index: mariadb103-server/files/patch-storage_rocksdb_build__rocksdb.cmake
 - endif()
 - 
 - add_definitions(-DZLIB)
-Index: mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc
+Index: databases/mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc
 ===================================================================
---- mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc	(revision 482478)
-+++ mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc	(nonexistent)
+--- databases/mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc	(revision 482837)
++++ databases/mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc	(nonexistent)
 @@ -1,15 +0,0 @@
 ---- storage/rocksdb/rocksdb/db/malloc_stats.cc.orig	2017-08-17 10:05:38 UTC
 -+++ storage/rocksdb/rocksdb/db/malloc_stats.cc
@@ -387,7 +472,7 @@ Index: mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc
 - typedef struct {
 -   char* cur;
 
-Property changes on: mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc
+Property changes on: databases/mariadb103-server/files/patch-storage_rocksdb_rocksdb_db_malloc__stats.cc
 ___________________________________________________________________
 Deleted: fbsd:nokeywords
 ## -1 +0,0 ##
@@ -401,20 +486,39 @@ Deleted: svn:mime-type
 ## -1 +0,0 ##
 -text/plain
 \ No newline at end of property
-Index: mariadb103-server/pkg-plist
+Index: databases/mariadb103-server/pkg-plist
 ===================================================================
---- mariadb103-server/pkg-plist	(revision 482478)
-+++ mariadb103-server/pkg-plist	(working copy)
-@@ -206,6 +206,8 @@
+--- databases/mariadb103-server/pkg-plist	(revision 482837)
++++ databases/mariadb103-server/pkg-plist	(working copy)
+@@ -7,7 +7,7 @@
+ bin/mariabackup
+ bin/mbstream
+ @comment bin/msql2mysql
+-@comment bin/my_print_defaults
++bin/my_print_defaults
+ bin/myisam_ftdump
+ bin/myisamchk
+ bin/myisamlog
+@@ -51,6 +51,7 @@
+ %%WSREP%%bin/wsrep_sst_rsync_wan
+ %%WSREP%%bin/wsrep_sst_xtrabackup
+ %%WSREP%%bin/wsrep_sst_xtrabackup-v2
++@comment data/test/db.opt
+ @comment include/mysql/my_config.h
+ @comment include/mysql/my_global.h
+ @comment include/mysql/my_sys.h
+@@ -206,7 +207,9 @@
  man/man1/galera_recovery.1.gz
  man/man1/innochecksum.1.gz
  @comment man/man1/mariadb-service-convert.1.gz
+-@comment man/man1/my_print_defaults.1.gz
 +man/man1/mariabackup.1.gz
 +man/man1/mbstream.1.gz
- @comment man/man1/my_print_defaults.1.gz
++man/man1/my_print_defaults.1.gz
  man/man1/myisam_ftdump.1.gz
  man/man1/myisamchk.1.gz
-@@ -214,6 +216,7 @@
+ man/man1/myisamlog.1.gz
+@@ -214,6 +217,7 @@
  man/man1/mysql.server.1.gz
  @comment man/man1/mysql_convert_table_format.1.gz
  man/man1/mysql_fix_extensions.1.gz
@@ -422,7 +526,7 @@ Index: mariadb103-server/pkg-plist
  man/man1/mysql_install_db.1.gz
  man/man1/mysql_secure_installation.1.gz
  @comment man/man1/mysql_setpermission.1.gz
-@@ -229,11 +232,13 @@
+@@ -229,11 +233,13 @@
  @comment man/man1/replace.1.gz
  man/man1/resolve_stack_dump.1.gz
  man/man1/resolveip.1.gz
@@ -437,3 +541,35 @@ Index: mariadb103-server/pkg-plist
  %%WSREP%%man/man1/wsrep_sst_xtrabackup-v2.1.gz
  %%WSREP%%man/man1/wsrep_sst_xtrabackup.1.gz
  man/man8/mysqld.8.gz
+@@ -252,6 +258,31 @@
+ %%DATADIR%%/mysql_test_db.sql
+ %%DATADIR%%/mysql_to_mariadb.sql
+ %%DATADIR%%/mysqld_multi.server
++%%DATADIR%%/czech/errmsg.sys
++%%DATADIR%%/danish/errmsg.sys
++%%DATADIR%%/dutch/errmsg.sys
++%%DATADIR%%/english/errmsg.sys
++%%DATADIR%%/errmsg-utf8.txt
++%%DATADIR%%/estonian/errmsg.sys
++%%DATADIR%%/french/errmsg.sys
++%%DATADIR%%/german/errmsg.sys
++%%DATADIR%%/greek/errmsg.sys
++%%DATADIR%%/hindi/errmsg.sys
++%%DATADIR%%/hungarian/errmsg.sys
++%%DATADIR%%/italian/errmsg.sys
++%%DATADIR%%/japanese/errmsg.sys
++%%DATADIR%%/korean/errmsg.sys
++%%DATADIR%%/norwegian-ny/errmsg.sys
++%%DATADIR%%/norwegian/errmsg.sys
++%%DATADIR%%/polish/errmsg.sys
++%%DATADIR%%/portuguese/errmsg.sys
++%%DATADIR%%/romanian/errmsg.sys
++%%DATADIR%%/russian/errmsg.sys
++%%DATADIR%%/serbian/errmsg.sys
++%%DATADIR%%/slovak/errmsg.sys
++%%DATADIR%%/spanish/errmsg.sys
++%%DATADIR%%/swedish/errmsg.sys
++%%DATADIR%%/ukrainian/errmsg.sys
+ %%WSREP%%%%DATADIR%%/wsrep.cnf
+ %%WSREP%%%%DATADIR%%/wsrep_notify
+ @comment %%DOCSDIR%%/COPYING
