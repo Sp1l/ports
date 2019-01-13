@@ -1,53 +1,81 @@
 # Created by: Ashish SHUKLA <ashish@FreeBSD.org>
-# $FreeBSD: head/mail/opensmtpd-devel/Makefile 378921 2015-02-13 11:51:06Z ashish $
+# $FreeBSD: head/mail/opensmtpd-devel/Makefile 488062 2018-12-22 03:44:37Z fluffy $
 
 PORTNAME=	opensmtpd
-PORTVERSION=	201502012312
-PORTREVISION=	1
+PORTVERSION=	201606220754
+DISTVERSIONSUFFIX=	p1
+PORTREVISION=	5
 PORTEPOCH=	1
 CATEGORIES=	mail
 MASTER_SITES=	http://www.opensmtpd.org/archives/ \
 		http://distfiles.pirateparty.in/ashish/
 PKGNAMESUFFIX=	-devel
-DISTNAME=	${PORTNAME}-${PORTVERSION}p1
 
-MAINTAINER=	ashish@FreeBSD.org
-COMMENT=	OpenSMTPD is a free MTA (development snapshot)
+MAINTAINER=	fluffy@FreeBSD.org
+COMMENT=	Security- and simplicity-focused SMTP server from OpenBSD
 
 LICENSE=	ISCL
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-LIB_DEPENDS=	libevent.so:${PORTSDIR}/devel/libevent2
+BROKEN_SSL=	openssl111
+BROKEN_SSL_REASON_openssl111=		Incompatible with Openssl 1.1.x yet
 
-OPTIONS_DEFINE=	CA_BUNDLE LIBASR
+LIB_DEPENDS=	libevent.so:devel/libevent
 
-OPTIONS_DEFAULT=	CA_BUNDLE PAM
+OPTIONS_DEFINE=		CA_BUNDLE LIBASR MAILERCONF PAM TABLE_DB
 
-CA_BUNDLE_DESC=	Install CA bundle for OpenSSL
-LIBASR_DESC=	Use stable version of libasr
+OPTIONS_DEFAULT=	CA_BUNDLE PAM TABLE_DB
 
+CA_BUNDLE_DESC=		Install CA bundle for SSL
+LIBASR_DESC=		Use stable version of libasr
+MAILERCONF_DESC=	Activate OpenSMTPD in mailer.conf(5)
+TABLE_DB_DESC=		Build table-db plugin (aliases)
+
+USES=		cpe groff libtool ssl
 GNU_CONFIGURE=	yes
-CONFIGURE_ARGS=	--with-libevent-dir=${LOCALBASE} --sysconfdir=${PREFIX}/etc/mail/ \
-		--with-mailwrapper --with-ssl-dir=${OPENSSLBASE}
+
+CPE_VENDOR=	openbsd
 
 USE_RC_SUBR=	smtpd
-SUB_FILES=	pkg-install pkg-deinstall
+SUB_FILES=	pkg-install pkg-deinstall pkg-message
 
 CONFLICTS_INSTALL=	postfix-[0-9]* sendmail-[0-9]* opensmtpd-[0-9]*
 
 USERS=		_smtpd _smtpq
-GROUPS=		_smtpd
+GROUPS=		_smtpd _smtpq
 
-LIBASR_LIB_DEPENDS_OFF=	libasr.so:${PORTSDIR}/dns/libasr-devel
-LIBASR_LIB_DEPENDS=	libasr.so:${PORTSDIR}/dns/libasr
+OPTIONS_SUB=	yes
 
-CA_BUNDLE_CONFIGURE_ON=	--with-ca-file=${LOCALBASE}/share/certs/ca-root-nss.crt
-CA_BUNDLE_RUN_DEPENDS=	${LOCALBASE}/share/certs/ca-root-nss.crt:${PORTSDIR}/security/ca_root_nss
+CA_BUNDLE_CONFIGURE_WITH=	path-CAfile=${LOCALBASE}/share/certs/ca-root-nss.crt
+CA_BUNDLE_RUN_DEPENDS=		${LOCALBASE}/share/certs/ca-root-nss.crt:security/ca_root_nss
 
-USE_OPENSSL=		yes
-WITH_OPENSSL_PORT=	yes
+LIBASR_LIB_DEPENDS=	libasr.so:dns/libasr
+LIBASR_LIB_DEPENDS_OFF=	libasr.so:dns/libasr-devel
 
-post-deinstall:
-		@${SETENV} ${SCRIPTS_ENV} ${SH} ${PKGINSTALL} ${PKGNAME} POST-DEINSTALL
+PAM_CONFIGURE_WITH=	auth-pam=smtpd
+TABLE_DB_CONFIGURE_WITH=	table-db
 
-.include <bsd.port.mk>
+CONFIGURE_ARGS+=	--with-libasr=${LOCALBASE} \
+			--with-libevent=${LOCALBASE} \
+			--with-libssl=${OPENSSLBASE} \
+			--sysconfdir=${PREFIX}/etc/mail/
+
+.include <bsd.port.pre.mk>
+
+.if ${OPSYS} == FreeBSD && \
+    ((${OSVERSION} > 1200084 && ${SSL_DEFAULT} == "base") || \
+    (${SSL_DEFAULT} == "openssl111"))
+BROKEN=		Incompatible with Openssl 1.1.x yet
+.endif
+
+post-patch:
+	${REINPLACE_CMD} -e '/chmod 2555/d' ${WRKSRC}/mk/smtpctl/Makefile.in
+	# https://github.com/OpenSMTPD/OpenSMTPD/issues/700
+	${REINPLACE_CMD} -r -e \
+		'/SMTPD_VERSION/s/"[^"]+"$$/"${PORTVERSION}${DISTVERSIONSUFFIX}"/' \
+		${WRKSRC}/smtpd/smtpd.h
+
+post-install-TABLE_DB-on:
+	@${LN} -sf ${PREFIX}/sbin/smtpctl ${STAGEDIR}${PREFIX}/libexec/opensmtpd/makemap
+
+.include <bsd.port.post.mk>

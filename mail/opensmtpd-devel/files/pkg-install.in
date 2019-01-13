@@ -3,14 +3,14 @@
 PKGNAME=$1
 TARGET=$2
 
-if [ "$TARGET" = POST-INSTALL ]; then
+if [ "$TARGET" = POST-INSTALL -a -z "%%MAILERCONF%%" ]; then
 	sed -e '/^[^#]/s/^/### opensmtpd: /g' -i '' /etc/mail/mailer.conf
 	cat >>/etc/mail/mailer.conf <<EOF
 sendmail        %%PREFIX%%/sbin/smtpctl
 send-mail       %%PREFIX%%/sbin/smtpctl
 mailq           %%PREFIX%%/sbin/smtpctl
-makemap         %%PREFIX%%/libexec/opensmtpd/makemap
-newaliases      %%PREFIX%%/libexec/opensmtpd/makemap
+makemap         %%PREFIX%%/sbin/smtpctl
+newaliases      %%PREFIX%%/sbin/smtpctl
 EOF
 fi
 
