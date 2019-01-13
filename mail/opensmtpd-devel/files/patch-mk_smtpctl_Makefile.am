@@ -1,0 +1,12 @@
+See https://github.com/OpenSMTPD/OpenSMTPD/issues/900
+
+--- mk/smtpctl/Makefile.am.orig	2019-01-05 19:41:09 UTC
++++ mk/smtpctl/Makefile.am
+@@ -21,7 +21,6 @@ smtpctl_SOURCES+=	$(smtpd_srcdir)/tree.c
+ smtpctl_SOURCES+=	$(smtpd_srcdir)/dict.c
+ 
+ if HAVE_DB_API
+-smtpctl_SOURCES+=	$(smtpd_srcdir)/config.c
+ smtpctl_SOURCES+=	$(smtpd_srcdir)/parse.y
+ smtpctl_SOURCES+=	$(smtpd_srcdir)/limit.c
+ smtpctl_SOURCES+=	$(smtpd_srcdir)/table.c

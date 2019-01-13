@@ -62,11 +62,11 @@ CONFIGURE_ARGS+=	--with-libasr=${LOCALBASE} \
 
 .include <bsd.port.pre.mk>
 
-.if ${OPSYS} == FreeBSD && \
-    ((${OSVERSION} > 1200084 && ${SSL_DEFAULT} == "base") || \
-    (${SSL_DEFAULT} == "openssl111"))
-BROKEN=		Incompatible with Openssl 1.1.x yet
-.endif
+#.if ${OPSYS} == FreeBSD && \
+#    ((${OSVERSION} > 1200084 && ${SSL_DEFAULT} == "base") || \
+#    (${SSL_DEFAULT} == "openssl111"))
+#BROKEN=		Incompatible with Openssl 1.1.x yet
+#.endif
 
 pre-configure:
 	( cd ${WRKSRC}; ./bootstrap ;)
