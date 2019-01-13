@@ -1,6 +1,10 @@
-@sample etc/mail/smtpd.conf.sample
+@sample etc/mail/smtpd.conf
 libexec/opensmtpd/encrypt
+libexec/opensmtpd/mail.lmtp
 libexec/opensmtpd/mail.local
+libexec/opensmtpd/mail.maildir
+libexec/opensmtpd/mail.mboxfile
+libexec/opensmtpd/mail.mda
 %%TABLE_DB%%libexec/opensmtpd/makemap
 @(,,2555) sbin/smtpctl
 sbin/smtpd

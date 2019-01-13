@@ -2,13 +2,9 @@
 # $FreeBSD: head/mail/opensmtpd-devel/Makefile 488062 2018-12-22 03:44:37Z fluffy $
 
 PORTNAME=	opensmtpd
-PORTVERSION=	201606220754
-DISTVERSIONSUFFIX=	p1
-PORTREVISION=	5
+PORTVERSION=	20190105
 PORTEPOCH=	1
 CATEGORIES=	mail
-MASTER_SITES=	http://www.opensmtpd.org/archives/ \
-		http://distfiles.pirateparty.in/ashish/
 PKGNAMESUFFIX=	-devel
 
 MAINTAINER=	fluffy@FreeBSD.org
@@ -39,6 +35,10 @@ CPE_VENDOR=	openbsd
 USE_RC_SUBR=	smtpd
 SUB_FILES=	pkg-install pkg-deinstall pkg-message
 
+USE_GITHUB=	yes
+GH_PROJECT=	OpenSMTPD
+GH_TAGNAME=	ef2f3682		
+
 CONFLICTS_INSTALL=	postfix-[0-9]* sendmail-[0-9]* opensmtpd-[0-9]*
 
 USERS=		_smtpd _smtpq
@@ -68,12 +68,8 @@ CONFIGURE_ARGS+=	--with-libasr=${LOCALBASE} \
 BROKEN=		Incompatible with Openssl 1.1.x yet
 .endif
 
-post-patch:
-	${REINPLACE_CMD} -e '/chmod 2555/d' ${WRKSRC}/mk/smtpctl/Makefile.in
-	# https://github.com/OpenSMTPD/OpenSMTPD/issues/700
-	${REINPLACE_CMD} -r -e \
-		'/SMTPD_VERSION/s/"[^"]+"$$/"${PORTVERSION}${DISTVERSIONSUFFIX}"/' \
-		${WRKSRC}/smtpd/smtpd.h
+pre-configure:
+	( cd ${WRKSRC}; ./bootstrap ;)
 
 post-install-TABLE_DB-on:
 	@${LN} -sf ${PREFIX}/sbin/smtpctl ${STAGEDIR}${PREFIX}/libexec/opensmtpd/makemap
