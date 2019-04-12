@@ -2,7 +2,7 @@
 # $FreeBSD: head/mail/nextcloud-mail/Makefile 482421 2018-10-19 10:04:59Z brnrd $
 
 PORTNAME=	mail
-PORTVERSION=	0.12.0
+PORTVERSION=	0.13.0
 DISTVERSIONPREFIX=	v
 CATEGORIES=	mail
 MASTER_SITES=	https://github.com/${PKGNAMEPREFIX:S/-//}/${PORTNAME}/releases/download/${DISTVERSIONPREFIX}${PORTVERSION}/

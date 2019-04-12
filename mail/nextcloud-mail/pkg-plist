@@ -244,6 +244,7 @@
 %%WWWDIR%%/lib/Migration/Version0100Date20180825194217.php
 %%WWWDIR%%/lib/Migration/Version0110Date20180825195812.php
 %%WWWDIR%%/lib/Migration/Version0110Date20180825201241.php
+%%WWWDIR%%/lib/Migration/Version0130Date20190408134101.php
 %%WWWDIR%%/lib/Model/ConvertAddresses.php
 %%WWWDIR%%/lib/Model/IMAPMessage.php
 %%WWWDIR%%/lib/Model/IMessage.php
