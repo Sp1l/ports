@@ -2,9 +2,8 @@
 # $FreeBSD: head/mail/opensmtpd-devel/Makefile 507877 2019-08-02 13:30:40Z jbeich $
 
 PORTNAME=	opensmtpd
-PORTVERSION=	201606220754
+PORTVERSION=	6.6.0
 DISTVERSIONSUFFIX=	p1
-PORTREVISION=	6
 PORTEPOCH=	1
 CATEGORIES=	mail
 PKGNAMESUFFIX=	-devel
@@ -14,9 +13,6 @@ COMMENT=	Security- and simplicity-focused SMTP server from OpenBSD
 
 LICENSE=	ISCL
 LICENSE_FILE=	${WRKSRC}/LICENSE
-
-BROKEN_SSL=	openssl111
-BROKEN_SSL_REASON_openssl111=		Incompatible with Openssl 1.1.x yet
 
 LIB_DEPENDS=	libevent.so:devel/libevent
 
@@ -39,7 +35,7 @@ SUB_FILES=	pkg-install pkg-deinstall pkg-message
 
 USE_GITHUB=	yes
 GH_PROJECT=	OpenSMTPD
-GH_TAGNAME=	ef2f3682		
+GH_TAGNAME=	branch-6.6.0p1
 
 CONFLICTS_INSTALL=	postfix-[0-9]* sendmail-[0-9]* opensmtpd-[0-9]*
 
@@ -63,12 +59,6 @@ CONFIGURE_ARGS+=	--with-libasr=${LOCALBASE} \
 			--sysconfdir=${PREFIX}/etc/mail/
 
 .include <bsd.port.pre.mk>
-
-#.if ${OPSYS} == FreeBSD && \
-#    ((${OSVERSION} > 1200084 && ${SSL_DEFAULT} == "base") || \
-#    (${SSL_DEFAULT} == "openssl111"))
-#BROKEN=		Incompatible with Openssl 1.1.x yet
-#.endif
 
 pre-configure:
 	( cd ${WRKSRC}; ./bootstrap ;)
