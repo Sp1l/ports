@@ -1,8 +1,10 @@
 # Created by: Ashish SHUKLA <ashish@FreeBSD.org>
-# $FreeBSD: head/mail/opensmtpd-devel/Makefile 488062 2018-12-22 03:44:37Z fluffy $
+# $FreeBSD: head/mail/opensmtpd-devel/Makefile 507877 2019-08-02 13:30:40Z jbeich $
 
 PORTNAME=	opensmtpd
-PORTVERSION=	20190105
+PORTVERSION=	201606220754
+DISTVERSIONSUFFIX=	p1
+PORTREVISION=	6
 PORTEPOCH=	1
 CATEGORIES=	mail
 PKGNAMESUFFIX=	-devel
