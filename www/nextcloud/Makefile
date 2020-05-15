@@ -1,7 +1,8 @@
-# $FreeBSD: head/www/nextcloud/Makefile 498510 2019-04-09 19:08:09Z brnrd $
+# $FreeBSD: head/www/nextcloud/Makefile 534898 2020-05-11 09:36:57Z brnrd $
 
 PORTNAME=	nextcloud
-DISTVERSION=	16.0.0RC1
+DISTVERSION=	18.0.4
+PORTREVISION=	1
 CATEGORIES=	www
 MASTER_SITES=	https://download.nextcloud.com/server/prereleases/
 PKGNAMESUFFIX=	${PHP_PKGNAMESUFFIX}
@@ -14,7 +15,7 @@ LICENSE=	AGPLv3
 USES=		cpe gettext-runtime php:flavors,web tar:bzip2
 USE_PHP=	bz2 ctype curl dom fileinfo filter gd hash iconv json \
 		mbstring pdo posix session simplexml xml xmlreader xmlwriter \
-		xsl wddx zip zlib
+		xsl zip zlib
 
 NEXTCLOUD_USERNAME?=	${WWWOWN}
 NEXTCLOUD_GROUPNAME?=	${WWWGRP}
