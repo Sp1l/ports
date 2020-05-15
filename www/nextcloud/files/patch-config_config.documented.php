@@ -3,12 +3,12 @@
 @@ -818,6 +818,11 @@ $CONFIG = array(
  		'url' => '/apps',
  		'writable' => true,
- 	),
-+	array(
+ 	],
++	[
 +		'path'=> '/var/www/nextcloud/apps-pkg',
 +		'url' => '/apps-pkg',
 +		'writable' => false,
-+	),
- ),
++	],
+ ],
  
  /**
