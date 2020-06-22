@@ -1,0 +1,17 @@
+[
+{ type: install
+  message: <<EOM
+MariaDB respects hier(7) and doesn't check /etc and /etc/mysql for
+my.cnf. Please move existing my.cnf files from those paths to
+%%ETCDIR%%. Sample configuration files are provided in
+%%ETCDIR%% and %%ETCDIR%%/conf.d/.
+EOM
+}
+{ type: upgrade
+  message: <<EOM
+Remember to run mariadb-upgrade (with the optional --datadir=<dbdir> flag)
+the first time you start the MySQL server after an upgrade from an
+earlier version.
+EOM
+}
+
