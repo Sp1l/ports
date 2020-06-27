@@ -6,6 +6,8 @@ bin/aria_read_log
 %%INNOBASE%%bin/innochecksum
 %%INNOBASE%%bin/mariabackup
 bin/mariadb-backup
+@comment bin/mariadb-config
+@comment bin/mariadb-conv
 bin/mariadb-dumpslow
 bin/mariadb-embedded
 bin/mariadb-fix-extensions
@@ -17,9 +19,9 @@ bin/mariadb-upgrade
 bin/mariadbd-multi
 bin/mariadbd-safe
 bin/mariadbd-safe-helper
-bin/mariadb-waitpid
+@comment bin/mariadb-waitpid
 %%INNOBASE%%bin/mbstream
-bin/my_print_defaults
+@comment bin/my_print_defaults
 bin/myisam_ftdump
 bin/myisamchk
 bin/myisamlog
@@ -46,14 +48,17 @@ bin/resolve_stack_dump
 bin/resolveip
 %%ROCKSDB%%bin/sst_dump
 @comment bin/test-connect-t
-%%TOKUDB%%bin/tokuft_logprint
-%%TOKUDB%%bin/tokuftdump
 %%WSREP%%bin/wsrep_sst_common
 %%WSREP%%bin/wsrep_sst_mariabackup
 %%WSREP%%bin/wsrep_sst_mysqldump
 %%WSREP%%bin/wsrep_sst_rsync
 %%WSREP%%bin/wsrep_sst_rsync_wan
+@comment %%ETCDIR%%/my.cnf
+@comment %%ETCDIR%%/conf.d/client.cnf
+%%ETCDIR%%/conf.d/enable_encryption.preset
+@comment %%ETCDIR%%/conf.d/mysql-clients.cnf
 @sample %%ETCDIR%%/conf.d/server.cnf.sample
+%%SPIDER%%@sample %%ETCDIR%%/conf.d/spider.cnf.sample 
 %%WSREP%%%%ETCDIR%%/conf.d/wsrep.cnf.sample
 @sample %%ETCDIR%%/user_map.conf.sample
 @comment data/test/db.opt
@@ -94,16 +99,23 @@ include/mysql/server/mysql/plugin.h
 include/mysql/server/mysql/plugin_audit.h
 include/mysql/server/mysql/plugin_auth.h
 include/mysql/server/mysql/plugin_auth_common.h
+include/mysql/server/mysql/plugin_data_type.h
 include/mysql/server/mysql/plugin_encryption.h
 include/mysql/server/mysql/plugin_ftparser.h
+include/mysql/server/mysql/plugin_function.h
 include/mysql/server/mysql/plugin_password_validation.h
 include/mysql/server/mysql/psi/mysql_file.h
 include/mysql/server/mysql/psi/mysql_idle.h
+include/mysql/server/mysql/psi/mysql_mdl.h
+include/mysql/server/mysql/psi/mysql_memory.h
+include/mysql/server/mysql/psi/mysql_ps.h
 include/mysql/server/mysql/psi/mysql_socket.h
+include/mysql/server/mysql/psi/mysql_sp.h
 include/mysql/server/mysql/psi/mysql_stage.h
 include/mysql/server/mysql/psi/mysql_statement.h
 include/mysql/server/mysql/psi/mysql_table.h
 include/mysql/server/mysql/psi/mysql_thread.h
+include/mysql/server/mysql/psi/mysql_transaction.h
 include/mysql/server/mysql/psi/psi.h
 include/mysql/server/mysql/psi/psi_abi_v0.h
 include/mysql/server/mysql/psi/psi_abi_v1.h
@@ -127,6 +139,7 @@ include/mysql/server/mysql/service_sha2.h
 include/mysql/server/mysql/service_thd_alloc.h
 include/mysql/server/mysql/service_thd_autoinc.h
 include/mysql/server/mysql/service_thd_error_context.h
+include/mysql/server/mysql/service_thd_mdl.h
 include/mysql/server/mysql/service_thd_rnd.h
 include/mysql/server/mysql/service_thd_specifics.h
 include/mysql/server/mysql/service_thd_timezone.h
@@ -153,6 +166,7 @@ lib/mysql/libmariadbd.so
 lib/mysql/libmariadbd.so.19
 lib/mysql/libmysqld.a
 lib/mysql/libmysqld.so
+@comment lib/mysql/libmysqlservices.a
 lib/mysql/plugin/adt_null.so
 lib/mysql/plugin/auth_0x0100.so
 lib/mysql/plugin/auth_ed25519.so
@@ -160,9 +174,10 @@ lib/mysql/plugin/auth_ed25519.so
 lib/mysql/plugin/auth_pam.so
 lib/mysql/plugin/auth_pam_tool_dir/auth_pam_tool
 lib/mysql/plugin/auth_pam_v1.so
-lib/mysql/plugin/caching_sha2_password.so
+@comment lib/mysql/plugin/caching_sha2_password.so
 lib/mysql/plugin/debug_key_management.so
 lib/mysql/plugin/file_key_management.so
+lib/mysql/plugin/func_test.so
 lib/mysql/plugin/ha_archive.so
 lib/mysql/plugin/ha_blackhole.so
 lib/mysql/plugin/ha_connect.so
@@ -173,12 +188,11 @@ lib/mysql/plugin/ha_federatedx.so
 %%ROCKSDB%%lib/mysql/plugin/ha_rocksdb.so
 %%SPHINX%%lib/mysql/plugin/ha_sphinx.so
 %%SPIDER%%lib/mysql/plugin/ha_spider.so
-%%TOKUDB%%lib/mysql/plugin/ha_tokudb.so
+lib/mysql/pam_user_map.so
 lib/mysql/plugin/ha_test_sql_discovery.so
 lib/mysql/plugin/handlersocket.so
 lib/mysql/plugin/locales.so
 lib/mysql/plugin/metadata_lock_info.so
-lib/mysql/plugin/pam_user_map.so
 lib/mysql/plugin/qa_auth_client.so
 lib/mysql/plugin/qa_auth_interface.so
 lib/mysql/plugin/qa_auth_server.so
@@ -188,9 +202,11 @@ lib/mysql/plugin/server_audit.so
 lib/mysql/plugin/simple_password_check.so
 lib/mysql/plugin/sql_errlog.so
 lib/mysql/plugin/test_versioning.so
+lib/mysql/plugin/type_test.so
 %%WSREP%%lib/mysql/plugin/wsrep_info.so
 libexec/mariadbd
 libexec/mysqld
+@comment libexec/rcmysql
 man/man1/aria_chk.1.gz
 man/man1/aria_dump_log.1.gz
 man/man1/aria_ftdump.1.gz
@@ -201,6 +217,8 @@ man/man1/galera_recovery.1.gz
 man/man1/innochecksum.1.gz
 man/man1/mariabackup.1.gz
 man/man1/mariadb-backup.1.gz
+@comment man/man1/mariadb-conv.1.gz
+@comment man/man1/mariadb_config.1.gz
 man/man1/mariadb-dumpslow.1.gz
 man/man1/mariadb-embedded.1.gz
 man/man1/mariadb-fix-extensions.1.gz
@@ -219,6 +237,7 @@ man/man1/myisam_ftdump.1.gz
 man/man1/myisamchk.1.gz
 man/man1/myisamlog.1.gz
 man/man1/myisampack.1.gz
+%%ROCKSDB%%man/man1/myrocks_hotbackup.1.gz
 man/man1/mysql.server.1.gz
 man/man1/mysql_fix_extensions.1.gz
 %%ROCKSDB%%man/man1/mysql_ldb.1.gz
@@ -230,11 +249,10 @@ man/man1/mysqld_multi.1.gz
 man/man1/mysqld_safe.1.gz
 man/man1/mysqld_safe_helper.1.gz
 man/man1/mysqldumpslow.1.gz
+@comment man/man1/mytop.1.gz
 man/man1/perror.1.gz
 man/man1/resolve_stack_dump.1.gz
 man/man1/resolveip.1.gz
-%%TOKUDB%%man/man1/tokuft_logprint.1.gz
-%%TOKUDB%%man/man1/tokuftdump.1.gz
 %%WSREP%%man/man1/wsrep_sst_common.1.gz
 %%WSREP%%man/man1/wsrep_sst_mariabackup.1.gz
 %%WSREP%%man/man1/wsrep_sst_mysqldump.1.gz
@@ -242,6 +260,7 @@ man/man1/resolveip.1.gz
 %%WSREP%%man/man1/wsrep_sst_rsync_wan.1.gz
 man/man8/mariadbd.8.gz
 man/man8/mysqld.8.gz
+@comment share/aclocal/mysql.m4
 %%DATADIR%%/binary-configure
 %%DATADIR%%/charsets/Index.xml
 %%DATADIR%%/charsets/README
@@ -281,7 +300,6 @@ man/man8/mysqld.8.gz
 %%DATADIR%%/greek/errmsg.sys
 %%DATADIR%%/hindi/errmsg.sys
 %%DATADIR%%/hungarian/errmsg.sys
-%%SPIDER%%%%DATADIR%%/install_spider.sql
 %%DATADIR%%/italian/errmsg.sys
 %%DATADIR%%/japanese/errmsg.sys
 %%DATADIR%%/korean/errmsg.sys
@@ -313,8 +331,11 @@ man/man8/mysqld.8.gz
 %%DATADIR%%/ukrainian/errmsg.sys
 %%WSREP%%%%DATADIR%%/wsrep_notify
 @comment %%DOCSDIR%%/COPYING
-%%DOCSDIR%%/INSTALL-BINARY
-%%WSREP%%%%DOCSDIR%%/README-wsrep
+%%PORTDOCS%%%%DOCSDIR%%/CREDITS
+%%PORTDOCS%%%%DOCSDIR%%/EXCEPTIONS-CLIENT
+%%PORTDOCS%%%%DOCSDIR%%/INSTALL-BINARY
+%%PORTDOCS%%%%DOCSDIR%%/README.md
+%%PORTDOCS%%%%WSREP%%%%DOCSDIR%%/README-wsrep
 @comment %%DOCSDIR%%/THIRDPARTY
 @comment share/groonga-normalizer-mysql/lgpl-2.0.txt
 @comment share/groonga/COPYING
@@ -440,4 +461,4 @@ man/man1/mariadb-waitpid.1.gz
 @comment man/man1/mysqltest_embedded.1.gz
 @comment man/man1/replace.1.gz
 @comment share/pkgconfig/mariadb.pc
-
+@dir(%%MARIADB_USER%%,%%MARIADB_GROUP%%,) %%MARIADB_LOGDIR%%

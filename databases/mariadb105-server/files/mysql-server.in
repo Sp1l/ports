@@ -19,7 +19,7 @@
 # mysql_(instance_)?pidfile (str): Custum PID file path and name.
 #			Default to "${mysql_dbdir}/${hostname}.pid".
 # mysql_(instance_)?user (str): User to run mysqld as
-#			Default to "mysql" created by the port
+#			Default to "%%MARIADB_USER%%" created by the port
 # mysql_(instance_)?optfile (str): Server-specific option file.
 #			Default to "${mysql_dbdir}/my.cnf".
 # mysql_instances (str): Set to "" by default. 
@@ -34,10 +34,10 @@ load_rc_config $name
 
 : ${mysql_enable="NO"}
 %%LEGACY_LIMITS%%: ${mysql_limits="NO"}
-: ${mysql_user="mysql"}
+: ${mysql_user="%%MARIADB_USER"}
 %%LEGACY_LIMITS%%mysql_limits_args="-e -U ${mysql_user}"
 : ${mysql_dbdir="/var/db/mysql"}
-: ${mysql_optfile="${mysql_dbdir}/my.cnf"}
+: ${mysql_optfile="%%ETCDIR%%/my.cnf"}
 
 command="/usr/sbin/daemon"
 procname="%%PREFIX%%/libexec/mysqld"
@@ -92,7 +92,7 @@ else
 		done
 		exit 0
 	else
-		mysql_pidfile=${mysql_pidfile:-"${mysql_dbdir}/`/bin/hostname`.pid"}
+		mysql_pidfile=${mysql_pidfile:-"/var/run/mysqld.pid"}
 	fi
 fi
 
@@ -110,9 +110,9 @@ mysql_create_auth_tables()
 mysql_prestart()
 {
 	local dir
-	for dir in /etc /etc/mysql; do
+	for dir in /etc /usr/local/etc /etc/mysql /var/db/mysql; do
 		if [ -f "${dir}/my.cnf" ]; then
-			echo "Please move existing my.cnf file from ${dir} to %%PREFIX%%${dir}"
+			echo "Please merge existing ${dir}/my.cnf file with %%ETCDIR%%/conf.d/server.cnf"
 			return 1
 		fi
 	done

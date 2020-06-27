@@ -2,7 +2,7 @@
 # $FreeBSD: head/databases/mariadb104-server/Makefile 536602 2020-05-26 09:58:39Z brnrd $
 
 PORTNAME?=	mariadb
-PORTVERSION=	10.5.3
+PORTVERSION=	10.5.4
 PORTREVISION?=	0
 CATEGORIES=	databases
 MASTER_SITES=	http://mirrors.supportex.net/${SITESDIR}/ \
@@ -24,12 +24,18 @@ LICENSE_NAME_PerconaFT=	PerconaFT patents license
 LICENSE_FILE_PerconaFT=	${WRKSRC}/storage/tokudb/PerconaFT/PATENTS
 LICENSE_PERMS_PerconaFT=	dist-mirror dist-sell pkg-mirror pkg-sell auto-accept
 
-USES=		bison:build cmake:insource,noninja compiler:c++11-lib cpe iconv:translit libedit ncurses shebangfix ssl
+BROKEN_i386=	compile error: undeclared identifier 'my_atomic_add32'
+
+LIB_DEPENDS+=	libpcre2-8.so:devel/pcre2
+
+# Ugly workaround for MariaDB/CMake library detection
+CFLAGS+=	-L/usr/local/lib 
+
+USES=		bison:build cmake:insource compiler:c++11-lib cpe iconv:translit libedit ncurses shebangfix ssl
 
 SUB_FILES=	pkg-message
 PKGMESSAGE=	${WRKDIR}/pkg-message
 
-SLAVEDIRS=	databases/mariadb102-client
 USE_LDCONFIG=	${PREFIX}/lib/mysql
 SHEBANG_FILES=	scripts/*.sh
 SITESDIR=	mariadb/mariadb-${PORTVERSION}/source
@@ -46,10 +52,11 @@ OPTIONS_GROUP=		COMPRESSION ENGINES GROONGA
 OPTIONS_DEFINE=		CONNECT_EXTRA DOCS
 OPTIONS_DEFINE_amd64=	WSREP
 OPTIONS_GROUP_COMPRESSION=	LZ4 LZO SNAPPY ZSTD
-OPTIONS_GROUP_ENGINES=	INNOBASE MROONGA OQGRAPH ROCKSDB SPHINX SPIDER TOKUDB
+OPTIONS_GROUP_ENGINES=	COLUMNSTORE INNOBASE MROONGA OQGRAPH ROCKSDB S3 SPHINX SPIDER
 OPTIONS_GROUP_GROONGA=	ZMQ MSGPACK
-OPTIONS_EXCLUDE_i386=	ROCKSDB TOKUDB
+OPTIONS_EXCLUDE_i386=	ROCKSDB
 
+COLUMNSTORE_DESC=	Columnar storage egine (BETA)
 CONNECT_EXTRA_DESC=	Enable ODBC and XML in CONNECT engine
 COMPRESSION_DESC=	Optional page compression
 ENGINES_DESC=	Optional MariaDB storage engines
@@ -58,31 +65,32 @@ INNOBASE_DESC=	InnoDB default engine
 MROONGA_DESC=	Mroonga Full Text Search engine
 MSGPACK_DESC=	MsgPack support
 OQGRAPH_DESC=	Open Query Graph Computation engine
-ROCKSDB_DESC=	RocksDB LSM engine (Alpha)
+ROCKSDB_DESC=	RocksDB LSM engine
+S3_DESC=	S3 storage engine (Alpha)
 SPHINX_DESC=	SphinxSE engine
 SPIDER_DESC=	Partitioning and XA-transactions engine
-TOKUDB_DESC=	Fractal tree index tree data structure engine
 WSREP_DESC=	Build wsrep clustering
 ZMQ_DESC=	ZeroMQ support
 ZSTD_DESC+=	Zstandard compression support (RocksDB only)
 .endif
 
-CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
+CMAKE_ARGS+=	-DCMAKE_PREFIX_PATH=${PREFIX} \
+		-DINSTALL_DOCDIR="share/doc/mysql" \
 		-DINSTALL_DOCREADMEDIR="share/doc/mysql" \
-		-DINSTALL_INCLUDEDIR="include/mysql" \
 		-DINSTALL_INFODIR="info" \
 		-DINSTALL_LIBDIR="lib/mysql" \
-		-DINSTALL_MANDIR="man" \
 		-DINSTALL_MYSQLDATADIR="/var/db/mysql" \
 		-DINSTALL_MYSQLSHAREDIR="share/mysql" \
 		-DINSTALL_MYSQLTESTDIR= \
 		-DINSTALL_PLUGINDIR="lib/mysql/plugin" \
 		-DINSTALL_SBINDIR="libexec" \
 		-DINSTALL_SCRIPTDIR="bin" \
-		-DINSTALL_SHAREDIR="share" \
 		-DINSTALL_SQLBENCHDIR= \
 		-DINSTALL_SUPPORTFILESDIR="share/mysql" \
-		-DDEFAULT_SYSCONFDIR="${PREFIX}/etc" \
+		-DINSTALL_SYSCONFDIR="${ETCDIR}" \
+		-DINSTALL_SYSCONF2DIR="${ETCDIR}/conf.d" \
+		-DINSTALL_UNIX_ADDRDIR="/var/run/mysql" \
+		-DWITH_PCRE=system \
 		-DWITH_SSL="${OPENSSLBASE}" \
 		-DCURSES_CURSES_LIBRARY="/usr/lib/libcurses.so" \
 		-DCURSES_FORM_LIBRARY="/usr/lib/libform.so" \
@@ -90,18 +98,21 @@ CMAKE_ARGS+=	-DINSTALL_DOCDIR="share/doc/mysql" \
 		-DKRB5_CONFIG="${KRB5CONFIG}" \
 		-DCURSES_NCURSES_LIBRARY="${NCURSESLIB}/libncurses.so" \
 		-DCOMPILATION_COMMENT="FreeBSD Ports" \
-		-DCMAKE_PREFIX_PATH=${PREFIX} \
 		-DPLUGIN_AUTH_TEST_PLUGIN=NO
 CMAKE_OFF+=	CONC_WITH_UNIT_TESTS CONNECT_WITH_MONGO WITH_UNIT_TESTS
 CMAKE_ON+=	WITH_LIBWRAP WITHOUT_DOCS
-DISABLED_PLUGINS+=	DAEMON_EXAMPLE DIALOG_EXAMPLES EXAMPLE \
-		EXAMPLE_KEY_MANAGEMENT FTEXAMPLE
+DISABLED_PLUGINS+=	AUTH_TEST_PLUGIN DAEMON_EXAMPLE DIALOG_EXAMPLES \
+		EXAMPLE EXAMPLE_KEY_MANAGEMENT FTEXAMPLE TOKUDB
 
 DATADIR=	${PREFIX}/share/mysql
 ETCDIR=		${PREFIX}/etc/mysql
 
-CONFLICTS_INSTALL=	mariadb5*-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
-			mariadb10[0-24-9]-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
+MARIADB_RUNDIR?=	/var/run/mysql
+MARIADB_lOGDIR?=	/var/log/mysql
+MARIADB_USER?=		mysql
+MARIADB_GROUP?=		mysql
+
+CONFLICTS_INSTALL=	mariadb10[0-35-9]-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
 			mysql[0-9]*-${PKGNAMESUFFIX:C/^[0-9]*-//}-* \
 			mysqlwsrep* \
 			percona[0-9]*-${PKGNAMESUFFIX:C/^[0-9]*-//}-*
@@ -120,15 +131,20 @@ CMAKE_OFF+=	WITH_WSREP
 USES+=		readline
 USE_LDCONFIG=	${PREFIX}/lib/mysql
 SUB_FILES+=	my.cnf.sample client.cnf.sample
+
+MARIADB_USER=	mysql
+MARIADB_GROUP=	mysql
+
+PLIST_SUB+=	MYSQL_USER="${MYSQL_USER}"
+PLIST_SUB+=	MYSQL_GROUP="${MYSQL_GROUP}"
+
 .else # ! ${PKGNAMESUFFIX:M*-client}
 # MySQL-Server part
 USES+=		mysql:105m
+
 USE_LDCONFIG+=	${PREFIX}/lib/mysql/plugin
 USE_RC_SUBR=	mysql-server
-USERS=		mysql
-GROUPS=		mysql
-PLIST_SUB+=	USERS="${USERS}"
-PLIST_SUB+=	GROUPS="${GROUPS}"
+
 CMAKE_ON+=	CMAKE_SKIP_BUILD_RPATH WITH_EMBEDDED_SERVER
 CMAKE_OFF+=	WITH_CLIENT
 SUB_FILES+=	server.cnf.sample
@@ -138,7 +154,6 @@ ${ENGINE}_CMAKE_OFF=	-DPLUGIN_${ENGINE}=NO
 ${ENGINE}_CMAKE_ON=	-DPLUGIN_${ENGINE}=DYNAMIC
 .endfor
 INNOBASE_VARS_OFF=	disabled_plugins+=INNOBASE
-
 CONNECT_EXTRA_LIB_DEPENDS=	libodbc.so:databases/unixODBC
 CONNECT_EXTRA_USE=		gnome=libxml2
 CONNECT_EXTRA_USES=		gnome
@@ -159,9 +174,6 @@ ROCKSDB_CMAKE_ON=	-DPYTHON_SHEBANG=${PYTHON_CMD}
 SNAPPY_CMAKE_ON=	-DWITH_INNODB_SNAPPY=ON  -DWITH_ROCKSDB_snappy=ON
 SNAPPY_CMAKE_OFF=	-DWITH_INNODB_SNAPPY=OFF -DWITH_ROCKSDB_snappy=OFF
 SNAPPY_LIB_DEPENDS=	libsnappy.so:archivers/snappy
-TOKUDB_IMPLIES=		SNAPPY
-TOKUDB_PORTDOCS=	README.md
-TOKUDB_VARS=		LICENSE+=PerconaFT LICENSE_COMB=multi
 WSREP_CMAKE_BOOL=	WITH_WSREP
 WSREP_LIB_DEPENDS=	libgalera.so:databases/galera26
 WSREP_RUN_DEPENDS=	bash:shells/bash \
@@ -173,11 +185,13 @@ ZSTD_CMAKE_ON=		-DWITH_ROCKSDB_zstd=ON
 ZSTD_CMAKE_OFF=		-DWITH_ROCKSDB_zstd=OFF
 ZSTD_LIB_DEPENDS=	libzstd.so:archivers/zstd
 
-.include <bsd.port.options.mk>
-
 .for PLUGIN in ${DISABLED_PLUGINS}
 CMAKE_ARGS+=		-DPLUGIN_${PLUGIN}=NO
 .endfor
+
+.endif # ${PKGNAMESUFFIX:M*-client}
+
+.include <bsd.port.options.mk>
 
 .if ${OPSYS} == FreeBSD && ${OSVERSION} >= 1200057
 SUB_LIST+=	LEGACY_LIMITS="@comment " MODERN_LIMITS=""
@@ -185,10 +199,8 @@ SUB_LIST+=	LEGACY_LIMITS="@comment " MODERN_LIMITS=""
 SUB_LIST+=	LEGACY_LIMITS="" MODERN_LIMITS="@comment "
 .endif
 
-.endif # ${PKGNAMESUFFIX:M*-client}
-
-.if defined(WITH_OPENSSL_PORT)
-GSSAPI_BASE_IGNORE=	BASE_GSSAPI is not compatible with OpenSSL from ports. Use other GSSAPI options or OpenSSL from base system
+.if ${SSL_DEFAULT} != base && ${PORT_OPTIONS:MGSSAPI_BASE}
+GSSAPI_BASE_IGNORE=	GSSAPI_BASE is not compatible with OpenSSL from ports. Use other GSSAPI options or OpenSSL from base system
 .endif
 
 .include <bsd.port.pre.mk>
@@ -197,21 +209,14 @@ GSSAPI_BASE_IGNORE=	BASE_GSSAPI is not compatible with OpenSSL from ports. Use o
 PLIST_SUB+=	WSREP="@comment "
 .endif
 
-.if ${OPSYS} == DragonFly
-CMAKE_OFF+=	WITH_TOKUDB
-.endif
-
 post-patch:
-	${REINPLACE_CMD} 's|%%LOCALBASE%%|${LOCALBASE}|g' \
-		${WRKSRC}/storage/tokudb/PerconaFT/cmake_modules/TokuThirdParty.cmake
-	${REINPLACE_CMD} 's|%%PREFIX%%|${PREFIX}|' ${WRKSRC}/mysys/my_default.c
 	${MV} ${WRKSRC}/storage/mroonga/version ${WRKSRC}/storage/mroonga/version_txt
 .if ${OPSYS} == DragonFly
 	${CP} ${WRKSRC}/cmake/os/FreeBSD.cmake \
 		${WRKSRC}/cmake/os/DragonFly.cmake
 .endif
 
-post-configure-no-more:
+post-configure:
 	${REINPLACE_CMD} -Ee 's|(#define INCLUDE.*)"$$|\1 -I${PREFIX}/include"|' \
 		-e 's|(#define LIBS .*)"$$|\1 -L${PREFIX}/lib"|' \
 		${WRKSRC}/libmariadb/mariadb_config/mariadb_config.c
@@ -224,11 +229,13 @@ post-install:
 	${INSTALL_DATA} ${WRKDIR}/my.cnf.sample ${STAGEDIR}${ETCDIR}/my.cnf.sample
 	${INSTALL_DATA} ${WRKDIR}/client.cnf.sample \
 		${STAGEDIR}${ETCDIR}/conf.d/client.cnf.sample
-	${RM} -r ${STAGEDIR}${DATADIR}
-	${RM} -r ${STAGEDIR}${PREFIX}/include/mysql/server
 	${MV} ${STAGEDIR}${PREFIX}/lib/mysql/pkgconfig/mariadb.pc \
 		${STAGEDIR}${PREFIX}/libdata/pkgconfig/mariadb.pc
-	${RMDIR} ${STAGEDIR}${PREFIX}/lib/mysql/pkgconfig
+	${RM} -r ${STAGEDIR}${DATADIR} \
+		${STAGEDIR}${PREFIX}/include/mysql/server \
+		${STAGEDIR}${ETCDIR}/init.d \
+		${STAGEDIR}${PREFIX}/lib/mysql/pkgconfig
+	${MKDIR} ${STAGEDIR}${MARIADB_RUNDIR}
 
 post-install-GSSAPI_NONE-off:
 	${STRIP_CMD} ${STAGEDIR}${PREFIX}/lib/mysql/plugin/auth_gssapi_client.so
@@ -237,16 +244,26 @@ post-install-GSSAPI_NONE-off:
 post-install:
 	${INSTALL_DATA} ${WRKDIR}/server.cnf.sample \
 		${STAGEDIR}${ETCDIR}/conf.d/server.cnf.sample
-	${RM} -r ${STAGEDIR}${PREFIX}/share/mysql/policy
-	${RM} -r ${STAGEDIR}${PREFIX}/include/mysql/server/private
-	${RM} -r ${STAGEDIR}${PREFIX}/lib/mysql/pkgconfig
-	${MV} ${STAGEDIR}${PREFIX}/etc/mysql/user_map.conf \
+	${MV} ${STAGEDIR}${PREFIX}/share/user_map.conf \
 		${STAGEDIR}${PREFIX}/etc/mysql/user_map.conf.sample
-	${MKDIR} ${STAGEDIR}/var/run/mysql
+	${MV} ${STAGEDIR}${PREFIX}/share/pam_user_map.so \
+		${STAGEDIR}${PREFIX}/lib/mysql/
+	${RM} -r ${STAGEDIR}${PREFIX}/share/mysql/policy \
+		${STAGEDIR}${PREFIX}/include/mysql/server/private \
+		${STAGEDIR}${PREFIX}/lib/mysql/pkgconfig \
+		${STAGEDIR}/suite \
+		${STAGEDIR}${ETCDIR}/init.d \
+		${STAGEDIR}${ETCDIR}/logrotate.d
+	${MKDIR} ${STAGEDIR}${MARIADB_LOGDIR}
 
 post-install-WSREP-on:
 	${MV} ${STAGEDIR}${DATADIR}/wsrep.cnf \
 		${STAGEDIR}${ETCDIR}/conf.d/wsrep.cnf.sample
+
+post-install-SPIDER-on:
+	${MV} ${STAGEDIR}${ETCDIR}/conf.d/spider.cnf \
+		${STAGEDIR}${ETCDIR}/conf.d/spider.cnf.sample
+	
 .endif # ${PKGNAMESUFFIX:M*-client}
 
 .include <bsd.port.post.mk>

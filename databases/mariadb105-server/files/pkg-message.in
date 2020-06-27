@@ -1,10 +1,24 @@
 [
 { type: install
   message: <<EOM
-MariaDB respects hier(7) and doesn't check /etc and /etc/mysql for
-my.cnf. Please move existing my.cnf files from those paths to
-%%ETCDIR%%. Sample configuration files are provided in
-%%ETCDIR%% and %%ETCDIR%%/conf.d/.
+MariaDB respects hier(7) and doesn't check /etc, /etc/mysql and
+/var/db/mysql for my.cnf. Please merge existing my.cnf files from those
+paths with %%ETCDIR%%/conf.d/. Sample configuration files are provided in
+%%ETCDIR%% and %%ETCDIR%%/conf.d.
+Multi-instance configurations retain the old behavior.
+
+Files/paths:
+   %%ETCDIR%%/my.cnf - Configuration for all utilities, includes conf.d/*.cnf
+   %%ETCDIR%%/conf.d/client.cnf - Configuration for client utilities
+   %%ETCDIR%%/conf.d/server.cnf - Configuration for server
+   %%ETCDIR%%/conf.d/wsrep.cnf  - Configuration for wsrep clustering
+   %%MARIADB_RUNDIR%%/mysql.sock - mysqld listening socket
+   %%MARIADB_LOGDIR%% - mysqld logfiles
+   /var/run/mysqld.pid - mysqld PID file
+
+This port does NOT include the mytop perl script, this is included in
+the MariaDB tarball but the most recent version can be found in the
+databases/mytop port
 EOM
 }
 { type: upgrade
