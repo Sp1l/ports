@@ -1,9 +1,0 @@
-man/man5/bitlbee.conf.5.gz
-man/man8/bitlbee.8.gz
-sbin/bitlbee
-%%SKYPE%%bin/skyped
-%%SKYPE%%lib/bitlbee/skype.so
-%%SKYPE%%etc/skyped/skyped.conf
-%%SKYPE%%etc/skyped/skyped.cnf
-%%DATADIR%%/help.txt
-@dir etc/bitlbee

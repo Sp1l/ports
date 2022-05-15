@@ -1,9 +1,0 @@
-Kopano is a thoroughly modern communication stack.
-
-It's fully MAPI based server (Core) provides access to email, contacts, 
-calendaring through a web interface (WebApp), on the desktop (DeskApp) and 
-can be used with mobile devices. Integration with online meetings tools 
-based on WebRTC (Web Meetings) and integration with file storage services 
-(Files) provide a complete set of tools to work together. These tools: 
-Core, WebApp, DeskApp, Web Meetings and Files are all open source, licensed 
-under the AGPLv3 license.

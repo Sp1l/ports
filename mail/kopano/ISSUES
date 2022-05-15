@@ -1,6 +1,0 @@
-cURL detection only scans /usr/lib
-No --with-openssl= knob for configure
-
-Linuxisms
-bits/types.h (sys/types.h)
-byteswap.h (glibc?)
