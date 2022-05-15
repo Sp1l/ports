@@ -3,6 +3,8 @@ ports
 
 FreeBSD ports
 
+Check this out in your poudriere and set that directory as an overlay (`-O`)
+
 LibreSSL fixes for FreeBSD ports usually committed as PR and upstream where possible
 * lang/python: all versions in ports. These patches will appear in the coming fix versions of upstream
 * www/apache24
